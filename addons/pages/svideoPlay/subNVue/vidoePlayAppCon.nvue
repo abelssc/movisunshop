@@ -1,0 +1,1942 @@
+<template>
+	<view>
+		<view class="wrap" @tap.stop="subforbidden">
+			<view class="live_header">
+				<image mode="scaleToFill" @tap.stop="goBack" class='live_header_go_back' :src="img_url+'white_arrow_l.png'" />
+				<view class="live_header_avator" :data-authorId="videoDetail.author_id" @tap.stop="goLiveUserCenter(videoDetail.author_id)">
+					<image mode="aspectFill" class="live_header_avator_img" :src="videoDetail.member_avatar"/>
+				</view>
+				<view class="live_header_mem_info" :data-authorId="videoDetail.author_id" @tap.stop="goLiveUserCenter(videoDetail.author_id)">
+					<text class="live_header_mem_info_name">{{videoDetail.member_nickname}}</text>
+					<view class="live_header_mem_info_stat_num">
+						<text class="live_header_mem_info_stat_num_click_num" style="margin-right: 20rpx">{{videoDetail.fans_num}}{{$L('粉丝')}}</text>
+					</view>
+				</view>
+				<view v-if="videoDetail.is_own == 0" class="live_header_live_fllow" @tap="collect" :style="'backgroundColor:' + (videoDetail.is_follow == 1?'#999':'#fc1c1c')">
+					<image class="live_header_live_fllow_image" v-if="videoDetail.is_follow == 0" :src="img_url+'live/fav_a.png'"></image>
+					<text class="live_header_live_fllow_text">{{videoDetail.is_follow == 0?$L('关注'):$L('已关注')}}</text>
+				</view>
+			</view>
+
+			<view class="right_control">
+				<image class="right_control_image" :src="img_url+(videoDetail.is_like == 1 ?'svideo/dianzan_complete.png':'svideo/dianzan.png')" @tap="like"></image>
+				<text class="right_control_text">{{videoDetail.like_num}}</text>
+				<image class="right_control_image" :src="img_url+'svideo/play_comment.png'" @tap="openCommnet"></image>
+				<text class="right_control_text">{{(videoDetail.comment_num && videoDetail.comment_num > 0) ? videoDetail.comment_num : $L('评论')}}</text>
+				<!-- #ifdef  MP-WEIXIN -->
+				<button open-type="share" class="right_control_share_btn">
+					<image class="right_control_image" :src="img_url+'svideo/share.png'"></image>
+				</button>
+				<!-- #endif -->
+				<!-- #ifdef  APP-PLUS -->
+				<button @tap="showShare" class="right_control_share_btn">
+					<image class="right_control_image" :src="img_url+'svideo/share.png'"></image>
+				</button>
+				<text class="right_control_text">{{$L('分享')}}</text>
+				<!-- #endif -->
+				<!-- #ifdef H5 -->
+				<block v-if="isWeiXinBrower">
+				<button @tap="showShare" class="right_control_share_btn" >
+					<image class="right_control_image" :src="img_url+'svideo/share.png'"></image>
+				</button>
+				<text class="right_control_text">{{$L('分享')}}</text>
+				</block>
+				<!-- #endif -->
+				<block v-if="videoDetail.is_own == 1">
+					<image class="right_control_image" :src="img_url+'svideo/del_video.png'" @tap="del_video"></image>
+					<text class="right_control_text">{{$L('删除')}}</text>
+				</block>
+				<!-- 进入直播个人主页 -->
+				<view class="personal_homepage" @tap="gPensonalCenter" data-curTab="video">
+					<image class="personal_homepage_personal_homepage_image" :src="member_avatar"></image>
+				</view>
+				
+			</view>
+
+		<view class="select-wrap" catchtouchmove="touchmoveshare" v-if="shareWrap">
+			<view class="select-wrap_share-mode">
+				<view class="select-wrap_share-mode_share-img"></view>
+
+				<view class="select-wrap_share-mode_ul">
+					<!-- #ifdef  APP-PLUS -->
+					<button @tap.stop="sldShare(0,'WXSceneSession')" class="share-mode_item">
+						<image class="share-mode_item_image" :src="img_url+'wx_share.png'" mode="widthFix"></image>
+						<text class="share-mode_item_text">{{$L('微信好友')}}</text>
+					</button>
+					<button @tap.stop="sldShare(0,'WXSenceTimeline')" class="share-mode_item">
+						<image class="share-mode_item_image" :src="img_url+'pyq_share.png'" mode="widthFix"></image>
+						<text class="share-mode_item_text">{{$L('微信朋友圈')}}</text>
+					</button>
+					<!-- #endif -->
+					<!-- #ifdef  H5 -->
+					<button @tap.stop="sldShareBrower" class="share-mode_item" v-if="isWeiXinBrower">
+						<image class="share-mode_item_image" :src="img_url+'wx_share.png'" mode="widthFix"></image>
+						<text class="share-mode_item_text">{{$L('微信好友')}}</text>
+					</button>
+					<!-- #endif -->
+				</view>
+
+				<view class="select-wrap_close" @tap="closeShare">
+					<image class="select-wrap_close_image"  src="/static/images/share_close2.png" mode="scaleToFill"></image>
+				</view>
+			</view>
+		</view>
+		<view class="wx_brower_share_mask" v-if="showWeiXinBrowerTip">
+			<view class="wx_brower_share_top_wrap">
+				<image :src="img_url+'wx_share_tip.png'" mode="widthFix" @tap="closeShare" class="wx_brower_share_img"></image>
+			</view>
+		</view>
+
+			<view class="video_footer">
+				<text class="video_footer_title">{{videoDetail.video_name}}</text>
+				<text class="video_footer_desc">{{videoDetail.introdution}}</text>
+				<view v-if="goodsList.length == 0" style="width:100%;height:20rpx"></view>
+				<scroll-view scroll-x="true" class="video_footer_video_goods" v-if="goodsList.length > 0">
+					<view v-for="(item, index) in goodsList" :key="index" class="video_footer_goods_item">
+						<view class="video_footer_goods_item_goods_img" :data-gid="item.gid" @tap="goGoodsDetail">
+							<image class="video_footer_goods_item_goods_img_img" mode="aspectFill" :src="item.goods_image"/>
+						</view>
+						<view class="video_footer_goods_item_goods_detail">
+							<text class="video_footer_goods_item_goods_name" :data-gid="item.gid" @tap="goGoodsDetail">{{item.goods_name}}</text>
+							<view class="video_footer_goods_item_goods_info">
+								<text class="video_footer_goods_item_goods_price">{{$L('¥')}}{{item.goods_price}}</text>
+								<image class="video_footer_goods_item_add_cart" :data-gid="item.gid" @tap="addCart" :src="img_url+'svideo/add_cart.png'"></image>
+							</view>
+						</view>
+					</view>
+				</scroll-view>
+
+			</view>
+
+			<!-- 评论模块 start -->
+			<view class="video_comment" v-if="showComment" @touchmove.stop.prevent="moveHandle">
+				<view class="video_comment_title">
+					<view class="video_comment_title_com_t_l">
+						<text class="video_comment_title_com_t_l_com_t_l_title">{{$L('全部评论')}}</text>
+						<text class="video_comment_title_com_t_l_com_t_l_total">{{$L('共有')}}{{videoDetail.comment_num}}{{$L('条评论')}}</text>
+					</view>
+					<image class="video_comment_title_com_t_close" :src="img_url+'svideo/close.png'" @tap="closeComment"></image>
+				</view>
+
+				<scroll-view class="video_comment_comment" scroll-y="true" @scrolltolower="getMoreCom">
+					<view v-for="(item, index) in commentList" :key="index" class="video_comment_item_wrap" :index="index" v-if="commentList.length>0">
+						<view class="video_comment_item_wrap_item">
+							<view class="video_comment_item_wrap_item_l">
+								<view class="video_comment_item_wrap_item_l_com_avator" >
+									<image class="video_comment_item_wrap_item_l_com_avator_img" mode="aspectFill" :src="item.member_avatar"/>
+								</view>
+								<view class="video_comment_item_wrap_item_l_com_detail" :data-commentId="item.comment_id" :data-authorId="item.author_id" :data-memberNickname="item.member_nickname"
+								 @tap="replyComment">
+									<text class="video_comment_item_wrap_item_l_com_detail_name">{{item.member_nickname}}</text>
+									<text class="video_comment_item_wrap_item_l_com_detail_con">{{item.content}}</text>
+									<view class="video_comment_item_wrap_item_l_com_detail_other">
+										<text class="video_comment_item_wrap_item_l_com_detail_other_time">{{item.create_time}}</text>
+										<text v-if="item.is_own == 1" class="video_comment_item_wrap_item_l_com_detail_other_del_com" data-type="comment" @tap.stop="delCom" :data-commentId="item.comment_id">{{$L('删除')}}</text>
+									</view>
+								</view>
+							</view>
+							<view class="video_comment_item_wrap_item_r">
+								<image class="video_comment_item_wrap_item_r_image" :data-commentId="item.comment_id" @tap="likeComment" :src="img_url+(item.is_like == 1?'svideo/dz_complete.png':'svideo/dz.png')"></image>
+								<text class="video_comment_item_wrap_item_r_text">{{item.like_num}}</text>
+							</view>
+						</view>
+
+						<view v-for="(itemReplay, index2) in item.reply" :key="index2" class="video_comment_child" :index="itemIndex" v-if="item.reply.length>0">
+							<view class="video_comment_child_item">
+								<view class="video_comment_child_item_l">
+									<view class="video_comment_child_item_l_avator" ><image class="video_comment_child_item_l_avator_img" mode="aspectFill" :src="itemReplay.from_member_avatar"/></view>
+									<view class="video_comment_child_item_l_detail" :data-commentId="item.comment_id" :data-authorId="itemReplay.from_author_id"
+									 :data-memberNickname="itemReplay.from_member_nickname" @tap="replyComment">
+										<text class="video_comment_child_item_l_detail_name">{{itemReplay.from_member_nickname}}</text>
+										<div class="video_comment_child_item_l_detail_con_wrap">
+										<text class="video_comment_child_item_l_detail_con">{{$L('回复')}}</text>
+										<text class="video_comment_child_item_l_detail_con_replay_name">{{itemReplay.to_name!=undefinded?itemReplay.to_name:""}}：</text>
+										<text class="video_comment_child_item_l_detail_con_replay_name">{{itemReplay.content}}
+										</text>
+										</div>
+										<view class="video_comment_item_wrap_item_l_com_detail_other">
+											<text class="video_comment_item_wrap_item_l_com_detail_other_time">{{itemReplay.create_time}}</text>
+											<text v-if="itemReplay.is_own == 1" class="video_comment_item_wrap_item_l_com_detail_other_del_com" data-type="reply" @tap.stop="delCom" :data-commentId="item.comment_id"
+											 :data-replyId="itemReplay.reply_id">{{$L('删除')}}</text>
+										</view>
+									</view>
+								</view>
+								<view class="video_comment_item_wrap_item_r">
+									<image class="video_comment_item_wrap_item_r_image" :data-commentId="item.comment_id" :data-replyId="itemReplay.reply_id" @tap="likeReply" :src="img_url+(itemReplay.is_like == 1?'svideo/dz_complete.png':'svideo/dz.png')"></image>
+									<text class="video_comment_item_wrap_item_r_text">{{itemReplay.like_num}}</text>
+								</view>
+							</view>
+						</view>
+						<!-- 查看更多回复 -->
+						<view v-if="item.reply.length>3&&item.reply_has_more == 1" class="reply_pagnation" @tap="getMoreReply"
+						 :data-commentId="item.comment_id" :data-rpn="item.rpn">
+							<view class="reply_pagnation_left_line"></view>
+							<text class="reply_pagnation_more_reply">{{$L('查看更多回复')}}</text>
+							<view class="reply_pagnation_right_line"></view>
+						</view>
+						<!-- 收起更多回复 -->
+						<view v-if="item.reply.length>4&&item.reply_has_more == 0" class="reply_pagnation" @tap="closeMoreReply"
+						 :data-commentId="item.comment_id">
+							<view class="reply_pagnation_left_line"></view>
+							<text class="reply_pagnation_more_reply">{{$L('收起更多回复')}}</text>
+							<view class="reply_pagnation_right_line"></view>
+						</view>
+					</view>
+
+
+					<!-- 数据加载完毕 -->
+					<dataLoaded :showFlag="!hasmore&&commentList.length>0" />
+
+					<!-- 数据加载中 -->
+					<dataLoading :showFlag="hasmore&&loading" />
+
+
+
+					<!-- 页面loading -->
+					<view class="page_loading_child" v-if="firstLoading">
+						<image class="page_loading_child_image" :src="img_url + 'live/page_loading_icon.gif'"></image>
+					</view>
+
+				</scroll-view>
+
+				<view class="video_comment_empty" v-if="!firstLoading&&!commentList.length">
+					<view class="empty_data">
+						<image class="empty_data_image" :src="img_url+'live/live_list_empty_icon.png'" mode="aspectFit"></image>
+						<text class="empty_data_text" >{{$L('暂无数据')}}</text>
+					</view>
+				</view>
+
+				<view class="replay">
+					<view class="replay_input_wrap">
+						<text v-if="replyInfo!=''" class="replay_reply_tip">{{$L('回复')}}@<text class="replay_reply_name">{{replyInfo.member_nickname}}</text></text>
+						<image class="replay_input_wrap_image" v-if="replyInfo==''" :src="img_url+'svideo/edit.png'"></image>
+						<input type="text" cursor-spacing="30" :focus="showFocus" name="reply_con" class="replay_input_wrap_reply_inp" :placeholder="$L('赶快发表你的评论吧~')"
+						  placeholder-style="replay_input_wrap_reply_inp_placeholder" confirm-type="send" @confirm="sendReplyComment" maxlength="100"
+						 v-model="input_val"></input>
+					</view>
+				</view>
+			</view>
+			<!-- 评论模块 end -->
+
+		</view>
+	</view>
+</template>
+
+<script>
+	import {
+		checkPageHasMore
+	} from "@/utils/live";
+	import request from "@/utils/request";
+	import pageLoading from "@/addons/templates/live/pageLoading.vue";
+	import dataLoading from "@/addons/templates/live/dataLoading.vue";
+	import dataLoaded from "@/addons/templates/live/dataLoaded.vue";
+
+	const img_url = getApp().globalData.img_url;
+	let cur_time = 0; //记录发送评论的时间，由于微信小程序本身input的发送时间在swiper里面会触发两次，所以时间间隔规避一下这个问题
+
+	export default {
+		components: {
+			pageLoading,
+			dataLoading,
+			dataLoaded,
+		},
+		data() {
+			return {
+				loading: false, //数据加载状态 
+				videoDetail: '', //短视频详情
+				img_url: getApp().globalData.img_url, //图片地址
+				bgStyle: 'background-size:contain;background-position:center center;background-repeat: no-repeat;', //背景图片样式
+				goodsList: [], //短视频绑定的商品
+				commentList: [], // 评论列表
+				hasmore: true, //是否还有数据，用于页面展示
+				input_val: '', //输入框内容
+				firstLoading: true, //是否初次加载，是的话展示页面居中的loading效果，
+				showFocus: false, //评论回复输入框默认失去焦点
+				replyInfo: '', //回复评论的数据
+				showComment: false, //是否显示评论
+				pn: 1, //当前页
+				pageSize: 10, //每页数据
+				autoplay: true, //是否自动播放 
+				key: '', //登录的key值
+				member_avatar: '' ,//默认作者头像
+				shareWrap:false,
+				isWeiXinBrower: false, //是否微信浏览器
+				showWeiXinBrowerTip: false, //微信浏览器分享的提示操作
+				stat_end:1,  //终端，默认为1，pc端
+				video_id: '',
+				activeIndex:1,
+				
+			};
+		},
+
+		components: {},
+		
+
+		beforeMount() {
+			// uni.createVideoContext('sldVideo_child').pause();
+		},
+
+		mounted() {
+			uni.getCurrentSubNVue().addEventListener("hide", function() {
+				// uni.$emit('goBack');
+			});
+			//从缓存获取svideo_id
+			this.video_id = uni.getStorageSync('svideo_id');
+			// uni.createVideoContext('sldVideo_child').pause();
+			// #ifdef H5
+			this.isWeiXinBrower = this.$isWeiXinBrower();
+			// #endif
+			this.initData();
+			this.getPlatform();
+		},
+
+		moved() {
+
+		},
+
+		destroyed() {
+		},
+		
+		
+
+		methods: {
+			//禁止subnvue点击消失
+			subforbidden() {
+				uni.$emit('tapVideo')// 暂停/播放
+			},
+			// 返回上级页面
+			goBack() {
+				uni.$emit('goBack');
+			},
+			//获取当前终端的方法
+			   getPlatform(){
+			    //判断终端
+			    this.stat_end = 1;
+			    // #ifdef H5
+			    this.stat_end = 2;
+			    // #endif
+			    // #ifdef MP-WEIXIN
+			    this.stat_end = 3;
+			    // #endif
+			    // #ifdef APP-PLUS
+			    if(uni.getSystemInfoSync().platform == 'android'){
+			     this.stat_end = 5;
+			    }else if(uni.getSystemInfoSync().platform == 'ios'){
+			     this.stat_end = 4;
+			    }
+			    // #endif
+			   },
+			//初始化数据
+			initData() {
+				this.getVideoInfo();
+				this.getVideoGoods();
+			},
+
+			//获取短视频详情
+			getVideoInfo() {
+				let key = uni.getStorageSync('token');
+				let {
+					video_id,
+					videoDetail,
+					member_avatar
+				} = this;
+				uni.request({
+					url: getApp().globalData.svideo_url + '/index.php?app=video&mod=detail&video_id=' + video_id + '&key=' + key,
+					success: res => {
+						if (res.data.state == 200) {
+							videoDetail = res.data.data.video; //作者头像
+							this.member_avatar = res.data.data.member_info.member_avatar
+
+							if (videoDetail.status == 3) {
+								uni.showModal({
+									title: '',
+									content: this.$L('审核失败，') + videoDetail.remark,
+									showCancel: false,
+									confirmText: this.$L('确定'),
+									confirmColor: '#FC1C1C',
+									success: res => {
+										if (res.confirm) {
+											uni.navigateBack({});
+										}
+									}
+								});
+							} else {
+								this.videoDetail = videoDetail;
+							}
+						} else {
+							if (typeof res.data.msg == 'String') {
+								uni.showModal({
+									title: '',
+									content: res.data.msg,
+									showCancel: false,
+									confirmText: this.$L('确定'),
+									confirmColor: '#FC1C1C',
+									success: res => {
+										if (res.confirm) {
+											uni.navigateBack({});
+										}
+									}
+								});
+							} else {
+								uni.showModal({
+									title: res.data.msg[0],
+									content: res.data.msg[1],
+									showCancel: false,
+									confirmText: this.$L('确定'),
+									confirmColor: '#FC1C1C',
+									success: res => {
+										if (res.confirm) {
+											uni.navigateBack({});
+										}
+									}
+								});
+							}
+						}
+					}
+				});
+			},
+
+			//获取评论列表
+			getCommentList() {
+				let {
+					video_id,
+					videoDetail,
+					commentList,
+					hasmore,
+					firstLoading,
+					pageSize,
+					pn
+				} = this;
+				uni.request({
+					url: getApp().globalData.svideo_url + '/index.php?app=comment&mod=index&video_id=' + video_id + '&key=' + uni.getStorageSync('token') + '&current=' + pn + '&pageSize=' + pageSize,
+					success: res => {
+						if (res.data.state == 200) {
+							let list = res.data.data.comment;
+							list.forEach(el => el.rpn = 1);
+
+							if (pn == 1) {
+								commentList = list;
+							} else {
+								commentList = commentList.concat(list);
+							}
+
+							if (checkPageHasMore(res.data.data.pagination)) {
+								pn++;
+							} else {
+								hasmore = false;
+							} //初次加载的话更改状
+
+
+							if (firstLoading) {
+								firstLoading = false;
+							}
+							
+							this.loading = false;
+							this.hasmore = hasmore;
+							this.commentList = commentList;
+							this.firstLoading = firstLoading;
+							this.pn = pn;
+							this.hasmore = hasmore;
+
+						}
+					}
+				});
+			},
+
+			//评论列表滑到底部加载数据
+			getMoreCom() {
+				if (this.hasmore) {
+					this.getCommentList();
+				}
+			},
+
+			//关注、取消关注事件
+			collect(e) {
+				let key = uni.getStorageSync('token');
+				let {
+					videoDetail
+				} = this;
+
+				if (key) {
+					uni.request({
+						url: getApp().globalData.svideo_url + '/index.php?app=follow&mod=followAuthor',
+						method: 'POST',
+						header: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						data: {
+							to_auhtor_id: videoDetail.author_id,
+							key: key
+						},
+						success: res => {
+							if (res.data.state == 200) {
+								videoDetail.is_follow = videoDetail.is_follow == 1 ? 0 : 1;
+								videoDetail.fans_num = res.data.data.fans_num;
+								this.videoDetail = videoDetail;
+							} else {
+								uni.showToast({
+									title: res.data.msg,
+									icon: 'none'
+								});
+							}
+						}
+					});
+				} else {
+					uni.showModal({
+						title: this.$L('温馨提示!'),
+						content: `${this.$L('需要登录才能操作')}`,
+						cancelText:this.$L('取消'),
+						confirmText:this.$L('确定'),
+						success: res => {
+							if (res.confirm) {
+								getApp().globalData.goLogin();
+							}
+						}
+					});
+				}
+			},
+
+			//进入作者页面
+			goLiveUserCenter(e) {
+				let author_id = e;
+				let page = getCurrentPages();
+				let len = page.length;
+				uni.$emit('goLiveUserCenter',{pageLength:len,url:'/addons/pages/liveUserCenter/liveUserCenter?author_id=' + author_id});
+			},
+
+			//分享点击事件
+			showShare() {
+				this.shareWrap = true
+			},
+			
+			//关闭分享
+			closeShare() {
+				this.shareWrap = false;
+				this.showWeiXinBrowerTip = false; //微信浏览器提示层
+			},
+			
+			//分享 type：分享类型 0 图文 2图片，scene 场景 WXSceneSession：分享朋友  WXSenceTimeline：分享朋友圈
+			sldShare(type, scene) {
+				let {
+					videoDetail,
+					video_id
+				} = this;
+				let shareData = {};
+				if (type == 0) {
+					shareData.href = videoDetail.share_link;
+					shareData.title = videoDetail.video_name;
+					shareData.summary = this.$L('我正在看') + videoDetail.member_nickname + this.$L('的精彩内容，快来围观~');
+					shareData.imageUrl = videoDetail.video_image;
+				}
+				this.weiXinAppShare(type, scene, shareData);
+				this.closeShare(); //关闭分享
+			},
+			
+			weiXinAppShare(type, scene, shareData) {
+				if(type == 0){
+					//分享图文
+					uni.share({
+					    provider: "weixin",
+					    scene: scene,
+					    type: type,//0为图文
+					    href: shareData.href,
+					    title: shareData.title,
+					    summary: shareData.summary,
+					    imageUrl: shareData.imageUrl,//图片,图片过大的话不展示，建议小于20kb
+					    success: function (res) {
+					    },
+					    fail: function (err) {
+					    }
+					});
+				}else if(type == 2){
+					//分享图片
+					uni.share({
+					    provider: "weixin",
+					    scene: scene,
+					    type: type,//2为图片
+					    imageUrl: shareData.imageUrl,//图片,图片过大的话不展示，建议小于20kb
+					    success: function (res) {
+					    },
+					    fail: function (err) {
+					    }
+					});
+				}
+			},
+			
+			//浏览器分享
+			sldShareBrower() {
+				if (this.isWeiXinBrower) {
+					let {
+						videoDetail,
+						video_id
+					} = this;
+					//展示分享提示
+					this.showWeiXinBrowerTip = true;
+					this.shareWrap = false;
+					//微信浏览器分享
+					this.$weiXinBrowerShare(1, {
+						title: videoDetail.video_name,
+						desc: this.$L('我正在看') + videoDetail.member_nickname + this.$L('的精彩内容，快来围观~'),
+						link: videoDetail.share_link,
+						imgUrl: videoDetail.video_image,
+					});
+				}
+			},
+			
+			
+
+			//获取短视频绑定的商品
+			getVideoGoods() {
+				let {
+					goodsList,
+					video_id
+				} = this;
+				uni.request({
+					url: getApp().globalData.svideo_url + '/index.php?app=video&mod=goodsList',
+					data: {
+						pageSize: 100,
+						current: 1,
+						video_id: video_id
+					},
+					success: res => {
+						if (res.data.state == 200) {
+							goodsList = res.data.data.goods;
+						}
+
+						this.goodsList = goodsList
+					}
+				});
+			},
+
+			//跳转商品详情页
+			goGoodsDetail(e) {
+				let gid = e.currentTarget.dataset.gid;
+				if (gid) {
+					let page = getCurrentPages();
+					let len = page.length;
+					uni.$emit('goGoodsDetail',{pageLength:len,url:'/pages/goods_detail/goods_detail?gid=' + gid});
+				}
+			},
+
+			//加入购物车事件
+			addCart(e) {
+				let gid = e.currentTarget.dataset.gid;
+				let key = uni.getStorageSync('token');
+
+				if (key) {
+					uni.request({
+						url: getApp().globalData.ser_url + '/index.php?app=cart&mod=cart_add',
+						method: 'POST',
+						header: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						data: {
+							key: key,
+							gid: gid,
+							quantity: 1,
+							stat_end:this.stat_end
+						},
+						success: res => {
+							if (res.data.datas.status) {
+								uni.showToast({
+									title: this.$L('加入购物车成功'),
+									icon: 'none'
+								});
+							} else {
+								uni.showToast({
+									title: res.data.datas.msg,
+									icon: 'none'
+								});
+							}
+						}
+					});
+				} else {
+					let uuid = uni.getStorageSync('uuid');
+					let url = getApp().globalData.ser_url + '/index.php?app=cache_cart&mod=cart_add';
+					uni.request({
+					  url,
+					  method: 'POST',
+					  header: {
+					    'Content-Type': 'application/x-www-form-urlencoded'
+					  },
+					  data: {
+					    key: uuid,
+					    gid: gid,
+					    quantity: 1,
+						stat_end:this.stat_end
+					  },
+					  success: function (res) {
+					    if (res.data.code == 200 && res.data.datas.status == '1') {
+					      uni.showToast({
+					        title: this.$L('加入购物车成功'),
+					        duration: 500,
+							icon: 'none'
+					      });
+					    } else {
+					      uni.showToast({
+					        title: res.data.datas.msg,
+					        duration: 500,
+					        icon: 'none'
+					      });
+					    }
+					  }
+					}); 
+				}
+			},
+
+			//删除视频提示
+			del_video() {
+				uni.showModal({
+					title:this.$L('提示') ,
+					content: `${this.$L('确定删除该视频？')}`,
+					cancelText:this.$L('取消'),
+					confirmText:this.$L('确定'),
+					success: res => {
+						if (res.confirm) {
+							this.delVideo();
+						}
+					}
+				});
+			},
+
+			//删除视频
+			delVideo() {
+				let {
+					video_id
+				} = this;
+				uni.request({
+					url: getApp().globalData.svideo_url + '/index.php?app=video&mod=delVideo',
+					method: 'POST',
+					header: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					data: {
+						video_id: video_id,
+						key: uni.getStorageSync('token')
+					},
+					success: res => {
+						uni.showToast({
+							title: res.data.msg,
+							icon: 'none'
+						});
+
+						if (res.data.state == 200) {
+							//删除视频后刷新个人中心动态列表
+							const page = getCurrentPages();
+							if (page[page.length - 2].route == "addons/pages/liveUserCenter/liveUserCenter") {
+							  // 更新上一页数据
+							  page[page.length - 2].$vm.updateVideoList();
+							}
+							//返回上一页
+							uni.navigateBack({});
+						}
+					}
+				});
+			},
+
+			//点赞事件
+			like() {			
+				let key = uni.getStorageSync('token');
+				let {
+					video_id,
+					videoDetail
+				} = this;
+
+				if (key) {
+					uni.request({
+						url: getApp().globalData.svideo_url + '/index.php?app=video&mod=likeVideo',
+						method: 'POST',
+						header: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						data: {
+							video_id: video_id,
+							key: key
+						},
+						success: res => {
+							if (res.data.state == 200) {
+								videoDetail.is_like = videoDetail.is_like == 1 ? 0 : 1;
+								videoDetail.like_num = res.data.data.like_num;
+								this.videoDetail = videoDetail
+							} else {
+								uni.showToast({
+									title: res.data.msg,
+									icon: 'none'
+								});
+							}
+						}
+					});
+				} else {
+					uni.showModal({
+						title: this.$L('温馨提示!'),
+						content: `${this.$L('需要登录才能点赞')}`,
+						cancelText:this.$L('取消'),
+						confirmText:this.$L('确定'),
+						success: res => {
+							if (res.confirm) {
+								getApp().globalData.goLogin();
+							}
+						}
+					});
+				}
+			},
+
+			//评论模块删除事件
+			delCom(e) {
+				e.stopPropagation()
+				let tmp_data = e.currentTarget.dataset;
+				uni.showModal({
+					title: '',
+					content: `${this.$L('确认删除该评论？')}`,
+					cancelText:this.$L('取消'),
+					confirmText:this.$L('确定'),
+					success: res => {
+						if (res.confirm) {
+							if (tmp_data.type == 'comment') {
+								this.delComment(tmp_data.commentid);
+							} else {
+								this.delApply(tmp_data.replyid, tmp_data.commentid);
+							}
+						}
+					}
+				});
+			},
+
+			// 删除回复
+			delApply(reply_id, comment_id) {
+				let {
+					video_id,
+					videoDetail,
+					commentList
+				} = this;
+				uni.request({
+					url: getApp().globalData.svideo_url + '/index.php?app=reply&mod=delReply',
+					method: 'POST',
+					header: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					data: {
+						reply_id: reply_id,
+						key: uni.getStorageSync('token')
+					},
+					success: res => {
+						uni.showToast({
+							title: res.data.msg,
+							icon: 'none'
+						});
+
+						if (res.data.state == 200) {
+							let index = commentList.findIndex(el => el.comment_id == comment_id);
+							let r_index = commentList[index].reply.findIndex(el => el.reply_id == reply_id);
+							commentList[index].reply.splice(r_index, 1);
+							this.commentList = commentList
+						}
+					}
+				});
+			},
+
+			// 删除评论
+			delComment(comment_id) {
+				let {
+					video_id,
+					videoDetail,
+					commentList
+				} = this;
+				uni.request({
+					url: getApp().globalData.svideo_url + '/index.php?app=comment&mod=delComment',
+					method: 'POST',
+					header: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					},
+					data: {
+						comment_id: comment_id,
+						video_id: video_id,
+						key: uni.getStorageSync('token')
+					},
+					success: res => {
+						uni.showToast({
+							title: res.data.msg,
+							icon: 'none'
+						});
+
+						if (res.data.state == 200) {
+							videoDetail.comment_num = --videoDetail.comment_num;
+							let index = commentList.findIndex(el => el.comment_id == comment_id);
+							commentList.splice(index, 1);
+							this.videoDetail = videoDetail;
+							this.commentList = commentList;
+						}
+					}
+				});
+			},
+
+			// 点赞评论
+			likeComment(e) {
+				let comment_id = e.currentTarget.dataset.commentid;
+				let key = uni.getStorageSync('token');
+				let {
+					commentList
+				} = this;
+
+				if (key) {
+					uni.request({
+						url: getApp().globalData.svideo_url + '/index.php?app=comment&mod=likeComment',
+						method: 'POST',
+						header: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						data: {
+							comment_id: comment_id,
+							key: key
+						},
+						success: res => {
+							if (res.data.state == 200) {
+								let index = commentList.findIndex(el => el.comment_id == comment_id);
+								let is_like = commentList[index].is_like;
+								commentList[index].is_like = is_like == 1 ? 0 : 1;
+								commentList[index].like_num = res.data.data.like_num;
+								this.commentList = commentList
+							} else {
+								uni.showToast({
+									title: res.data.msg,
+									icon: 'none'
+								});
+							}
+						}
+					});
+				} else {
+					uni.showModal({
+						title: this.$L('温馨提示!'),
+						content: `${this.$L('需要登录才能点赞哦')}`,
+						cancelText:this.$L('取消'),
+						confirmText:this.$L('确定'),
+						success: res => {
+							if (res.confirm) {
+								getApp().globalData.goLogin();
+							}
+						}
+					});
+				}
+			},
+
+			// 点赞回复
+			likeReply(e) {
+				let comment_id = e.currentTarget.dataset.commentid;
+				let reply_id = e.currentTarget.dataset.replyid;
+				let key = uni.getStorageSync('token');
+				let {
+					commentList
+				} = this;
+
+				if (key) {
+					uni.request({
+						url: getApp().globalData.svideo_url + '/index.php?app=reply&mod=likeReply',
+						method: 'POST',
+						header: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						data: {
+							reply_id: reply_id,
+							key: key
+						},
+						success: res => {
+							if (res.data.state == 200) {
+								let index = commentList.findIndex(el => el.comment_id == comment_id);
+								let r_index = commentList[index].reply.findIndex(el => el.reply_id == reply_id);
+								let is_like = commentList[index].reply[r_index].is_like;
+								commentList[index].reply[r_index].is_like = is_like == 1 ? 0 : 1;
+								commentList[index].reply[r_index].like_num = res.data.data.like_num;
+								this.commentList = commentList
+							} else {
+								uni.showToast({
+									title: res.data.msg,
+									icon: 'none'
+								});
+							}
+						}
+					});
+				} else {
+					uni.showModal({
+						title: this.$L('温馨提示!'),
+						content: `${this.$L('需要登录才能点赞哦')}`,
+						cancelText:this.$L('取消'),
+						confirmText:this.$L('确定'),
+						success: res => {
+							if (res.confirm) {
+								getApp().globalData.goLogin();
+							}
+						}
+					});
+				}
+			},
+
+			//回复评论
+			replyComment(e) {
+				let tmp = e.currentTarget.dataset;
+				let {
+					replyInfo
+				} = this;
+
+				if (uni.getStorageSync('token')) {
+					this.replyInfo = {
+							comment_id: tmp.commentid,
+							to_author_id: tmp.authorid,
+							member_nickname: tmp.membernickname
+						};
+					this.showFocus = true;
+				} else {
+					uni.showToast({
+						title: this.$L('需要登录才能回复哦'),
+						icon: 'none'
+					});
+				}
+			},
+
+			//评论功能
+			sendReplyComment(e) {
+				if (Date.parse(new Date()) - cur_time < 10) {
+					return false;
+				} else {
+					cur_time = Date.parse(new Date());
+				}
+
+				let key = uni.getStorageSync('token');
+
+				if (!key) {
+					uni.showModal({
+						title: this.$L('温馨提示!'),
+						content: `${this.$L('需要登录才能操作哦')}`,
+						cancelText:this.$L('取消'),
+						confirmText:this.$L('确定'),
+						success: res => {
+							if (res.confirm) {
+								getApp().globalData.goLogin();
+							}
+						}
+					});
+					return;
+				}
+
+				let {
+					replyInfo,
+					video_id,
+					commentList,
+					videoDetail
+				} = this;
+
+				if (replyInfo == '') {
+					//发布评论
+					uni.request({
+						url: getApp().globalData.svideo_url + '/index.php?app=comment&mod=publishComment',
+						method: 'POST',
+						header: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						data: {
+							video_id: video_id,
+							content: e.detail.value,
+							key: key
+						},
+						success: res => {
+
+							if (res.data.state == 200) {
+							   let that=this
+								videoDetail.comment_num = res.data.data.comment_num;
+								commentList.unshift(res.data.data); //清空输入内容
+                                setTimeout(()=>{
+										that.commentList= JSON.parse(JSON.stringify(commentList)),
+										that.input_val= '',
+										that.showFocus= false,
+										that.videoDetail= videoDetail
+								},0)
+
+							} else {
+								uni.showToast({
+									title: res.data.msg,
+									icon: 'none'
+								});
+							}
+						}
+					});
+				} else {
+					//回复评论
+					let that=this
+					uni.request({
+						url: getApp().globalData.svideo_url + '/index.php?app=reply&mod=publishReply',
+						method: 'POST',
+						header: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						},
+						data: {
+							comment_id: replyInfo.comment_id,
+							to_author_id: replyInfo.to_author_id,
+							video_id: video_id,
+							content: e.detail.value,
+							key: key
+						},
+						success: res => {
+							if (res.data.state == 200) {
+								let index = commentList.findIndex(el => el.comment_id == replyInfo.comment_id);
+								commentList[index].reply.push(res.data.data); //清空输入内容
+                                
+								// this.setData({
+								// 	commentList: commentList,
+								// 	input_val: '',
+								// 	showFocus: false,
+								// 	replyInfo: ''
+								// });
+								setTimeout(()=>{
+									// this.setData({
+										that.commentList= commentList,
+										that.input_val= '',
+										that.showFocus= false,
+										that.replyInfo= ''
+									// });
+								},0)
+							} else {
+								uni.showToast({
+									title: res.data.msg,
+									icon: 'none'
+								});
+							}
+						}
+					});
+				}
+			},
+
+			//关闭评论
+			closeComment() {
+				this.showComment = false
+			},
+
+			//打开评论
+			openCommnet() {
+				this.showComment = true;
+				this.firstLoading = true;
+				this.hasmore = true;
+				this.pn = 1;
+				this.getCommentList();
+			},
+
+			// 查看更多回复
+			getMoreReply(e) {
+				let tmp = e.currentTarget.dataset;
+				let {
+					commentList
+				} = this;
+				uni.request({
+					url: getApp().globalData.svideo_url + '/index.php?app=reply&mod=index&comment_id=' + tmp.commentid + '&pageSize=' +
+						this.pageSize + '&current=' + tmp.rpn,
+					success: res => {
+						if (res.data.state == 200) {
+							let index = commentList.findIndex(el => el.comment_id === tmp.commentid);
+							let list = res.data.data.reply;
+
+							if (tmp.rpn == 1) {
+								commentList[index].reply = list;
+							} else {
+								commentList[index].reply = commentList[index].reply.concat(list);
+							}
+
+							let ishasmore = checkPageHasMore(res.data.data.pagination);
+
+							if (!ishasmore) {
+								commentList[index].reply_has_more = 0;
+							} else {
+								commentList[index].rpn = ++tmp.rpn;
+							}
+
+							this.commentList = commentList
+						}
+					}
+				});
+			},
+
+			// 收起更多回复
+			closeMoreReply(e) {
+				let comment_id = e.currentTarget.dataset.commentid;
+				let {
+					commentList
+				} = this;
+				let index = commentList.findIndex(el => el.comment_id === comment_id);
+				commentList[index].reply = commentList[index].reply.slice(0, 4);
+				commentList[index].reply_has_more = 1;
+				commentList[index].rpn = 1;
+				this.commentList = commentList
+			},
+
+			chansgedd() {
+				uni.createVideoContext('sldVideo_child_76').pause();
+			},
+
+			//视频暂停播放，flag为true播放，否则暂停
+			videoCon(flag) {
+				let {
+					video_id
+				} = this;
+				let str = "sldVideo_child_" + video_id;
+				let videoContext = uni.createVideoContext(str);
+				videoContext.pause(); //暂停播放
+
+				this.autoplay = flag;
+			},
+
+			//进入直播个人中心
+			gPensonalCenter(e) {
+				var curTab = e.currentTarget.dataset.curtab;
+				let key = uni.getStorageSync('token');
+
+				if (!key) {
+					uni.showModal({
+						title: this.$L('提示'),
+						content: this.$L('未登录，请先登录'),
+						cancelText:this.$L('取消'),
+						confirmText:this.$L('确定'),
+						success: function(res) {
+							if (res.cancel) { //点击了取消
+							} else {
+								uni.switchTab({
+									url: '/pages/user/user'
+								});
+							}
+						}
+					});
+				} else {
+					uni.navigateTo({
+						url: '/addons/pages/liveUserCenter/liveUserCenter?curTab=' + curTab
+					});
+				}
+			},
+			moveHandle(){
+				
+			}
+
+		}
+	};
+</script>
+<style>
+	page {background: transparent;}
+	.video_comment_empty {
+		position: fixed;
+		z-index: -1;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: 750rpx;
+		height: 750rpx;
+	}
+	.empty_data {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		background-color: transparent;
+		width: 750rpx;
+		margin-top: 350rpx;
+	}
+	
+	.empty_data_image {
+		width: 179rpx;
+		height: 140rpx;
+	}
+	
+	.empty_data_text {
+		font-size: 28rpx;
+		margin-top: 20rpx;
+		color: #949494;
+	}
+	.live_back,
+	.living {
+		width: 750rpx;
+		height: 100vh;
+	}
+
+	.live_header {
+		position: fixed;
+		/* top: calc(var(--status-bar-height) + 80rpx); */
+		top: 120rpx;
+		left: 20rpx;
+		z-index: 2;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-start;
+		height: 80rpx;
+	}
+	
+	.live_header_go_back {
+	    width: 45rpx;
+	    height: 47rpx;
+	}
+
+	.live_header_avator {
+		width: 80rpx;
+		height: 80rpx;
+		border-radius: 40rpx;
+		border-width: 2rpx;
+	    border-style: solid;
+	    border-color: #fff;
+		margin-left: 8rpx;
+		overflow: hidden;
+	}
+	
+	.live_header_avator_img{
+		width: 76rpx;
+		height: 76rpx;
+		border-radius: 38rpx;
+		overflow: hidden;
+	}
+
+	.live_header_mem_info {
+		margin-left: 20rpx;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: space-between;
+	}
+	
+	.live_header_live_fllow {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		width: 120rpx;
+		height: 50rpx;
+		background: #fc1c1c;
+		border-radius: 25rpx;
+		margin-left: 25rpx;
+	}
+	
+	.live_header_live_fllow_image {
+		width: 46rpx;
+		height: 46rpx;
+	}
+	
+	.live_header_live_fllow_text {
+		color: #fff;
+		font-size: 24rpx;
+		margin-right: 8rpx;
+	}
+
+	.live_header_mem_info_name {
+		max-width: 150rpx;
+		color: #fff;
+		font-size: 28rpx;
+		line-height: 32rpx;
+		margin-bottom: 15rpx;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-weight: 600;
+	}
+
+	.live_header_mem_info_stat_num {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+	}
+
+	.live_header_mem_info_stat_num_click_num {
+		color: #fff;
+		font-size: 22rpx;
+		line-height: 36rpx;
+		white-space: nowrap;
+		font-weight: 600;
+	}
+
+	.select-wrap {
+		position: fixed;
+		top:0;
+		bottom: 0;
+		left: 0; 
+		right: 0;
+		/* margin: 0 auto; */
+		width: 750rpx;
+		background-color: rgba(0, 0, 0, 0.45);
+		z-index: 9999;
+	}
+
+	.select-wrap_share-mode {
+		position: fixed;
+		bottom: 100rpx;
+		left: 0;
+		right: 0;
+		width: 750rpx;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.select-wrap_share-mode_share-img {
+		width: 72vw;
+		border-radius: 20rpx;
+		overflow: hidden;
+	}
+
+	.select-wrap_share-mode_share-img_image {
+		width: 100%;
+		height: 0;
+		border-radius: 20rpx;
+	}
+
+	.select-wrap_share-mode_ul {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		width: 750rpx;
+		padding-left: 30px;
+		padding-right: 30px;
+		justify-content: space-around;
+	}
+
+	.share-mode_item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		cursor: pointer;
+		border: none;
+		margin: 0;
+		padding: 0;
+		line-height: 1;
+		background-color: transparent;
+		border-width: 0;
+	}
+
+	.share-mode_item_image {
+		width: 106rpx;
+		height: 0;
+	}
+
+	.share-mode_item_text {
+		color: #fff;
+		font-size: 24rpx;
+		margin-top: 30rpx;
+	}
+
+	.select-wrap_close {
+		width: 750rpx;
+		height: 120rpx;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		
+	}
+
+	.select-wrap_close_image {
+		width: 90rpx;
+		height: 90rpx;
+		padding: 30rpx;
+	}
+
+	.select-wrap_share-mode_share-img {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.empty_158 {
+		width: 750rpx;
+		height: 158rpx;
+	}
+
+	.right_control {
+		position: fixed;
+		bottom: 310rpx;
+		right: 30rpx;
+		z-index: 99;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+	.right_control_image {
+		width: 68rpx;
+		height: 68rpx;
+		margin-bottom: 13rpx;
+	}
+
+	.right_control_text {
+		color: #fff;
+		font-size: 24rpx;
+		margin-bottom: 36rpx;
+		white-space: nowrap;
+	}
+
+	.right_control_share_btn {
+		background-color: transparent;
+		border: none;
+		color: transparent;
+		line-height: 0;
+		border-color: rgba(0,0,0,0);
+	}
+
+	.right_control_share_btn::after {
+		border: none !important;
+	}
+
+	/* 进入个人主页按钮入口 */
+	.personal_homepage {
+		width: 66rpx;
+		height: 66rpx;
+		border-radius: 50%;
+		border-width: 2rpx;
+	    border-style: solid;
+	    border-color: #fff;
+		z-index: 99;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: #ffffff;
+	}
+
+	.personal_homepage_personal_homepage_image {
+		width: 66rpx;
+		height: 66rpx;
+		border-radius: 50%;
+		margin-bottom: 0;
+	}
+
+
+	.video_footer {
+		left: 30rpx;
+		bottom: 37rpx;
+		right: 0;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		align-items: flex-start;
+		position: fixed;
+	}
+
+	.video_footer_title {
+		color: #fff;
+		font-size: 32rpx;
+		font-weight: 600;
+		margin-bottom: 10rpx;
+	}
+
+	.video_footer_desc {
+		color: #fff;
+		font-size: 26rpx;
+		line-height: 40rpx;
+		margin-bottom: 18rpx;
+		width: 570rpx;
+	}
+
+	.wrap {
+		width: 750rpx;
+		height: 100vh;
+		overflow: hidden;
+		position: relative;
+	}
+
+	.video_footer_video_goods {
+		height: 172rpx;
+		white-space: nowrap;
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+	.video_footer_goods_item {
+		width: 410rpx;
+		height: 172rpx;
+		display: inline-block;
+		border-radius: 15rpx;
+		flex-direction: row;
+		justify-content: flex-start;
+		align-items: flex-start;
+		margin-right: 30rpx;
+		clear: both;
+		overflow: hidden;
+	}
+
+	.video_footer_goods_item_goods_img {
+		width: 172rpx;
+		height: 172rpx;
+		background-color: #fff;
+		border-top-left-radius: 15rpx;
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+		border-bottom-left-radius: 15rpx;
+		float: left;
+	}
+	
+	.video_footer_goods_item_goods_img_img {
+		width: 172rpx;
+		height: 172rpx;
+		background-color: #fff;
+		border-top-left-radius: 15rpx;
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+		border-bottom-left-radius: 15rpx;
+		float: left;
+	}
+
+	.video_footer_goods_item_goods_detail {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: flex-start;
+		flex: 1;
+		background-color: #222;
+		height: 142rpx;
+		border-top-left-radius: 0;
+		border-top-right-radius: 15rpx;
+		border-bottom-right-radius: 15rpx;
+		border-bottom-left-radius: 0;
+		padding: 15rpx 20rpx;
+		height: 172rpx;
+	}
+
+	.video_footer_goods_item_goods_name {
+		width: 200rpx;
+		color: #fff;
+		font-size: 24rpx;
+		line-height: 36rpx;
+		height: 72rpx;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		word-break: break-word;
+		white-space: normal;
+	}
+
+	.video_footer_goods_item_goods_info {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		width: 200rpx;
+	}
+
+	.video_footer_goods_item_goods_price {
+		color: #fff;
+		font-size: 28rpx;
+		letter-spacing: 2rpx;
+	}
+
+	.video_footer_goods_item_add_cart {
+		width: 48rpx;
+		height: 48rpx;
+	}
+
+	.video_comment {
+		/* position: fixed; */
+		position: fixed;
+		z-index: 100;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: 750rpx;
+		/* height: 90vw; */
+		background-color: #fff;
+		border-top-left-radius: 15rpx;
+		border-top-right-radius: 15rpx;
+		border-bottom-right-radius: 0;
+		border-bottom-left-radius: 0;
+	}
+	
+
+	.video_comment_title {
+		display: flex;
+		padding: 30rpx;
+		flex-direction: row;
+		justify-content: space-between;
+		align-content: center;
+		height: 100rpx;
+		border-bottom-width: 1rpx;
+		border-bottom-color: rgba(0, 0, 0, 0.1);
+		border-bottom-style: solid;
+	}
+
+	.video_comment_title_com_t_l {
+		display: flex;
+		flex: 1;
+		flex-direction: row;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+	.video_comment_title_com_t_l_com_t_l_title {
+		color: #2d2d2d;
+		font-size: 32rpx;
+		margin-right: 18rpx;
+	}
+
+	.video_comment_title_com_t_l_com_t_l_total {
+		color: #949494;
+		font-size: 22rpx;
+	}
+
+	.video_comment_title_com_t_close {
+		width: 48rpx;
+		height: 48rpx;
+	}
+
+	.replay {
+		position: fixed;
+		z-index: 4;
+		height: 100rpx;
+		width: 750rpx;
+		padding: 0 30rpx;
+		background-color: #fff;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		box-shadow: 0px 0px 20px 0px rgba(86, 86, 86, 0.08);
+	}
+
+	.replay_input_wrap {
+		background-color: #ddd;
+		border-radius: 6px;
+		width: 690rpx;
+		height: 57rpx;
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+	.replay_input_wrap_reply_inp {
+		display: flex;
+		flex: 1;
+		font-size: 24rpx;
+	}
+	
+	.replay_input_wrap_reply_inp_placeholder{
+		font-size: 24rpx;
+		color: #949494;
+	}
+
+	.replay_input_wrap_image {
+		width: 47rpx;
+		height: 47rpx;
+		margin: 0 10rpx;
+	}
+
+	.replay_reply_tip {
+		color: #2d2d2d;
+		font-size: 24rpx;
+		padding: 0 15rpx;
+	}
+
+	.replay_reply_name {
+		color: #4d8efb;
+	}
+
+	.video_comment_item_wrap {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: flex-start;
+	}
+
+	.video_comment_comment {
+		width: 750rpx;
+		height: 530rpx;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: flex-start;
+		margin-top: 20rpx;
+		/* position: relative; */
+		padding-bottom: 100rpx;
+	}
+
+	.video_comment_item_wrap_item,.video_comment_child_item {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: flex-start;
+		width: 690rpx;
+		margin-left: 30rpx;
+	}
+
+	.video_comment_item_wrap_item_l,.video_comment_child_item_l {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+		align-items: flex-start;
+		width: 600rpx;
+	}
+
+	.video_comment_item_wrap_item_l_com_avator {
+		width: 43rpx;
+		height: 43rpx;
+		border-radius: 50%;
+		margin-right: 18rpx;
+		margin-top: 10rpx;
+	}
+	
+	.video_comment_item_wrap_item_l_com_avator_img{
+		width: 43rpx;
+		height: 43rpx;
+		border-radius: 50%;
+	}
+	
+	.video_comment_child_item_l_avator {
+		width: 30rpx;
+		height: 30rpx;
+		border-radius: 50%;
+		margin-right: 18rpx;
+		margin-top: 10rpx;
+	}
+
+	.video_comment_child_item_l_avator_img{
+		width: 30rpx;
+		height: 30rpx;
+		border-radius: 50%;
+	}
+
+	.video_comment_item_wrap_item_l_com_detail {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: flex-start;
+		flex: 1;
+	}
+
+	.video_comment_item_wrap_item_l_com_detail_name {
+		color: #2d2d2d;
+		font-size: 28rpx;
+		margin-bottom: 12rpx;
+	}
+
+	.video_comment_item_wrap_item_l_com_detail_con {
+		color: #2d2d2d;
+		font-size: 26rpx;
+		line-height: 39rpx;
+		margin-bottom: 7rpx;
+	}
+
+	.video_comment_item_wrap_item_l_com_detail_other {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: flex-start;
+		margin-bottom: 12rpx;
+	}
+
+	.video_comment_item_wrap_item_l_com_detail_other_time {
+		color: #949494;
+		font-size: 22rpx;
+		margin-right: 20rpx;
+	}
+
+	.video_comment_item_wrap_item_l_com_detail_other_del_com {
+		color: #4d8efb;
+		font-size: 20rpx;
+	}
+
+	.video_comment_item_wrap_item_r {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+	.video_comment_item_wrap_item_r_image {
+		width: 46rpx;
+		height: 46rpx;
+	}
+
+	.video_comment_item_wrap_item_r_text {
+		color: #949494;
+		font-size: 20rpx;
+		margin-top: -3rpx;
+	}
+
+	.video_comment_child {
+		padding-left: 60rpx;
+	}
+
+	.video_comment_child_item_l_avator {
+		width: 30rpx;
+		height: 30rpx;
+		margin-top: 0;
+		margin-right: 10rpx;
+	}
+
+	.video_comment_child_item_l_detail_name {
+		font-size: 26rpx;
+		margin-bottom: 5rpx;
+	}
+	
+	.video_comment_child_item_l_detail_con_wrap {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+		align-items: flex-start;
+	}
+
+	.video_comment_child_item_l_detail_con {
+		font-size: 24rpx;
+	}
+
+	.video_comment_child_item_l_detail_con_replay_name {
+		color: #949494;
+		font-size: 24rpx;
+	}
+
+	.video_comment_child_item {
+		width: 630rpx;
+	}
+
+	.video_comment_child_item_l {
+		width: 550rpx;
+	}
+
+	.reply_pagnation {
+		width: 750rpx;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		align-items: center;
+		height: 40rpx;
+		padding-left: 110rpx;
+		padding-right: 90rpx;
+	}
+
+	.reply_pagnation_left_line,
+	.reply_pagnation_right_line {
+		height: 1rpx;
+		background-color: rgba(0, 0, 0, 0.1);
+		width: 166rpx;
+	}
+
+	.reply_pagnation_more_reply {
+		color: #2d2d2d;
+		font-size: 22rpx;
+	}
+
+	.page_loading_child {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		width: 750rpx;
+		height: 750rpx;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		background-color: transparent;
+	}
+
+	.page_loading_child_image {
+		width: 60rpx;
+		height: 60rpx;
+	}
+</style>

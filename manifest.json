@@ -1,0 +1,226 @@
+{
+    "name" : "商联达商城",
+    "appid" : "__UNI__A5A0C9E",
+    "description" : "",
+    "versionName" : "1.3",
+    "versionCode" : 202,
+    "transformPx" : false,
+    "app-plus" : {
+        "usingComponents" : true,
+        "nvueCompiler" : "uni-app",
+        "compilerVersion" : 3,
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : true,
+            "waiting" : true,
+            "autoclose" : true,
+            "delay" : 0
+        },
+        "modules" : {
+            "Share" : {},
+            "Payment" : {},
+            "Webview-x5" : {},
+            "Maps" : {},
+            "OAuth" : {},
+            "VideoPlayer" : {}
+        },
+        "distribute" : {
+            "android" : {
+                "permissions" : [
+                    "<uses-feature android:name=\"android.hardware.camera\"/>",
+                    "<uses-feature android:name=\"android.hardware.camera.autofocus\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CALL_PHONE\"/>",
+                    "<uses-permission android:name=\"android.permission.CAMERA\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.FLASHLIGHT\"/>",
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+                    "<uses-permission android:name=\"android.permission.LOCATION_HARDWARE\"/>",
+                    "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.permission.MOUNT_UNMOUNT_FILESYSTEMS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_LOGS\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>",
+                    "<uses-permission android:name=\"android.permission.WAKE_LOCK\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
+                    "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
+                ],
+                "minSdkVersion" : 18,
+                "targetSdkVersion" : 28,
+                "schemes" : "slodonphp",
+                "abiFilters" : [ "armeabi-v7a", "arm64-v8a" ]
+            },
+            "ios" : {
+                "privacyDescription" : {
+                    "NSBluetoothPeripheralUsageDescription" : "是否允许App使用您的蓝牙",
+                    "NSBluetoothAlwaysUsageDescription" : "是否允许App使用您的蓝牙",
+                    "NSPhotoLibraryUsageDescription" : "是否允许App使用您的相册以便上传图片",
+                    "NSPhotoLibraryAddUsageDescription" : "是否允许APP保存图片到相册",
+                    "NSCameraUsageDescription" : "是否允许app使用您的相机以便拍摄上传图片",
+                    "NSMicrophoneUsageDescription" : "是否允许App使用您的麦克风",
+                    "NSLocationWhenInUseUsageDescription" : "我们需要获取您的地理位置以便获取您附近的商家",
+                    "NSLocationAlwaysUsageDescription" : "我们需要获取您的地理位置以便获取您附近的商家",
+                    "NSLocationAlwaysAndWhenInUseUsageDescription" : "是否允许App使用您的地理",
+                    "NSCalendarsUsageDescription" : "是否允许App使用您的日历",
+                    "NSSpeechRecognitionUsageDescription" : "语音识别权限",
+                    "NSLocalNetworkUsageDescription" : "是否允许app访问您的本地网络以便与服务器连接"
+                },
+                "urltypes" : "slodonphp",
+                "idfa" : false
+            },
+            "sdkConfigs" : {
+                "ad" : {},
+                "push" : {
+                    "unipush" : {}
+                },
+                "oauth" : {
+                    "weixin" : {
+                        "appid" : "wx9ab84313208a2b97",
+                        "appsecret" : "9910bda06e0c6f1ac89f34ecc1669cf4",
+                        "UniversalLinks" : "https://www.slodon.cn/wechat-auth/"
+                    },
+                    "facebook" : {
+                        "appid" : "",
+                        "client_token" : ""
+                    }
+                },
+                "share" : {
+                    "weixin" : {
+                        "appid" : "wx9ab84313208a2b97",
+                        "UniversalLinks" : "https://www.slodon.cn/wechat-auth/"
+                    }
+                },
+                "payment" : {
+                    "weixin" : {
+                        "__platform__" : [ "ios", "android" ],
+                        "appid" : "wx9ab84313208a2b97",
+                        "UniversalLinks" : "https://www.slodon.cn/wechat-auth/"
+                    },
+                    "alipay" : {
+                        "__platform__" : [ "ios", "android" ]
+                    }
+                },
+                "maps" : {
+                    "amap" : {
+                        "appkey_ios" : "b89b9eeee6ed3c5dfc549efeda8a26f0",
+                        "appkey_android" : "5fb49be06ff189e926404f7d4efe692f"
+                    }
+                }
+            },
+            "icons" : {
+                "android" : {
+                    "hdpi" : "static/app-plus/icon/72x72.png",
+                    "xhdpi" : "static/app-plus/icon/96x96.png",
+                    "xxhdpi" : "static/app-plus/icon/144x144.png",
+                    "xxxhdpi" : "static/app-plus/icon/192x192.png"
+                },
+                "ios" : {
+                    "appstore" : "static/app-plus/icon/1024x1024.png",
+                    "iphone" : {
+                        "app@2x" : "static/app-plus/icon/120x120.png",
+                        "app@3x" : "static/app-plus/icon/180x180.png",
+                        "spotlight@2x" : "static/app-plus/icon/80x80.png",
+                        "spotlight@3x" : "static/app-plus/icon/120x120.png",
+                        "settings@2x" : "static/app-plus/icon/58x58.png",
+                        "settings@3x" : "static/app-plus/icon/87x87.png",
+                        "notification@2x" : "static/app-plus/icon/40x40.png",
+                        "notification@3x" : "static/app-plus/icon/60x60.png"
+                    },
+                    "ipad" : {
+                        "notification@2x" : "static/app-plus/icon/40x40.png",
+                        "spotlight@2x" : "static/app-plus/icon/80x80.png",
+                        "spotlight" : "static/app-plus/icon/40x40.png",
+                        "settings@2x" : "static/app-plus/icon/58x58.png",
+                        "settings" : "static/app-plus/icon/29x29.png",
+                        "notification" : "static/app-plus/icon/20x20.png",
+                        "proapp@2x" : "static/app-plus/icon/167x167.png",
+                        "app@2x" : "static/app-plus/icon/152x152.png",
+                        "app" : "static/app-plus/icon/76x76.png"
+                    }
+                }
+            },
+            "splashscreen" : {
+                "androidStyle" : "common",
+                "android" : {
+                    "hdpi" : "",
+                    "xhdpi" : "",
+                    "xxhdpi" : ""
+                },
+                "iosStyle" : "common"
+            }
+        },
+        "privacy" : {
+            "prompt" : "template", //可取值template、custom、none  
+            "template" : {
+                //prompt取值为template时有效，用于配置模板提示框上显示的内容  
+                "title" : "感谢下载我们的APP",
+                "message" : "<font style=\"fontSize:40px;lineHeight:60px;\">亲，感谢您对我们一直以来的信任</font>！我们依据最新的监管要求更新了我们的<a href=\"https://www.slodon.cn/cwap/pages/privacyPolicy/privacyPolicy\">《用户注册协议及隐私政策》</a>了解详细信息，特向您说明：<br/>1.为向您提供交易相关基本功能，我们会收集、使用必要的信息；<br/>2.未经您同意,我们不会从第三方获取、共享或向其提供您的信息；<br/>3.你可以查询、更正、删除您的个人信息，我们也提供账户注销的渠道",
+                "buttonAccept" : "同意",
+                "buttonRefuse" : "不同意",
+                "second" : {
+                    "title" : "您需要同意该隐私政策才能继续",
+                    "message" : "若不同意，很遗憾我们将无法为您提供服务",
+                    "buttonAccept" : "同意",
+                    "buttonRefuse" : "退出应用"
+                }
+            }
+        }
+    },
+    "quickapp" : {},
+    "mp-weixin" : {
+        "appid" : "wxa7ad70a10ac61ff2",
+        "setting" : {
+            "urlCheck" : true,
+            "minified" : true
+        },
+        "usingComponents" : true,
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "你的位置信息将用于小程序位置接口的效果展示"
+            }
+        },
+        "optimization" : {
+            "subPackages" : true
+        },
+        "plugins" : {},
+        "unipush" : {
+            "enable" : false
+        }
+    },
+    "mp-alipay" : {
+        "usingComponents" : true,
+        "appid" : "2019050664367000"
+    },
+    "mp-baidu" : {
+        "usingComponents" : true,
+        "setting" : {
+            "urlCheck" : false
+        }
+    },
+    "mp-toutiao" : {
+        "usingComponents" : true
+    },
+    "h5" : {
+        "title" : "商城",
+        "router" : {
+            "base" : "/cwap/",
+            "mode" : "history"
+        },
+        "devServer" : {
+            "https" : false,
+            "port" : 8080
+        },
+        "domain" : "newbbc.slodon.cn",
+        "sdkConfigs" : {
+            "maps" : {
+                "google" : {
+                    "key" : ""
+                }
+            }
+        },
+        "template" : "template.h5.html"
+    }
+}

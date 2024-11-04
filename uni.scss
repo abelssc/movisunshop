@@ -1,0 +1,42 @@
+
+/* 页面左右间距 */
+$page-row-spacing: 30upx;
+$page-color-base: #f8f8f8;
+$page-color-light: #f8f6fc;
+$base-color: #fa436a;
+
+/* 文字尺寸 */
+$font-sm: 24upx;
+$font-base: 28upx;
+$font-lg: 32upx;
+/*文字颜色*/
+$font-color-dark: #303133;
+$font-color-base: #606266;
+$font-color-light: #909399;
+$font-color-disabled: #C0C4CC;
+$font-color-spec: #4399fc;
+/* 边框颜色 */
+$border-color-dark: #DCDFE6;
+$border-color-base: #E4E7ED;
+$border-color-light: #EBEEF5;
+/* 图片加载中颜色 */
+$image-bg-color: #eee;
+/* 行为相关颜色 */
+$uni-color-primary:#fa436a;
+$uni-color-success: #4cd964;
+$uni-color-warning: #f0ad4e;
+$uni-color-error: #dd524d;
+
+/* zokxc-设计规范 */
+$bg-color-split: #f5f5f5; //用于分割背景的底色,页面背景色
+$border-color-split: rgba(0,0,0,.1);//辅助分割线
+$main-color: #FC1C1C;//主体红色
+$com-v-border: 20rpx;//主体内容距离两边的距离
+$com-h-border: 20rpx;//主体内容距上下模块的间距
+$com-main-font-color: #2D2D2D;//主要内容字体颜色，eg:商品名称
+$main-font-color: #333;//用于重要级文字信息、内页标题信息，如导航名称、大板块标题、类目名称等
+$main-second-color: #666;//用于普通级段落信息引导词二级标题信息，如商品详情段落标题信息
+$main-third-color: #999;//用于辅助、次要的文字信息，如商品评论、规格标识
+
+
+
