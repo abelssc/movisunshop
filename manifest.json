@@ -1,6 +1,6 @@
 {
     "name" : "商联达商城",
-    "appid" : "__UNI__A5A0C9E",
+    "appid" : "__UNI__GF870A1D",
     "description" : "",
     "versionName" : "1.3",
     "versionCode" : 202,
@@ -210,7 +210,7 @@
             "mode" : "history"
         },
         "devServer" : {
-            "https" : false,
+            "https" : true,
             "port" : 8080
         },
         "domain" : "newbbc.slodon.cn",
@@ -221,6 +221,11 @@
                 }
             }
         },
-        "template" : "template.h5.html"
+        "template" : "template.h5.html",
+        "optimization" : {
+            "treeShaking" : {
+                "enable" : false
+            }
+        }
     }
 }
