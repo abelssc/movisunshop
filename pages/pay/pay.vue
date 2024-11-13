@@ -239,7 +239,7 @@
 				`
 				<form  name="f1" id="f1" action="#" method="post" class="alignet-form-vpos2 goPay">
 					${inputList}
-					<input style="width: 100%; height: 60px; background-color: #e74310;color: #fff;font-size: 17px; line-height: 60px;letter-spacing: 5px;border-radius: 0; border:none; text-align:center;" type="submit" onclick="javascript:AlignetVPOS2.openModal('https://integracion.alignetsac.com/','[DesignType]')" value="${this.$L('确定')}">
+					<input style="width: 100%; height: 60px; background-color: #e74310;color: #fff;font-size: 17px; line-height: 60px;letter-spacing: 5px;border-radius: 0; border:none; text-align:center;" type="submit" onclick="javascript:AlignetVPOS2.openModal('https://vpayment.verifika.com/','[DesignType]')" value="${this.$L('确定')}">
 				</form>
 				`
 				fromModel.innerHTML = fromInputNode
