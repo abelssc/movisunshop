@@ -15,7 +15,7 @@
 			<image v-if="city_site_open" mode="aspectFit" :src="img_url+'more_site.png'" class="top_icon"></image>
 			<view class="search_con">
 				<image :src="img_url+'search.png'" mode="aspectFit" class="search_img"></image>
-				<input class="ser-input" type="text" :value="$L('输入关键字搜索')" disabled @click="toSearchPage" placeholder-class="search_input" />
+				<input class="ser-input" type="text" :value="$L('输入关键字搜索')"  @click="toSearchPage" placeholder-class="search_input" />
 			</view>
 			<!-- #ifdef APP-PLUS -->
 			<view class="scan" @click="scanCode">

@@ -9,12 +9,12 @@
 			</view>
 			<view class="input-content">
 				<view class="input-item">
-					<input type="text" :value="mobile" @click="hideBottomInfo" :placeholder="$L('请输入账号')" @blur="showBottomInfo" maxlength="20" data-key="mobile" @input="inputChange"
+					<input type="text" :value="mobile" @click="hideBottomInfo" :placeholder="$L('请输入账号')" @blur="showBottomInfo" data-key="mobile" @input="inputChange"
 					 @focus="setFocus" />
 					<text class="clear-account iconfont iconziyuan34" v-show="mobile&&curFocus=='mobile'" @click="clearContent('mobile')"></text>
 				</view>
 				<view class="input-item pwd_wrap">
-					<input type="text" :value="password" @click="hideBottomInfo" :placeholder="$L('请输入密码')" maxlength="20" :password="!showPwd" @blur="showBottomInfo" data-key="password"
+					<input type="text" :value="password" @click="hideBottomInfo" :placeholder="$L('请输入密码')" :password="!showPwd" @blur="showBottomInfo" data-key="password"
 					 @input="inputChange" @confirm="toLogin" @focus="setFocus" />
 					<view class="pwd-right">
 						<text class="clear-pwd iconfont iconziyuan34" v-show="password&&curFocus=='password'" @click="clearContent('password')"></text>
