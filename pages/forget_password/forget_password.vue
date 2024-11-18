@@ -29,7 +29,7 @@
 
 				</view>
 				<view class="input-item pwd_wrap">
-					<input type="text" :value="password" :placeholder="$L('请设置6～20位英文、数字或符号的密码')" maxlength="20" :password="!showPwd"
+					<input type="text" :value="password" :placeholder="$L('请设置6～20位英文、数字或符号的密码')" :password="!showPwd"
 					 placeholder-class="input_placeholder" data-key="password" @input="inputChange" @confirm="toLogin" @focus="setFocus" />
 					<view class="pwd-right">
 						<text class="clear-pwd iconfont iconziyuan34" v-show="password&&curFocus=='password'" @click="clearContent('password')"></text>
@@ -331,15 +331,16 @@
 		margin-bottom: 50upx;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 		position: relative;
-
 		input {
+			width: 100%;
 			color: #2D2D2D;
-			font-size: 28rpx;
+			height: 60upx;
+			font-size: $font-base;
+			color: $font-color-dark;
 		}
 
 		.input_placeholder {
 			color: $main-third-color;
-			font-size: 30rpx;
 		}
 
 		.clear-account {
@@ -427,13 +428,6 @@
 			font-size: $font-sm+2upx;
 			color: $font-color-base;
 		}
-
-		input {
-			height: 60upx;
-			font-size: $font-base + 2upx;
-			color: $font-color-dark;
-			width: 100%;
-		}
 	}
 
 
@@ -442,9 +436,9 @@
 		height: 88rpx;
 		line-height: 88rpx;
 		margin-top: 90rpx;
-		border-radius: 44rpx;
+		border-radius: 6rpx;
 		color: #fff;
-		font-size: 36rpx;
+		font-size: 30rpx;
 		background-color: #1E2A74;
 	}
 

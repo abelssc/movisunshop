@@ -1410,7 +1410,6 @@ page {
     display: flex;
     align-items: center;
     border: none;
-    padding: 0;
     background-color: transparent;
 }
 

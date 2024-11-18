@@ -25,9 +25,13 @@
 
 				</view>
 			</view>
+			<view class='remember_password'>
+				<text class='remember_text'>{{$L('忘记密码')}}</text>
+				<text class="mobile-login" @click="navTo('/pages/forget_password/forget_password',2)">{{$L('verification_code_sms')}}</text>
+			</view>
 			<button class="confirm-btn" @click="toLogin">{{$L('登录')}}</button>
 			<view class="login-register">
-				<text class="mobile-login" @click="navTo('/pages/forget_password/forget_password',2)">{{$L('忘记密码')}}</text>
+				<text class='register_text'>{{$L('register_text')}}</text>
 				<text class="register" @click="navTo('/pages/register/registerel',1)">{{$L('用户注册')}}</text>
 			</view>
 		</view>
@@ -37,16 +41,16 @@
 			</view>
 			<view class="login-method">
 				<view class="wechat-login" @tap="tripartite(1)" v-if="facebook_isuse==1">
-					<image class="wechat-icon" src="https://dwqshop.slodon.cn/mall/views//images/facebook.png" mode="aspectFill" />
+					<image class="wechat-icon" src="https://www.movisunshop.com/mall/views/images/facebook.png" mode="aspectFill" />
 					<text>Facebook</text>
 				</view>
 				<view class="wechat-login" @tap="tripartite(2)" v-if="instagram_isuse==1">
-					<image class="wechat-icon" src="https://dwqshop.slodon.cn/mall/views/images/insragram.jpeg" mode="aspectFill" />
-					<text>instagram</text>
+					<image class="wechat-icon" src="https://www.movisunshop.com/mall/views/images/insragram.jpeg" mode="aspectFill" />
+					<text>Instagram</text>
 				</view>
 				<view class="wechat-login" @tap="tripartite(3)" v-if="tiktok_isuse==1">
-					<image class="wechat-icon" src="https://dwqshop.slodon.cn/mall/views/images/tiktok.png" mode="aspectFill" />
-					<text>tiktok</text>
+					<image class="wechat-icon" src="https://www.movisunshop.com/mall/views/images/tiktok.png" mode="aspectFill" />
+					<text>Tiktok</text>
 				</view>
 			</view>
 			
@@ -68,21 +72,6 @@
 				</view>
 			</view> -->
 			<!-- #endif -->
-		</view>
-			<!-- #ifdef H5 -->
-			<view class="agreement-part flex_row_center_center" :style="!isWeiXinBrower?'bottom:120rpx; gap:5px':'gap:5px'">
-			<!-- #endif -->
-			<!-- #ifndef H5 -->
-			<view class="agreement-part flex_row_center_center">
-			<!-- #endif -->
-			<!-- #ifdef APP-PLUS -->
-			<image @click="checkAgrement" class="register_icon" :src="show_check_icon" mode="aspectFill" />
-			{{$L('我已阅读并同意')}}
-			<!-- #endif -->
-			<!-- #ifndef APP-PLUS -->
-			{{$L('登录即代表您已同意')}}
-			<!-- #endif -->
-			<text class="agreement" @click="agreement">{{$L('《用户隐私政策》')}}</text>
 		</view>
 
 		<!-- 授权成功后弹层 -->
@@ -691,6 +680,7 @@
 
 	.input-content {
 		padding: 0 65rpx;
+		margin-bottom: 16rpx;
 	}
 
 	.input-item {
@@ -703,7 +693,11 @@
 		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 		position: relative;
 		input {
+			width: 100%;
 			color: #2D2D2D;
+			height: 60upx;
+			font-size: $font-base;
+			color: $font-color-dark;
 		}
 
 		.clear-account {
@@ -756,13 +750,6 @@
 				}
 			}
 		}
-
-		input {
-			height: 60upx;
-			font-size: $font-base;
-			color: $font-color-dark;
-			width:100%;
-		}
 	}
 
 
@@ -771,9 +758,9 @@
 		height: 88rpx;
 		line-height: 88rpx;
 		margin-top: 90rpx;
-		border-radius: 44rpx;
+		border-radius: 6rpx;
 		color: #fff;
-		font-size: 36rpx;
+		font-size: 30rpx;
 		background-color:#1E2A74;
 	}
 
@@ -859,25 +846,28 @@
 			border-bottom: 1rpx solid #1E2A74;
 		}
 	}
-
-	.login-register {
-		display: flex;
-		justify-content: center;
-		margin-top: 33rpx;
-
-		.mobile-login {
-			color: #2D2D2D;
-			font-size: 28rpx;
-			line-height: 34rpx;
-			border-right: 1px solid rgba(0, 0, 0, .1);
-			padding-right: 30rpx;
-			margin-right: 30rpx;
+	.remember_password{
+		padding: 0 64rpx;
+		font-size: 14px;
+		.remember_text{
+			color: grey;
 		}
-
+		.mobile-login {
+			color: #1e2a74;
+			text-decoration: underline;
+		}
+	}
+	.login-register {
+		padding: 0 64rpx;
+		margin-top: 33rpx;
+		text-align:center;
+		font-size: 14px;
+		.register_text{
+			color: grey;
+		}
 		.register {
 			color: #1e2a74;
-			font-size: 28rpx;
-			line-height: 34rpx;
+			text-decoration: underline;
 		}
 	}
 

@@ -38,9 +38,19 @@
 					</view>
 				</view>
 				<view class="input-item">
-				<input type="password" :value="password" :placeholder="$L('请设置您的密码')" maxlength="11" data-key="password" @input="inputChange"
+				<input type="password" :value="password" :placeholder="$L('请设置您的密码')" data-key="password" @input="inputChange"
 					 @focus="setFocus" style="width:100%"/>
 					<text class="clear-account iconfont iconziyuan34" v-show="password&&curFocus=='password'" @click="clearContent('password')"></text>
+				</view>
+				<!-- #ifdef H5 -->
+				<view class="agreement-part">
+				<!-- #endif -->
+				<!-- #ifndef H5 -->
+				<view class="agreement-part">
+				<!-- #endif -->
+					<image @click="checkAgrement" class="register_icon" :src="show_check_icon" mode="aspectFill" />
+					{{$L('我已阅读并同意')}}
+					<text class="agreement" @click="agreement">{{$L('《用户注册协议及隐私政策》')}}</text>
 				</view>
 			</view>
 			<button class="confirm-btn" @click="toRegist">{{$L('注册')}}</button>
@@ -59,16 +69,6 @@
 					<text>{{$L('微信登录')}}</text>
 				</view>
 			</view>
-		</view>
-		<!-- #ifdef H5 -->
-		<view class="agreement-part flex_row_center_center" :style="!isWeiXinBrower?'bottom:120rpx':''">
-		<!-- #endif -->
-		<!-- #ifndef H5 -->
-		<view class="agreement-part flex_row_center_center" style="flex-wrap: wrap">
-		<!-- #endif -->
-			<image @click="checkAgrement" class="register_icon" :src="show_check_icon" mode="aspectFill" />
-			{{$L('我已阅读并同意')}}
-			<text class="agreement" @click="agreement">{{$L('《用户注册协议及隐私政策》')}}</text>
 		</view>
 	</view>
 </template>
@@ -376,13 +376,14 @@
 		align-items: flex-start;
 		justify-content: center;
 		height: 80rpx;
-		margin-bottom: 50upx;
+		margin-bottom: 30upx;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 		position: relative;
-
 		input {
 			color: #2D2D2D;
-			font-size: 28rpx;
+			height: 60upx;
+			font-size: $font-base;
+			color: $font-color-dark;
 		}
 
 		.clear-account {
@@ -417,8 +418,6 @@
 		}
 
 		&:nth-child(3) {
-			/* margin-bottom: 0; */
-
 			.pwd-right {
 				position: absolute;
 				right: 6rpx;
@@ -447,21 +446,11 @@
 			}
 		}
 
-		&:nth-child(4) {
-			margin-bottom: 0;
-		}
-
 		.tit {
 			height: 50upx;
 			line-height: 56upx;
 			font-size: $font-sm+2upx;
 			color: $font-color-base;
-		}
-
-		input {
-			height: 60upx;
-			font-size: $font-base + 2upx;
-			color: $font-color-dark;
 		}
 	}
 
@@ -471,9 +460,9 @@
 		height: 88rpx;
 		line-height: 88rpx;
 		margin-top: 90rpx;
-		border-radius: 44rpx;
+		border-radius: 6rpx;
 		color: #fff;
-		font-size: 36rpx;
+		font-size: 30rpx;
 		background-color: #1E2A74;
 	}
 
@@ -537,19 +526,16 @@
 	}
 
 	.agreement-part {
-		position: absolute;
-		left: 0;
-		bottom: 60rpx;
 		width: 100%;
 		font-size: 26rpx;
 		color: #999999;
-		text-align: center;
 		flex-wrap: wrap;
 		justify-content: center;
 		
 		.register_icon {
 			width: 46rpx;
 			height: 46rpx;
+			top: 11rpx;
 		}
 
 		.agreement {
@@ -563,17 +549,16 @@
 		justify-content: center;
 		gap: 4px;
 		margin-top: 33rpx;
+		font-size: 14px;
 
 		.mobile-login {
 			color: #949494;
-			font-size: 28rpx;
 			line-height: 34rpx;
 		}
 
 		.register {
 			color: #1E2A74;
-			font-size: 28rpx;
-			line-height: 34rpx;
+			text-decoration: underline;
 		}
 	}
 	.avatar{
