@@ -3,15 +3,10 @@
 <!-- 会员顶部 start -->
 <view class="member-top">
 
-    <image :src="img_url+'/site/mine_bg.png'" class="member-bg"></image>
-
     <view class="setting">
         <view  data-url="/pages/setting/setting" class="navigator" @tap="drup" hover-class="none">
             <image :src="img_url+'/site/mine_set.png'" mode="widthFix"></image>
         </view>
-		<view  data-url="/pages/setting/language" class="navigator" @tap="drup" hover-class="none">
-		    <image :src="img_url+'/lang.png'" mode="widthFix"></image>
-		</view>
         <view  data-url="/pages/msg/msg?u=cwap_user_msg_xcx.html" @tap="drup"  class="navigator" hover-class="none">
             <image :src="img_url+'/site/mine_msg.png'" mode="widthFix"></image>
             <view class="msgCount" v-if="msg_count>0">
@@ -25,24 +20,41 @@
         <view class="member-base-info" v-if="!show_log_btn">
             <view class="user-avatar" data-url="/pages/user/profile" @tap="drup">
                 <view class="user-avator2" v-if="member_info.avator" :style="'background: url(' + member_info.avator + ') no-repeat center center #fff;background-size: 100% 100%;'">
-					<image :src="member_info.avator" mode="aspectFill"></image>
+					        <image :src="member_info.avator" mode="aspectFill"></image>
                 </view>
                 <view class="user-avator2" v-else>
                     <image class="avator-img" :src="img_url+'no-login.png'" mode="widthFix"></image>
                 </view>
             </view>
-            <view class="user_new_info" data-url="/pages/member_grade/member_grade" @tap="drup">
+            <view class="user_new_info">
                 <view class="user-name">
                     <text class="user-info-name-txt">{{member_info.member_nickname?member_info.member_nickname:member_info.member_name}}</text>
                     <text v-if="member_info.member_nickname">{{$L('会员名')}}:{{member_info.member_name}}</text>
                 </view>
-
+                <!--
                 <view class="user-level">
-					<view class="user-level1">
-						   {{$L('会员等级')}}:{{member_info.grade_info.grade_name}}
-					</view>                 
+                  <view class="user-level1">
+                      {{$L('会员等级')}}:{{member_info.grade_info.grade_name}}
+                  </view>                 
+                </view>
+                -->
+            </view>
+            <view class="action">
+                <view  data-url="/pages/favorites/favorites" class="navigator" @tap="drup" hover-class="none">
+                  <text class="action-top">{{(member_info.goodsNum||member_info.goodsNum===0)?member_info.goodsNum:'--'}}</text>
+                    <view>
+                        <image :src="img_url+'/site/mine_like.svg'" mode="widthFix"></image>
+                    </view>
+                   
+                </view>
+                <view data-url="/pages/footprint/footprint" class="navigator" @tap="drup" hover-class="none">
+                  <text class="action-top">{{(member_info.BrowseHistoryNum||member_info.BrowseHistoryNum===0)?member_info.BrowseHistoryNum:'--'}}</text>
+                    <view>
+                        <image :src="img_url+'/site/mine_footprint_white.png'" mode="widthFix"></image>
+                    </view>
                 </view>
             </view>
+
         </view>
 
         <!-- 未登录 -->
@@ -85,31 +97,12 @@
 		    </view>
 		</button> -->
 		<!-- #endif -->
-
+        <!--
         <view class="check-in" data-url="/pages/singIn/singIn" @tap="drup">
             <image :src="img_url+ 'site/mine_time.png'" mode="widthFix"></image>
             {{$L('去签到')}}
         </view>
-
-        <view class="action-wrap">
-            <view class="action">
-                <view  data-url="/pages/favorites/favorites" class="navigator" @tap="drup" hover-class="none">
-                    <view class="action-top ">
-                        <image :src="img_url+'/site/mine_like.png'" mode="widthFix"></image>
-                        {{$L('我的收藏')}}
-                    </view>
-                    <text>{{(member_info.goodsNum||member_info.goodsNum===0)?member_info.goodsNum:'--'}}</text>
-                </view>
-                <view data-url="/pages/footprint/footprint" class="navigator" @tap="drup" hover-class="none">
-                    <view class="action-top">
-                        <image :src="img_url+'/site/mine_footprint.png'" mode="widthFix"></image>
-                        {{$L('我的足迹')}}
-                    </view>
-                    <text>{{(member_info.BrowseHistoryNum||member_info.BrowseHistoryNum===0)?member_info.BrowseHistoryNum:'--'}}</text>
-                </view>
-            </view>
-        </view>
-
+        -->
     </view>
 </view>
 <view class="fixed_top_status_bar" :hidden="scrollTopH==0"></view>
@@ -223,22 +216,23 @@
 <image class="svideo" @tap="goLiveUserCenter" data-curTab="video" v-if="member_info.is_open_svideo == 1 && !member_info.is_shenhe" :src="img_url + $L('svideo_entry.gif')"></image>
 
 <!-- 我的服务 -->
-<view class="wrap-title" style="margin-top:-20rpx">
+<view class="wrap-title service-title">
     <text>{{$L('我的服务')}}</text>
 </view>
 
 <view class="my-service">
-
+    <!--
     <view v-if="key && !member_info.wx_xcx_checking" class="ser-item" data-url="/pages/Balance/Balance?type=banance" @tap="drup">
         <image class="left_icon" :src="img_url+'my_s_09.png'"></image>
         <text>{{$L('预存款')}}</text>
     </view>
-
+    -->
+    <!--
     <view class="ser-item" data-url="/pages/red/red" @tap="drup">
         <image class="left_icon" :src="img_url+'my_s_05.png'"></image>
         <text>{{$L('优惠券')}}</text>
     </view>
-
+    -->
     <view class="ser-item" data-url="/integral/activity/pin_list/pin_list" @tap="drup" v-if="moduleInfo.pin_isuse==1">
         <image class="left_icon" :src="img_url+'my_s_03.png'"></image>
         <text>{{$L('拼团')}}</text>
@@ -250,35 +244,36 @@
     </view>
 
     <view class="ser-item" data-url="/pages/address/address" @tap="drup">
-        <image class="left_icon" :src="img_url+'my_s_06.png'"></image>
+        <image class="left_icon" :src="img_url+'my_s_06.svg'"></image>
         <text>{{$L('地址')}}</text>
     </view>
 
     <view class="ser-item" data-url="/pages/red/red_get_list" @tap="drup">
-        <image class="left_icon" :src="img_url+'my_s_01.png'"></image>
+        <image class="left_icon" :src="img_url+'my_s_01.svg'"></image>
         <text>{{$L('领劵')}}</text>
     </view>
 
     <view class="ser-item" data-url="/pages/help/help" @tap="drup">
-        <image class="left_icon" :src="img_url+'my_s_08.png'"></image>
+        <image class="left_icon" :src="img_url+'my_s_08.svg'"></image>
         <text>{{$L('帮助')}}</text>
     </view>
 
     <view class="ser-item" :data-phone="site_phone" @tap.stop="call_phone">
-        <image class="left_icon" :src="img_url+'my_s_07.png'"></image>
+        <image class="left_icon" :src="img_url+'my_s_07.svg'"></image>
         <text>{{$L('投诉')}}</text>
     </view>
-
+    <!--
     <view class="ser-item" data-url="/pages/recharge/recharge" @tap="drup" v-if="key && !member_info.wx_xcx_checking && member_info.allow_deposit==1">
         <image class="left_icon" :src="img_url+'sld_chongzhi_icon.png'"></image>
         <text>{{$L('充值')}}</text>
     </view>
-
+    -->
+    <!--
     <view v-if="key && !member_info.wx_xcx_checking" class="ser-item" data-url="/pages/recharge/tixian" @tap="drup">
         <image class="left_icon" :src="img_url+'sld_tixian_icon.png'"></image>
         <text>{{$L('提现')}}</text>
     </view>
-
+    -->
     <view class="ser-item" data-url="/addons/pages/ladderOrder/ladderOrder" @tap="drup" v-if="moduleInfo.pin_ladder_isuse==1">
         <image class="left_icon" :src="img_url + 'jtt@2x.png'"></image>
         <text>{{$L('阶梯团')}}</text>
@@ -1269,10 +1264,10 @@ page {
     height: calc(var(--status-bar-height) + 420rpx);
 	/* #endif */
 	/* #ifndef APP-PLUS */
-	height: 420rpx;
+	height: 135px;
 	/* #endif */
     text-align: center;
-    background: #f8f8f8;
+    background: #05092d;
     z-index: 1;
     overflow: hidden;
 }
@@ -1299,18 +1294,20 @@ page {
 .member-base-info {
     position: absolute;
 	/* #ifdef APP-PLUS */
-    top: calc(var(--status-bar-height) + 100rpx);
 	/* #endif */
 	/* #ifndef APP-PLUS */
-	top: 100rpx;
+	top: 40px;
 	/* #endif */
-    left: 40rpx;
+    left: 0;
     height: 115rpx;
     display: flex;
     align-items: center;
     font-size: 30rpx;
     z-index: 2;
     transition: all 0.3s;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .member-base-info .user-avatar {
@@ -1420,114 +1417,43 @@ page {
 .no_login::after {
     border: 0;
 }
-
-.action-wrap {
-    position: absolute;
-	/* #ifdef APP-PLUS */
-	top: calc(var(--status-bar-height) + 240rpx);
-	/* #endif */
-    /* #ifndef APP-PLUS */
-    top: 240rpx;
-    /* #endif */
-    left: calc(50% + 12rpx);
-    width: 710rpx;
-    height: 200rpx;
-    /* background-color: #fc6e66; */
-    border-radius: 6rpx;
-    transform: translateX(-50%);
+.action{
+  flex: 1;
+  display: flex;
+  justify-content: end;
+  align-items:center;
 }
-
-.action {
-    position: absolute;
-    top: 35rpx;
-    left: -12rpx;
-    width: 100%;
-    height: 100%;
-    border-radius: 6rpx;
-    background-color: #fff;
-    display: flex;
-    justify-content: space-between;
+.action .navigator{
+  position: relative;
+  padding: 10px;
+  display: flex;
 }
-
-.action::after {
-    position: absolute;
-    content: '';
-    top: 30rpx;
-    left: 50%;
-    width: 1px;
-    height: 30rpx;
-    background-color: #565656;
-    transform: translateX(-50%);
+.action image{
+  width: 22px;
+  height: 22px;
 }
-
-.action navigator {
-    flex: 1;
+.action .action-top{
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ffffff87;
+    color: #000;
+    width: 14px;
+    height: 14px;
     display: block;
-    height: 100%;
-    font-size: 30rpx;
-    line-height: 30rpx;
-    color: #2d2d2d;
-    text-align: center;
-}
-.action .navigator {
-    flex: 1;
-    display: block;
-    height: 100%;
-    font-size: 30rpx;
-    line-height: 30rpx;
-    color: #2d2d2d;
-    text-align: center;
+    border-radius: 50%;
+    /* z-index: 1; */
+    padding: 2px;
+    font-size: 10px;
 }
 
-.action .action-top {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28rpx;
-    padding: 30rpx 0;
-}
-.action-top image{
-	width: 29rpx;
-	height: 27rpx;
-}
 
-.action navigator image {
-    width: 25rpx;
-    height: 0;
-    margin-right: 8rpx;
-}
-
-.action navigator text {
-    font-weight: bold;
-    font-size: 34rpx;
-}
-.action .navigator image {
-    width: 25rpx;
-    height: 0;
-    margin-right: 8rpx;
-}
-
-.action .navigator text {
-    font-weight: bold;
-    font-size: 34rpx;
-}
-.action .navigator image {
-    width: 25rpx;
-    height: 0;
-    margin-right: 8rpx;
-}
-
-.action .navigator text {
-    font-weight: bold;
-    font-size: 34rpx;
-}
 .member-top .setting {
     position: absolute;
 	/* #ifdef APP-PLUS */
-	top: calc(var(--status-bar-height) + 16rpx);
 	/* #endif */
 	/* #ifndef APP-PLUS */
-    top: 16rpx;
+    top: 0;
 	/* #endif */
     z-index: 9;
     right: 10rpx;
@@ -1575,11 +1501,14 @@ page {
     padding: 0 20rpx;
     background-color: #fff;
 }
+.wrap-title.service-title{
+  background-color: #fff;
+  padding: 25rpx;
+}
 
 .wrap-title text {
-    font-size: 30rpx;
+    font-size: 14px;
     color: #2d2d2d;
-    font-weight: bold;
 }
 
 .wrap-title .more {
@@ -1601,7 +1530,7 @@ page {
     display: flex;
     /* align-items: center; */
     justify-content: space-evenly;
-    padding: 20rpx;
+    padding: 30rpx 20rpx;
     background-color: #fff;
 }
 
@@ -1609,7 +1538,7 @@ page {
     flex: 1;
     position: relative;
     text-align: center;
-    font-size: 24rpx;
+    font-size: 22rpx;
     color: #333;
     box-sizing: border-box;
 }
@@ -1624,29 +1553,23 @@ page {
 
 .order-item .item-num {
     position: absolute;
-    left: 90rpx;
     top: -20rpx;
-    width: auto;
-    min-width: 22rpx;
-    height: 22rpx;
-    border-radius: 11rpx;
-    background-color: #e1251b;
+    left: 90rpx;
+    width: 14px;
+    height: 14px;
+    padding: 2px;
+    border-radius: 50%;
+    background-color: #e1251bb8;
     color: #fff;
-    font-size: 20rpx;
-    padding: 0 6rpx;
-    box-sizing: border-box;
+    font-size: 10px;
     font-weight: normal;
-    line-height: 22rpx;
     z-index: 2;
 }
 
 .my-service {
     display: flex;
     flex-wrap: wrap;
-    margin: 0 20rpx;
     background-color: #fff;
-    border-radius: 6rpx;
-    box-shadow: 0 0 5px #e4e4e4;
 }
 
 .my-service .ser-item {
@@ -1745,9 +1668,7 @@ page {
 
 .user_new_info .user-name {
     display: flex;
-    align-items: center;
-    line-height: 1.2;
-    text-align: left;
+    flex-direction: column;
     font-size: 30rpx;
     font-weight: bold;
     transition: all 0.3s;
@@ -1755,7 +1676,7 @@ page {
 
 .user_new_info .user-name text {
     font-weight: 300;
-    font-size: 18rpx;
+    font-size: 22rpx;
     margin-left: 10rpx;
 }
 
@@ -1954,7 +1875,7 @@ page {
 }
 
 .user_new_info .user-name .user-info-name-txt {
-    max-width: 240rpx;
+    max-width: 400rpx;
     font-size: 30rpx;
     font-weight: bold;
     white-space: nowrap;
