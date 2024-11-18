@@ -4,6 +4,7 @@
 		<!-- <text class="back-btn iconfont iconziyuan2" @click="navBack"></text> -->
 		<!-- 设置白色背景防止软键盘把下部绝对定位元素顶上来盖住输入框等 -->
 		<view class="wrapper">
+			<image class="avatar" src="https://www.movisunshop.com/data/upload/mall/store/07656731789056289.jpg" mode="aspectFit"></image>
 			<view class="login-title">
 				{{$L('找回密码')}}
 			</view>
@@ -13,7 +14,7 @@
 						<view class="uni-input" style="width: 50px;text-align: center;">{{countryCodeArray[currentCodeIndex]?countryCodeArray[currentCodeIndex].country_code:'区号'}}</view>
 					</picker>
 					<input type="number" :value="mobile" :placeholder="$L('请输入手机号')" maxlength="11" data-key="mobile" @input="inputChange"
-					 placeholder-class="input_placeholder" style="margin-left: 10px;" @focus="setFocus" />
+					 placeholder-class="input_placeholder" style="margin-left: 10px;" @focus="setFocus" step="1" />
 					<text class="clear-account iconfont iconziyuan34" v-show="mobile&&curFocus=='mobile'" @click="clearContent('mobile')"></text>
 				</view>
 				<view class="input-item pwd_wrap">
@@ -37,7 +38,7 @@
 
 				</view>
 			</view>
-			<button class="confirm-btn" @click="toResetPwd" :style="{opacity: (!(mobile&&password&&smsCode)||logining)?0.5:1}">{{$L('找回密码')}}</button>
+			<button class="confirm-btn" @click="toResetPwd">{{$L('找回密码')}}</button>
 		</view>
 	</view>
 </template>
@@ -58,7 +59,7 @@
 				countDownM: 0, //短信验证码倒计时
 				timeOutId: '', //定时器的返回值
 				curFocus: '', //当前光标所在的位置
-				currentCodeIndex:0,
+				currentCodeIndex:151,
 				countryCodeArray:[],
 			}
 		},
@@ -311,22 +312,10 @@
 
 	.login-title {
 		position: relative;
-		margin-top: 90rpx;
-		margin-bottom: 70rpx;
-		margin-left: 65rpx;
-		font-size: 36rpx;
-		color: $main-font-color;
+		margin: 64rpx;
+		font-size: 40rpx;
+		color: #333;
 		font-weight: bold;
-
-		&:after {
-			position: absolute;
-			left: 0;
-			bottom: -10rpx;
-			content: '';
-			width: 76rpx;
-			height: 6rpx;
-			background: linear-gradient(90deg, rgba(252, 28, 28, 1) 0%, rgba(255, 138, 0, 0) 100%);
-		}
 	}
 
 	.input-content {
@@ -345,7 +334,7 @@
 
 		input {
 			color: #2D2D2D;
-			font-size: 30rpx;
+			font-size: 28rpx;
 		}
 
 		.input_placeholder {
@@ -375,14 +364,14 @@
 				}
 
 				.sms-code-view {
-					border: 1px solid $main-color;
+					background:#48537d;
 					padding: 14rpx;
 					border-radius: 6rpx;
 					line-height: 0;
 					margin-left: 20rpx;
 
 					.sms-code {
-						color: $main-color;
+						color: #fff;
 						font-size: 24rpx;
 						line-height: 24rpx;
 					}
@@ -453,12 +442,10 @@
 		height: 88rpx;
 		line-height: 88rpx;
 		margin-top: 90rpx;
-		background: linear-gradient(90deg, rgba(252, 31, 29, 1) 0%, rgba(253, 115, 38, 1) 100%);
-		box-shadow: 0px 3rpx 14rpx 1rpx rgba(253, 38, 29, 0.26);
-		opacity: 0.7;
 		border-radius: 44rpx;
 		color: #fff;
 		font-size: 36rpx;
+		background-color: #1E2A74;
 	}
 
 	.other-login {
@@ -560,5 +547,9 @@
 		flex-flow: row nowrap;
 		justify-content: flex-start;
 		align-items: center;
+	}
+	.avatar{
+		width: 100%;
+		height: 25px;
 	}
 </style>

@@ -445,7 +445,7 @@
 
 		input {
 			color: #2D2D2D;
-			font-size: 30rpx;
+			font-size: 28rpx;
 		}
 
 		.clear-account {

@@ -4,6 +4,7 @@
 		<!-- <text class="back-btn iconfont iconziyuan2" @click="navBack"></text> -->
 		<!-- 设置白色背景防止软键盘把下部绝对定位元素顶上来盖住输入框等 -->
 		<view class="wrapper">
+	  		<image class="avatar" src="https://www.movisunshop.com/data/upload/mall/store/07656731789056289.jpg" mode="aspectFit"></image>
       <view class="" style="display: flex;">   
 			<view class="login-title">
 				{{$L('邮箱注册')}}
@@ -15,12 +16,12 @@
 			<view class="input-content">
 				<view class="input-item">
 					<input type="text" :value="email" :placeholder="$L('请输入邮箱')" data-key="email" @input="inputChange"
-					 @focus="setFocus" />
+					 @focus="setFocus" style="width:100%" />
 					<text class="clear-account iconfont iconziyuan34" v-show="email&&curFocus=='email'" @click="clearContent('email')"></text>
 				</view>
 				<view class="input-item">
 					<input type="text" :value="imgCode" maxlength="5" :placeholder="$L('请输入图形验证码')" data-key="imgCode" @input="inputChange"
-					 @focus="setFocus" />
+					 @focus="setFocus" style="width:100%" />
 					<view class="pwd-right">
 						<text class="clear-pwd iconfont iconziyuan34" v-show="imgCode&&curFocus=='imgCode'" @click="clearContent('imgCode')"></text>
 						<image @click="getImgCode" :src='showCodeImg' />
@@ -28,7 +29,7 @@
 				</view>
 				<view class="input-item">
 					<input type="number" :value="smsCode" maxlength="6" :placeholder="$L('请输入邮箱验证码')" data-key="smsCode" @input="inputChange"
-					 @confirm="toRegist" @focus="setFocus" />
+					 @confirm="toRegist" @focus="setFocus" style="width:100%" />
 					<view class="pwd-right">
 						<text class="clear-pwd iconfont iconziyuan34" v-show="smsCode&&curFocus=='smsCode'" @click="clearContent('smsCode')"></text>
 						<view :style="{opacity: countDownM?0.3:1}" class="sms-code-view" @click="getSmsCode">
@@ -37,15 +38,15 @@
 					</view>
 				</view>
 				<view class="input-item">
-				<input type="text" :value="password" :placeholder="$L('请设置您的密码')" maxlength="11" data-key="password" @input="inputChange"
-					 @focus="setFocus" />
+				<input type="password" :value="password" :placeholder="$L('请设置您的密码')" maxlength="11" data-key="password" @input="inputChange"
+					 @focus="setFocus" style="width:100%"/>
 					<text class="clear-account iconfont iconziyuan34" v-show="password&&curFocus=='password'" @click="clearContent('password')"></text>
 				</view>
 			</view>
-			<button class="confirm-btn" @click="toRegist" :style="{opacity: (!(check_agreement&&email&&smsCode&&imgCode)||logining)?0.5:1}">{{$L('注册')}}</button>
+			<button class="confirm-btn" @click="toRegist">{{$L('注册')}}</button>
 			<view class="login-register">
 				<text class="mobile-login">{{$L('已有账号～')}}</text>
-				<text class="register" @click="navTo('/pages/login/login',1)">{{$L('去登陆>')}}></text>
+				<text class="register" @click="navTo('/pages/login/login',1)">{{$L('去登陆')}}</text>
 			</view>
 		</view>
 		<view class="other-login" v-if="showOtherFlag">
@@ -63,7 +64,7 @@
 		<view class="agreement-part flex_row_center_center" :style="!isWeiXinBrower?'bottom:120rpx':''">
 		<!-- #endif -->
 		<!-- #ifndef H5 -->
-		<view class="agreement-part flex_row_center_center">
+		<view class="agreement-part flex_row_center_center" style="flex-wrap: wrap">
 		<!-- #endif -->
 			<image @click="checkAgrement" class="register_icon" :src="show_check_icon" mode="aspectFill" />
 			{{$L('我已阅读并同意')}}
@@ -349,22 +350,10 @@
 
 	.login-title {
 		position: relative;
-		margin-top: 90rpx;
-		margin-bottom: 70rpx;
-		margin-left: 65rpx;
-		font-size: 36rpx;
+		margin: 64rpx;
+		font-size: 40rpx;
 		color: #333;
 		font-weight: bold;
-
-		&:after {
-			position: absolute;
-			left: 0;
-			bottom: -10rpx;
-			content: '';
-			width: 76rpx;
-			height: 6rpx;
-			background: linear-gradient(90deg, rgba(252, 28, 28, 1) 0%, rgba(255, 138, 0, 0) 100%);
-		}
 	}
   .login-title1{
     position: relative;
@@ -393,7 +382,7 @@
 
 		input {
 			color: #2D2D2D;
-			font-size: 30rpx;
+			font-size: 28rpx;
 		}
 
 		.clear-account {
@@ -443,14 +432,14 @@
 				}
 
 				.sms-code-view {
-					border: 1px solid $main-color;
+					background:#48537d;
 					padding: 14rpx;
 					border-radius: 6rpx;
 					line-height: 0;
 					margin-left: 20rpx;
 
 					.sms-code {
-						color: $main-color;
+						color: #fff;
 						font-size: 24rpx;
 						line-height: 24rpx;
 					}
@@ -482,12 +471,10 @@
 		height: 88rpx;
 		line-height: 88rpx;
 		margin-top: 90rpx;
-		background: linear-gradient(90deg, rgba(252, 31, 29, 1) 0%, rgba(253, 115, 38, 1) 100%);
-		box-shadow: 0px 3rpx 14rpx 1rpx rgba(253, 38, 29, 0.26);
-		opacity: 0.7;
 		border-radius: 44rpx;
 		color: #fff;
 		font-size: 36rpx;
+		background-color: #1E2A74;
 	}
 
 	.other-login {
@@ -557,21 +544,24 @@
 		font-size: 26rpx;
 		color: #999999;
 		text-align: center;
-
+		flex-wrap: wrap;
+		justify-content: center;
+		
 		.register_icon {
 			width: 46rpx;
 			height: 46rpx;
 		}
 
 		.agreement {
-			color: #FC1E1E;
-			border-bottom: 1rpx solid #FC1E1E;
+			color: #1E2A74;
+			border-bottom: 1rpx solid #1E2A74;
 		}
 	}
 
 	.login-register {
 		display: flex;
 		justify-content: center;
+		gap: 4px;
 		margin-top: 33rpx;
 
 		.mobile-login {
@@ -581,9 +571,13 @@
 		}
 
 		.register {
-			color: #FC1C1C;
+			color: #1E2A74;
 			font-size: 28rpx;
 			line-height: 34rpx;
 		}
+	}
+	.avatar{
+		width: 100%;
+		height: 25px;
 	}
 </style>

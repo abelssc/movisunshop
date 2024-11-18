@@ -4,6 +4,7 @@
 		<!-- <text class="back-btn iconfont iconziyuan2" @click="navBack"></text> -->
 		<!-- 设置白色背景防止软键盘把下部绝对定位元素顶上来盖住输入框等 -->
 		<view class="wrapper">
+			<image class="avatar" src="https://www.movisunshop.com/data/upload/mall/store/07656731789056289.jpg" mode="aspectFit"></image>
 			<view class="login-title">
 				{{$L('普通登录')}}
 			</view>
@@ -24,7 +25,7 @@
 
 				</view>
 			</view>
-			<button class="confirm-btn" @click="toLogin" :style="{opacity: (!(mobile&&password)||logining)?0.5:1}">{{$L('登录')}}</button>
+			<button class="confirm-btn" @click="toLogin">{{$L('登录')}}</button>
 			<view class="login-register">
 				<text class="mobile-login" @click="navTo('/pages/forget_password/forget_password',2)">{{$L('忘记密码')}}</text>
 				<text class="register" @click="navTo('/pages/register/registerel',1)">{{$L('用户注册')}}</text>
@@ -69,7 +70,7 @@
 			<!-- #endif -->
 		</view>
 			<!-- #ifdef H5 -->
-			<view class="agreement-part flex_row_center_center" :style="!isWeiXinBrower?'bottom:120rpx':''">
+			<view class="agreement-part flex_row_center_center" :style="!isWeiXinBrower?'bottom:120rpx; gap:5px':'gap:5px'">
 			<!-- #endif -->
 			<!-- #ifndef H5 -->
 			<view class="agreement-part flex_row_center_center">
@@ -682,22 +683,10 @@
 
 	.login-title {
 		position: relative;
-		margin-top: 90rpx;
-		margin-bottom: 70rpx;
-		margin-left: 65rpx;
-		font-size: 36rpx;
+		margin: 64rpx;
+		font-size: 40rpx;
 		color: #333;
 		font-weight: bold;
-
-		&:after {
-			position: absolute;
-			left: 0;
-			bottom: -10rpx;
-			content: '';
-			width: 76rpx;
-			height: 6rpx;
-			background: linear-gradient(90deg, rgba(252, 28, 28, 1) 0%, rgba(255, 138, 0, 0) 100%);
-		}
 	}
 
 	.input-content {
@@ -770,7 +759,7 @@
 
 		input {
 			height: 60upx;
-			font-size: $font-base + 2upx;
+			font-size: $font-base;
 			color: $font-color-dark;
 			width:100%;
 		}
@@ -782,11 +771,10 @@
 		height: 88rpx;
 		line-height: 88rpx;
 		margin-top: 90rpx;
-		background: linear-gradient(90deg, rgba(252, 31, 29, 1) 0%, rgba(253, 115, 38, 1) 100%);
-		box-shadow: 0px 3rpx 14rpx 1rpx rgba(253, 38, 29, 0.26);
 		border-radius: 44rpx;
 		color: #fff;
 		font-size: 36rpx;
+		background-color:#1E2A74;
 	}
 
 	.other-login {
@@ -861,13 +849,14 @@
 		font-size: 26rpx;
 		color: #999999;
 		text-align: center;
-.register_icon {
+		flex-direction: column;
+		.register_icon {
 			width: 46rpx;
 			height: 46rpx;
 		}
 		.agreement {
-			color: #FC1E1E;
-			border-bottom: 1rpx solid $main-color;
+			color: #1E2A74;
+			border-bottom: 1rpx solid #1E2A74;
 		}
 	}
 
@@ -886,7 +875,7 @@
 		}
 
 		.register {
-			color: #FC1C1C;
+			color: #1e2a74;
 			font-size: 28rpx;
 			line-height: 34rpx;
 		}
@@ -1104,5 +1093,9 @@
 		100% {
 			opacity: 1;
 		}
+	}
+	.avatar{
+		width: 100%;
+		height: 25px;
 	}
 </style>
