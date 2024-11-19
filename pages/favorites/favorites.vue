@@ -16,11 +16,17 @@
 					</view>
 					<view class="goods-info">
 						<view class="name">{{item.goods_name}}</view>
+						<!--
 						<view class="goods_jingle">{{item.goods_jingle}}</view>
+						-->
 						<view class="price bw">
 							<text class="red">{{$L('￥')}}{{item.show_price}}</text>
-							<text class="cancel-collect" :data-id="item.fav_id" @tap.stop="cancel">{{$L('取消收藏')}}</text>
 						</view>
+					</view>
+					<view class="cancel-box">
+						<text class="cancel-collect" :data-id="item.fav_id" @tap.stop="cancel">
+							<image :src="img_url+'trash.svg'" mode="widthFix"></image>
+						</text>
 					</view>
 				</navigator>
 			</view>
@@ -55,10 +61,6 @@
 				</view>
 
 				<view class="cart-comment" v-if="type==='goods'">
-					<view class="cart-comment-title">
-						<image :src="img_url+'cart_comm.png'"></image>
-					</view>
-
 					<view class="goods-list">
 						<navigator v-for="(item, index) in recGoods" :key="index" hover-class="none" :url="'/pages/goods_detail/goods_detail?gid=' + item.gid">
 							<view class="img">
@@ -76,7 +78,9 @@
 						</navigator>
 					</view>
 				</view>
-
+			</view>
+			<view class="cart-brand">
+				<image class="avatar" src="https://www.movisunshop.com/data/upload/mall/store/07656731789056289.jpg" mode="aspectFit"></image>
 			</view>
 		</view>
 		<common :title="$L('我的收藏')" :gids="gids" v-if="gids.length"></common>
@@ -287,7 +291,7 @@
 	.favorites {
 		width: 100%;
 		min-height: 100vh;
-		background-color: #f5f5f5;
+		background-color: #fff;
 	}
 
 	.goods_jingle{
@@ -298,6 +302,7 @@
 		background-color: #fff;
 		box-sizing: border-box;
 		padding: 10rpx 0;
+		display: none;
 	}
 
 	.favorites_top .favorites_nav {
@@ -307,8 +312,8 @@
 		align-items: center;
 		margin: 10rpx auto;
 		box-sizing: border-box;
-		border: 2rpx solid #f23030;
-		border-radius: 15rpx;
+		border: 2rpx solid #eee;
+		border-radius: 6rpx;
 		overflow: hidden;
 	}
 
@@ -326,7 +331,7 @@
 	/* #endif */
 
 	.favorites_nav text.on {
-		background-color: #f23030;
+		background-color: #ff4d4d;
 		color: #fff;
 		
 	}
@@ -396,20 +401,20 @@
 	}
 
 	.goods-item .img {
-		flex: 0 0 180rpx;
+		flex: 0 0 212rpx;
 		display: flex;
 		align-content: center;
 		justify-content: center;
-		width: 180rpx;
-		height: 180rpx;
+		width: 212rpx;
+		height: 212rpx;
 		overflow: hidden;
 		/* border: 1rpx solid #e2e2e2; */
 		box-sizing: border-box;
 	}
 
 	.goods-item .img image {
-		width: 180rpx;
-		height: 180rpx;
+		width: 212rpx;
+		height: 212rpx;
 	}
 
 	.goods-item .goods-info {
@@ -417,11 +422,14 @@
 		height: 180rpx;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
+		justify-content: center;
 		padding-left: 20rpx;
+		padding-right: 20rpx;
 	}
 
 	.goods-info .name {
+		font-size: 26rpx;
+		font-weight: bold;
 		width: 100%;
 		color: #333;
 		word-break: break-all;
@@ -433,25 +441,30 @@
 	}
 
 	.goods-info .price {
+		font-size: 28rpx;
 		padding-bottom: 10rpx;
 	}
 
 	.price .red {
-		color: #f02323;
+		color: #ff4d4d;
 	}
-
-	.price .cancel-collect {
-		height: 45rpx;
-		line-height: 43rpx;
-		padding: 0 10rpx;
+	.cancel-box{
+		height: 22px;
+		line-height: 21px;
+		padding: 0 5px;
 		color: #686868;
-		border: 1rpx solid #686868;
-		border-radius: 6rpx;
+		border: 1px solid #686868;
+		border-radius: 3px;
+		image{
+			width: 20px;
+			height: 20px;
+		}
 	}
 
 	.store-list {
 		padding: 0 20rpx;
 		background-color: #fff;
+		min-height: 400px;
 	}
 
 	.store-item {
@@ -510,12 +523,12 @@
 		width: 30rpx;
 	}
 
-	.cart-comment .cart-comment-title {
+	.cart-brand {
 		margin: 41rpx 0 23rpx;
 		text-align: center;
 	}
 
-	.cart-comment-title image {
+	.cart-brand image {
 		width: 427rpx;
 		height: 48rpx;
 	}

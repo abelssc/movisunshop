@@ -1,62 +1,67 @@
 <template>
 <view>
-<common :title="$L('足迹')" :gids="gids" v-if="gids.length"></common>
+  <common :title="$L('足迹')" :gids="gids" v-if="gids.length"></common>
 
-<view class="del" v-if="list.length">
-  <text @tap="clearAll">{{$L('清空')}}</text>
-</view>
+  <view class="del" v-if="list.length">
+    <text @tap="clearAll" class="clearAll">
+      {{$L('清空')}}
+    </text>
+  </view>
 
-<view class="list" v-if="list.length">
-  <navigator v-for="(item, index) in list" :key="index" class="goods" hover-class="none" :url="'/pages/goods_detail/goods_detail?gid=' + item.gid">
-    <view class="img">
-      <image :src="item.goods_image" mode="aspectFit"></image>
-    </view>
-    <view class="goods-info">
-      <view class="name">{{item.goods_name}}</view>
-      <view class="goods_jingle">{{item.goods_jingle}}</view>
-      <view class="price">{{$L('￥')}}{{item.show_price}}</view>
-    </view>
-	<view class="cancel-box">
-		<text class="cancel-collect" :data-id="item.gid" @tap.stop="cancel">{{$L('删除')}}</text>
-	</view>
-  </navigator>
-</view>
-
-<view class="empty" v-if="!list.length && !isloading">
-  <view class="noorder">
-    <view class="noorder_content">
+  <view class="list" v-if="list.length">
+    <navigator v-for="(item, index) in list" :key="index" class="goods" hover-class="none" :url="'/pages/goods_detail/goods_detail?gid=' + item.gid">
       <view class="img">
-        <image :src="img_url+'goods-browse_w.png'" mode="widthFix"></image>
+        <image :src="item.goods_image" mode="aspectFit"></image>
       </view>
-      <text>{{$L('暂无您的浏览记录')}}</text>
-      <text>{{$L('可以去看看哪些想要买的')}}</text>
-      <navigator hover-class="none" class="btn" url="/pages/index/index" open-type="switchTab">{{$L('随便逛逛')}}</navigator>
+      <view class="goods-info">
+        <view class="name">{{item.goods_name}}</view>
+        <!--
+        <view class="goods_jingle">{{item.goods_jingle}}</view>
+        -->
+        <view class="price">{{$L('￥')}}{{item.show_price}}</view>
+      </view>
+    <view class="cancel-box">
+      <text class="cancel-collect" :data-id="item.gid" @tap.stop="cancel">
+        <image :src="img_url+'trash.svg'" mode="widthFix"></image>
+      </text>
     </view>
+    </navigator>
   </view>
 
-  <view class="cart-comment">
-    <view class="cart-comment-title">
-      <image :src="img_url+'cart_comm.png'"></image>
-    </view>
-
-    <view class="goods-list">
-      <navigator v-for="(item, index) in goods_list" :key="index" hover-class="none" :url="'/pages/goods_detail/goods_detail?gid=' + item.gid">
+  <view class="empty" v-if="!list.length && !isloading">
+    <view class="noorder">
+      <view class="noorder_content">
         <view class="img">
-          <image :src="item.goods_img_url" mode="aspectFit"></image>
+          <image :src="img_url+'goods-browse_w.png'" mode="widthFix"></image>
         </view>
+        <text>{{$L('暂无您的浏览记录')}}</text>
+        <text>{{$L('可以去看看哪些想要买的')}}</text>
+        <navigator hover-class="none" class="btn" url="/pages/index/index" open-type="switchTab">{{$L('随便逛逛')}}</navigator>
+      </view>
+    </view>
 
-        <view class="goods-name">{{item.goods_name}}</view>
-
-        <view class="price-wrap">
-          <view class="price">{{$L('￥')}}
-            <text>{{item.goods_price}}</text>
+    <view class="cart-comment">
+      <view class="goods-list">
+        <navigator v-for="(item, index) in goods_list" :key="index" hover-class="none" :url="'/pages/goods_detail/goods_detail?gid=' + item.gid">
+          <view class="img">
+            <image :src="item.goods_img_url" mode="aspectFit"></image>
           </view>
-          <view class="sale">{{item.goods_salenum}}{{$L('人付款')}}</view>
-        </view>
-      </navigator>
+
+          <view class="goods-name">{{item.goods_name}}</view>
+
+          <view class="price-wrap">
+            <view class="price">{{$L('￥')}}
+              <text>{{item.goods_price}}</text>
+            </view>
+            <view class="sale">{{item.goods_salenum}}{{$L('人付款')}}</view>
+          </view>
+        </navigator>
+      </view>
     </view>
   </view>
-</view>
+  <view class="cart-brand">
+		<image class="avatar" src="https://www.movisunshop.com/data/upload/mall/store/07656731789056289.jpg" mode="aspectFit"></image>
+	</view>
 </view>
 </template>
 
@@ -217,7 +222,7 @@ export default {
 </script>
 <style>
 page{
-  background-color: #f5f5f5;
+  background-color: #fff;
   width: 750rpx;
   margin: 0 auto;
 }
@@ -281,28 +286,29 @@ page{
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   padding-left: 30rpx;
+  padding-right: 30rpx;
   height: 212rpx;
 }
 
 .goods .goods-info .name {
+  font-size: 26rpx;
+  font-weight: bold;
   width: 100%;
   color: #333;
-  font-size: 28rpx;
   word-break: break-all;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  min-height: 80rpx;
+  box-sizing: border-box;
 }
 
 .goods .goods-info .price {
   color: #f02323;
   font-size: 28rpx;
-  padding-bottom: 30rpx;
 }
 
 .noorder {
@@ -452,6 +458,16 @@ page{
   background-color: transparent;
 }
 
+.cart-brand {
+	margin: 41rpx 0 23rpx;
+	text-align: center;
+}
+
+.cart-brand image {
+	width: 427rpx;
+	height: 48rpx;
+}
+
 .goods-list navigator {
   width: 345rpx;
   margin-bottom: 20rpx;
@@ -511,13 +527,22 @@ page{
 }
 
 .cancel-box{
-	border: 2rpx solid #444444;
-	padding: 2rpx 20rpx;
-	color: #444444;
-	border-radius: 10rpx;
-	position: absolute;
-	right: 0rpx;
-	bottom: 20rpx;
-	font-size: 28rpx;
+  height: 22px;
+  line-height: 21px;
+  padding: 0 5px;
+  color: #686868;
+  border: 1px solid #686868;
+  border-radius: 3px;
+  image{
+    width: 20px;
+    height: 20px;
+  }
+}
+.clearAll{
+  padding: 2px 4px;
+  border:1px solid #686868;
+  border-radius: 3px;
+  color: #000;
+  font-size: 26rpx;
 }
 </style>
