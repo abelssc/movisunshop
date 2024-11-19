@@ -1,23 +1,24 @@
 <template>
 <view>
-<view class="show-avatar">
-    <view class="show-avatar-main">
-        <view class="user-avatar upload">
-            <view class="up_item" @tap="chooseImage">
-              <image :src="member_info.avator" class="up_img" mode="aspectFill"></image>
-            </view>
-        </view>
-    </view>
-</view>
-
-<view class="bbctouch-inp-con">
-
-  <view class="bottom-btn">
-    <button @tap="profile_submit">{{$L('保存更改')}}</button>
+  <image class="avatar" src="https://www.movisunshop.com/data/upload/mall/store/07656731789056289.jpg" mode="aspectFit"></image>
+  <view class="show-avatar">
+      <view class="show-avatar-main">
+          <view class="user-avatar upload">
+              <view class="up_item" @tap="chooseImage">
+                <image :src="member_info.avator" class="up_img" mode="aspectFill"></image>
+              </view>
+          </view>
+      </view>
   </view>
 
-</view>
-<common :title="$L('个人信息')"></common>
+  <view class="bbctouch-inp-con">
+
+    <view class="bottom-btn">
+      <button @tap="profile_submit">{{$L('保存更改')}}</button>
+    </view>
+
+  </view>
+  <common :title="$L('个人信息')"></common>
 </view>
 </template>
 
@@ -188,7 +189,7 @@ export default {
 /* pages/user/profile.wxss */
 
 page {
-  background-color: #f5f5f5;
+  background-color: #fff;
   width: 750rpx;
   margin: 0 auto;
   
@@ -199,7 +200,7 @@ page {
   width: 100%;
   text-align: center;
   background-color: #fff;
-  margin: 20rpx 0 20rpx 0;
+  margin-bottom: 20rpx;
   padding: 30rpx 0;
 }
 
@@ -208,8 +209,8 @@ page {
 }
 
 .show-avatar .user-avatar {
-  width: 100rpx;
-  height: 100rpx;
+  width: 300rpx;
+  height: 300rpx;
   border-radius: 100%;
   overflow: hidden;
   background-color: #efecdd;
@@ -217,13 +218,13 @@ page {
 }
 
 .show-avatar .user-avatar .up_item {
-  width: 100rpx;
-  height: 100rpx;
+  width: 300rpx;
+  height: 300rpx;
 }
 
 .show-avatar .user-avatar .up_item image {
-  width: 100rpx;
-  height: 100rpx;
+  width: 300rpx;
+  height: 300rpx;
 }
 
 .bottom-btn {
@@ -231,7 +232,12 @@ page {
 }
 
 .bottom-btn button {
-  background-color: #fff;
+  background-color: #041a70;
+  color: #fff;
 }
-
+.avatar{
+  padding: 40rpx 0;
+  width: 100%;
+  height: 25px;
+}
 </style>

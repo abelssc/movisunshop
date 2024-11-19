@@ -24,16 +24,14 @@
 				<text>{{$L('修改头像')}}</text>
 				<image :src="img_url+'pltr.png'" mode="widthFix"></image>
 			</navigator>
-      
+
+			<!--
 			<navigator hover-class="none" url="/pages/setting/language" class="item">
 				<text>{{$L('切换语言')}}</text>
 				<image :src="img_url+'pltr.png'" mode="widthFix"></image>
 			</navigator>
-			
-			<view @tap="cancle()" class="item">
-				<text>{{$L('注销账号')}}</text>
-				<image :src="img_url+'pltr.png'" mode="widthFix"></image>
-			</view>
+			-->
+
 			<!-- #ifdef APP-PLUS -->
 			<navigator hover-class="none" url="/pages/privacyPolicy/privacyPolicy" class="item">
 				<text>{{$L('用户协议和隐私政策')}}</text>
@@ -41,7 +39,7 @@
 			</navigator>
 			<!-- #endif -->
 			
-			<view class="logout" @tap="logout" v-if="showexit">
+			<view class="item" @tap="logout" v-if="showexit">
 				<text>{{$L('安全退出')}}</text>
 			</view>
 		</view> 
@@ -82,41 +80,6 @@
 			this.getUserInfo();
 		},
 		methods: {
-			//注销账号 
-			cancle(){
-				const { key } = this;
-				uni.showModal({
-				  title: this.$L('提示'),
-				  content: this.$L('确认注销该账号吗？'),
-          cancelText:this.$L('取消'),
-          confirmText:this.$L('确定'),
-				  success: function (result) {
-					if (result.confirm) {
-						uni.request({
-							url: getApp().globalData.ser_url + '/index.php?app=login&mod=memberCancel',
-							data: {
-								key
-							},
-							success: res => {
-								if(res.data.state == 255){
-									uni.showToast({
-									  title: res.data.msg,
-									  icon: 'none'
-									});
-								}else{
-									uni.clearStorageSync('uuid'); //清空零时uuid
-									uni.removeStorage('token');
-									uni.removeStorage('share_u');
-									uni.navigateTo({
-										url: '/pages/login/login'
-									});
-								}
-							}
-						});
-					}
-				  }
-				});
-			},
 			testmemberbuy(key) {
 				uni.request({
 					url: getApp().globalData.ser_url + '/index.php?app=usercenter&mod=testmemberbuy',
@@ -209,6 +172,7 @@
 		width: 750rpx;
 		margin: 0 auto;
 		height: 100%;
+		background: #f3f3f3;
 	}
 	/* pages/setting/setting.wxss */
 	.setting {
@@ -247,14 +211,5 @@
 		font-size: 26rpx;
 		margin-top: 10rpx;
 		font-weight: 300;
-	}
-
-	.setting .logout {
-		height: 100rpx;
-		background-color: white;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 26rpx;
 	}
 </style>

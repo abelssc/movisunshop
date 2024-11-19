@@ -1,45 +1,44 @@
 <template>
 <view>
-<view class="bg">
-  <image :src="img_url+'bindBg.png'"></image>
-</view>
+  <view class="p-md">
+      <image class="avatar" src="https://www.movisunshop.com/data/upload/mall/store/07656731789056289.jpg" mode="aspectFit"></image>
+      <view class="avator">
+        <view class="img">
+          <image :src="info.member_avatar"></image>
+        </view>
+        <view class="we">{{$L('welcome')}}, {{info.member_name}} {{$L('请完善信息')}}</view>
+      </view>
 
-<view class="avator">
-  <view class="img">
-    <image :src="info.member_avatar"></image>
+      <view class="form">
+          <view class="form_item">
+              <label for="phone">
+                  <image :src="img_url+'b_user.png'" mode="widthFix"></image>
+                  <text class="nickname">{{$L('呢称')}}</text>
+              </label>
+              <input type="text" id="phone" @input="nickInput" :value="info.member_nickname?info.member_nickname:''" :placeholder="$L('请输入呢称')"></input>
+          </view>
+
+          <view class="form_item">
+              <label for="password">
+                  <image :src="img_url+'b_phone.png'" style="width: 24rpx" mode="widthFix"></image>
+                  <text class="nickname">{{$L('手机号')}}</text>
+              </label>
+              <input type="number" @input="phoneInput" :value="mobile" id="password" :placeholder="$L('请输入手机号')"></input>
+          </view>
+
+          <view class="form_item">
+              <label for="yzm">
+                  <text class="nickname">{{$L('验证码')}}</text>
+              </label>
+              <input type="text" @input="codeinput" id="yzm" :placeholder="$L('请输入验证码')"></input>
+              <view v-if="issend" class="btn" @tap="sendcode">{{btn_txt}}</view>
+              <view v-if="!issend" class="btn">{{btn_txt}}</view>
+          </view>
+
+          <button class="submit" @tap="submit">{{$L('确 定')}}</button>
+      </view>
+      <common :title="$L('完善个人信息')"></common>
   </view>
-  <view class="we">Hi, {{info.member_name}} {{$L('请完善信息')}}</view>
-</view>
-
-<view class="form">
-    <view class="form_item">
-        <label for="phone">
-            <image :src="img_url+'b_user.png'" mode="widthFix"></image>
-            <text class="nickname">{{$L('呢称')}}</text>
-        </label>
-        <input type="text" maxlength="8" id="phone" @input="nickInput" :value="info.member_nickname?info.member_nickname:''" :placeholder="$L('请输入呢称')"></input>
-    </view>
-
-    <view class="form_item">
-        <label for="password">
-            <image :src="img_url+'b_phone.png'" style="width: 18rpx" mode="widthFix"></image>
-            <text class="nickname">{{$L('手机号')}}</text>
-        </label>
-        <input type="number" maxlength="11" @input="phoneInput" :value="mobile" id="password" :placeholder="$L('请输入手机号')"></input>
-    </view>
-
-    <view class="form_item">
-        <label for="yzm">
-            <text class="nickname">{{$L('验证码')}}</text>
-        </label>
-        <input type="text" @input="codeinput" id="yzm" :placeholder="$L('请输入验证码')"></input>
-        <view v-if="issend" class="btn" @tap="sendcode">{{btn_txt}}</view>
-		<view v-if="!issend" class="btn">{{btn_txt}}</view>
-    </view>
-
-    <button class="submit" @tap="submit">{{$L('确 定')}}</button>
-</view>
-<common :title="$L('完善个人信息')"></common>
 </view>
 </template>
 
@@ -254,6 +253,9 @@ export default {
 		width: 750rpx;
 		margin: 0 auto;
 	}
+.p-md{
+  padding: 60rpx 60rpx 0;
+}
 .bg {
   position: fixed;
   top: 0;
@@ -294,15 +296,11 @@ export default {
   font-size: 26rpx;
 }
 
-.form {
-  padding: 0 70rpx;
-}
-
 .form .form_item {
   position: relative;
   display: flex;
   align-items: center;
-  height: 100rpx;
+  height: 90rpx;
   color: #ccc;
   font-size: 28rpx;
 }
@@ -325,15 +323,15 @@ export default {
 }
 
 .form .form_item label image {
-  width: 22rpx;
+  width: 30rpx;
   height: 0;
   margin-right: 10rpx;
 }
 
 .form .form_item input {
   flex: 1;
-  height: 80rpx;
-  line-height: 80rpx;
+  height: 60rpx;
+  line-height: 60rpx;
   border: none;
   color: #333;
   padding-left: 20rpx;
@@ -352,17 +350,12 @@ export default {
 }
 
 .form .form_item .btn {
-  width: 150rpx;
-  min-height: 45rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1rpx solid #ff2f43;
-  color: #ff2f43;
-  text-align: center; 
+  padding:8px;
   border-radius: 4rpx;
-  /* line-height: 42rpx; */
-  font-size: 20rpx; 
+  font-size: 24rpx; 
+  background-color: #48537d;
+  color: #fff;
+  line-height: 24rpx;
 }
 
 .submit {
@@ -370,16 +363,20 @@ export default {
   height: 74rpx;
   width: 615rpx;
   margin: 100rpx auto 0;
-  background-color: #ff2f43;
+  background-color: #041a70;
   color: #fff;
   font-size: 28rpx;
-  border-radius: 37rpx;
+  border-radius: 15rpx;
   border: none;
 }
 .form_item .nickname{
-	font-size: 30rpx	
+	font-size: 28rpx	
 }
 .form_item input{
 	font-size: 26rpx	
+}
+.avatar{
+  width: 100%;
+  height: 25px;
 }
 </style>
