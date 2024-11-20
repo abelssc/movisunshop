@@ -23,134 +23,225 @@
 
 			</view>
 			<scroll-view scroll-y="true" @scroll="scroll" :scroll-top="scroll_height" @scrolltolower="loadMore">
-				<view class="order_list">
-					<view v-for="(item, order_index) in order_list" :key="order_index" class="gray-order-skin" :data-order-id="item.order_list[0].order_id">
-						<view class="bbctouch-order-item" :data-order-id="item.order_list[0].order_id" @tap.stop="go_order_detail">
-							<view class="bbctouch-order-item-head" :data-vid="item.order_list[0].vid" @tap.stop="go_vendor">
-								<view :data-store-id="item.order_list[0].vid" class="store">
-									<image class="icon" src="/static/images/store_b.png" mode="widthFix"></image>
-									<text>{{item.order_list[0].store_name}}</text>
-									<image class="arrow-r" src="/static/images/arrow_right_b.png" mode="widthFix"></image>
-								</view>
+				<view class="order" v-for="(order, order_index) in order_list" :key="order_index" :data-order-id="order.order_list[0].order_id">
+					<view class="order-head">
+						<view class="order-head__state">
+							<block v-if="order.order_list[0].pin">
+								<navigator :url="'../found/import?u=/pin_detail_xcx.html&id=' + order.order_list[0].pin.sld_team_id">
+									<span>{{order.order_list[0].state_desc}}</span>
+								</navigator>
+							</block>
+							<block v-else>
+								<span>{{$L('order_status')}} {{order.order_list[0].state_desc}}</span>
+							</block>
+						</view>
+						<view class="order-head__actions">
+							<div v-if="(order.order_list[0].order_state != 10 && order.order_list[0].payment_code != 'offline')||(order.order_list[0].payment_code == 'offline' && order.order_list[0].order_state != 10 && order.order_list[0].order_state != 20)">
+								<a href="javascript:void(0)" :data-promotion-type="order.order_list[0].promotion_type" :data-promotions-id="order.order_list[0].extend_order_goods[0].promotions_id"
+									:data-order-id="order.order_list[0].order_id" :data-order-index="order_index" @tap.stop="again_order">
+									<div>{{$L('再来一单')}}</div>
+								</a>
+							</div>
 
-								<view class="state">
-									<block v-if="item.order_list[0].pin">
-										<navigator :url="'../found/import?u=/pin_detail_xcx.html&id=' + item.order_list[0].pin.sld_team_id">
-											<span class="ot-finish">{{item.order_list[0].state_desc}}</span>
-										</navigator>
-									</block>
-									<block v-else>
-										<span class="ot-finish">{{item.order_list[0].state_desc}}</span>
-									</block>
-								</view>
+							<div v-if="order.order_list[0].order_state==10">
+								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
+									:data-pay-sn="order.pay_sn" :data-price="order.order_list[0].order_amount" @tap.stop="go_pay">
+									<div>{{$L('去支付')}}</div>
+								</a>
+							</div>
+
+							<div v-if="order.order_list[0].if_delete">
+								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
+									:data-pay-sn="order.pay_sn" :data-price="order.order_list[0].order_amount" @tap.stop="del_order">
+									<div>{{$L('删除订单')}}</div>
+								</a>
+							</div>
+
+							<div v-if="order.order_list[0].if_deliver">
+								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
+									@tap.stop="show_wuliu">
+									<div>{{$L('物流信息')}}</div>
+								</a>
+							</div>
+
+							<div v-if="order.order_list[0].order_state==40&&order.order_list[0].evaluation_state==0">
+								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
+									@tap.stop="pinjia">
+									<div>{{$L('评价订单')}}</div>
+								</a>
+							</div>
+
+							<div v-if="order.order_list[0].if_cancel">
+								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
+									@tap.stop="cancle_order">
+									<div>{{$L('取消订单')}}</div>
+								</a>
+							</div>
+
+							<div v-if="order.order_list[0].if_refund_cancel">
+								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
+									@tap.stop="refund">
+									<div>{{$L('申请退款')}}</div>
+								</a>
+							</div>
+
+							<div v-if="order.order_list[0].if_receive">
+								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
+									@tap.stop="confirm_order">
+									<div>{{$L('确认收货')}}</div>
+								</a>
+							</div>
+
+							<div v-if="order.order_list[0].order_state == 30 && order.order_list[0].if_refund_cancel==1">
+								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
+									@tap.stop="refund">
+									<div>{{$L('申请退货')}}</div>
+								</a>
+							</div>
+
+							<view v-if="order.order_list[0].if_lock">{{$L('退款/退货中...')}}</view>
+						</view>
+					</view>
+					<view class="order-body" :data-order-id="order.order_list[0].order_id" @tap.stop="go_order_detail">
+						<div class="order-body__items">
+							<div class="order-body__items-item" v-for="(item, index) in order.order_list[0].extend_order_goods" :key="index">
+								<image :src="item.goods_image_url"></image>
+								<div>{{item.goods_name}}</div>
+							</div>
+						</div>
+						<div class="order-body__toDetails">
+							<image src="/static/images/arrow_right_b.png" mode="widthFix"></image>
+						</div>
+					</view>
+				</view>
+				<!--
+				<view v-for="(item, order_index) in order_list" :key="order_index" class="gray-order-skin" :data-order-id="item.order_list[0].order_id">
+					<view class="bbctouch-order-item" :data-order-id="item.order_list[0].order_id" @tap.stop="go_order_detail">
+						<view class="bbctouch-order-item-head" :data-vid="item.order_list[0].vid" @tap.stop="go_vendor">
+							<view :data-store-id="item.order_list[0].vid" class="store">
+								<image class="icon" src="/static/images/store_b.png" mode="widthFix"></image>
+								<text>{{item.order_list[0].store_name}}</text>
+								<image class="arrow-r" src="/static/images/arrow_right_b.png" mode="widthFix"></image>
 							</view>
-							<div class="bbctouch-order-item-con">
-								<div v-for="(item, index) in item.order_list[0].extend_order_goods" :key="index" class="goods-block">
-									<a :data-goods-id="item.order_id" href="javascript:void(0)">
-										<div class="goods-pic">
-											<div class="goods-pic-middle">
-												<image :src="item.goods_image_url"></image>
-											</div>
+
+							<view class="state">
+								<block v-if="item.order_list[0].pin">
+									<navigator :url="'../found/import?u=/pin_detail_xcx.html&id=' + item.order_list[0].pin.sld_team_id">
+										<span class="ot-finish">{{item.order_list[0].state_desc}}</span>
+									</navigator>
+								</block>
+								<block v-else>
+									<span class="ot-finish">{{item.order_list[0].state_desc}}</span>
+								</block>
+							</view>
+						</view>
+						<div class="bbctouch-order-item-con">
+							<div v-for="(item, index) in item.order_list[0].extend_order_goods" :key="index" class="goods-block">
+								<a :data-goods-id="item.order_id" href="javascript:void(0)">
+									<div class="goods-pic">
+										<div class="goods-pic-middle">
+											<image :src="item.goods_image_url"></image>
 										</div>
-										<dl class="goods-info">
-											<dt class="goods-name">{{item.goods_name}}</dt>
-											<dd class="goods-type" v-if="item.goods_type_cn!=''">{{item.goods_type_cn}}</dd>
-										</dl>
-										<div class="goods-subtotal">
-											<span class="goods-price">{{$L('￥')}}
-												<em>{{item.goods_price}}</em>
-											</span>
-											<span class="goods-num">x{{item.goods_num}}</span>
-										</div>
+									</div>
+									<dl class="goods-info">
+										<dt class="goods-name">{{item.goods_name}}</dt>
+										<dd class="goods-type" v-if="item.goods_type_cn!=''">{{item.goods_type_cn}}</dd>
+									</dl>
+									<div class="goods-subtotal">
+										<span class="goods-price">{{$L('￥')}}
+											<em>{{item.goods_price}}</em>
+										</span>
+										<span class="goods-num">x{{item.goods_num}}</span>
+									</div>
+								</a>
+							</div>
+
+
+						</div>
+						<div class="bbctouch-order-item-footer">
+							<div class="store-totle">
+								<div class="order_promotion_type">
+									<span v-if="item.order_list[0].promotion_type_str">{{item.order_list[0].promotion_type_str}}</span>
+									<span v-if="item.order_list[0].store_promotion_type_str">{{item.order_list[0].store_promotion_type_str}}</span>
+								</div>
+								<span>{{$L('合计')}}</span>
+								<span class="sum flex_row_start_start">{{$L('￥')}}
+									<em>{{item.order_list[0].order_amount}}</em>
+								</span>
+								<span class="freight">({{$L('含运费')}}{{$L('￥')}}{{item.order_list[0].shipping_fee}})</span>
+							</div>
+							<div class="handle">
+
+								<div class="bottom-but" v-if="(item.order_list[0].order_state != 10 && item.order_list[0].payment_code != 'offline')||(item.order_list[0].payment_code == 'offline' && item.order_list[0].order_state != 10 && item.order_list[0].order_state != 20)">
+									<a href="javascript:void(0)" :data-promotion-type="item.order_list[0].promotion_type" :data-promotions-id="item.order_list[0].extend_order_goods[0].promotions_id"
+										:data-order-id="item.order_list[0].order_id" :data-order-index="order_index" @tap.stop="again_order" class=" sure-order">
+										<div>{{$L('再来一单')}}</div>
 									</a>
 								</div>
 
+								<div class="bottom-but" v-if="item.order_list[0].order_state==10">
+									<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
+										:data-pay-sn="item.pay_sn" class="check-payment" :data-price="item.order_list[0].order_amount" @tap.stop="go_pay">
+										<div>{{$L('去支付')}}</div>
+									</a>
+								</div>
+
+								<div class="bottom-but" v-if="item.order_list[0].if_delete">
+									<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
+										:data-pay-sn="item.pay_sn" class="check-payment" :data-price="item.order_list[0].order_amount" @tap.stop="del_order">
+										<div>{{$L('删除订单')}}</div>
+									</a>
+								</div>
+
+								<div class="bottom-but" v-if="item.order_list[0].if_deliver">
+									<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
+										@tap.stop="show_wuliu" class=" quxiao-order ">
+										<div>{{$L('物流信息')}}</div>
+									</a>
+								</div>
+
+								<div class="bottom-but" v-if="item.order_list[0].order_state==40&&item.order_list[0].evaluation_state==0">
+									<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
+										@tap.stop="pinjia" class=" quxiao-order ">
+										<div>{{$L('评价订单')}}</div>
+									</a>
+								</div>
+
+								<div class="bottom-but" v-if="item.order_list[0].if_cancel">
+									<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
+										@tap.stop="cancle_order" class="quxiao-order ">
+										<div>{{$L('取消订单')}}</div>
+									</a>
+								</div>
+
+								<div class="bottom-but" v-if="item.order_list[0].if_refund_cancel">
+									<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
+										@tap.stop="refund" class="quxiao-order ">
+										<div>{{$L('申请退款')}}</div>
+									</a>
+								</div>
+
+								<div class="bottom-but" v-if="item.order_list[0].if_receive">
+									<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
+										@tap.stop="confirm_order" class="sure-order">
+										<div>{{$L('确认收货')}}</div>
+									</a>
+								</div>
+
+								<div class="bottom-but" v-if="item.order_list[0].order_state == 30 && item.order_list[0].if_refund_cancel==1">
+									<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
+										@tap.stop="refund" class="sure-order">
+										<div>{{$L('申请退货')}}</div>
+									</a>
+								</div>
+
+								<view class="refund_info" v-if="item.order_list[0].if_lock">{{$L('退款/退货中...')}}</view>
 
 							</div>
-							<div class="bbctouch-order-item-footer">
-								<div class="store-totle">
-									<div class="order_promotion_type">
-										<span v-if="item.order_list[0].promotion_type_str">{{item.order_list[0].promotion_type_str}}</span>
-										<span v-if="item.order_list[0].store_promotion_type_str">{{item.order_list[0].store_promotion_type_str}}</span>
-									</div>
-									<span>{{$L('合计')}}</span>
-									<span class="sum flex_row_start_start">{{$L('￥')}}
-										<em>{{item.order_list[0].order_amount}}</em>
-									</span>
-									<span class="freight">({{$L('含运费')}}{{$L('￥')}}{{item.order_list[0].shipping_fee}})</span>
-								</div>
-								<div class="handle">
-
-									<div class="bottom-but" v-if="(item.order_list[0].order_state != 10 && item.order_list[0].payment_code != 'offline')||(item.order_list[0].payment_code == 'offline' && item.order_list[0].order_state != 10 && item.order_list[0].order_state != 20)">
-										<a href="javascript:void(0)" :data-promotion-type="item.order_list[0].promotion_type" :data-promotions-id="item.order_list[0].extend_order_goods[0].promotions_id"
-										 :data-order-id="item.order_list[0].order_id" :data-order-index="order_index" @tap.stop="again_order" class=" sure-order">
-											<div>{{$L('再来一单')}}</div>
-										</a>
-									</div>
-
-									<div class="bottom-but" v-if="item.order_list[0].order_state==10">
-										<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
-										 :data-pay-sn="item.pay_sn" class="check-payment" :data-price="item.order_list[0].order_amount" @tap.stop="go_pay">
-											<div>{{$L('去支付')}}</div>
-										</a>
-									</div>
-
-									<div class="bottom-but" v-if="item.order_list[0].if_delete">
-										<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
-										 :data-pay-sn="item.pay_sn" class="check-payment" :data-price="item.order_list[0].order_amount" @tap.stop="del_order">
-											<div>{{$L('删除订单')}}</div>
-										</a>
-									</div>
-
-									<div class="bottom-but" v-if="item.order_list[0].if_deliver">
-										<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
-										 @tap.stop="show_wuliu" class=" quxiao-order ">
-											<div>{{$L('物流信息')}}</div>
-										</a>
-									</div>
-
-									<div class="bottom-but" v-if="item.order_list[0].order_state==40&&item.order_list[0].evaluation_state==0">
-										<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
-										 @tap.stop="pinjia" class=" quxiao-order ">
-											<div>{{$L('评价订单')}}</div>
-										</a>
-									</div>
-
-									<div class="bottom-but" v-if="item.order_list[0].if_cancel">
-										<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
-										 @tap.stop="cancle_order" class="quxiao-order ">
-											<div>{{$L('取消订单')}}</div>
-										</a>
-									</div>
-
-									<div class="bottom-but" v-if="item.order_list[0].if_refund_cancel">
-										<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
-										 @tap.stop="refund" class="quxiao-order ">
-											<div>{{$L('申请退款')}}</div>
-										</a>
-									</div>
-
-									<div class="bottom-but" v-if="item.order_list[0].if_receive">
-										<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
-										 @tap.stop="confirm_order" class="sure-order">
-											<div>{{$L('确认收货')}}</div>
-										</a>
-									</div>
-
-									<div class="bottom-but" v-if="item.order_list[0].order_state == 30 && item.order_list[0].if_refund_cancel==1">
-										<a href="javascript:void(0)" :data-order-id="item.order_list[0].order_id" :data-order-index="order_index"
-										 @tap.stop="refund" class="sure-order">
-											<div>{{$L('申请退货')}}</div>
-										</a>
-									</div>
-
-									<view class="refund_info" v-if="item.order_list[0].if_lock">{{$L('退款/退货中...')}}</view>
-
-								</div>
-							</div>
-						</view>
+						</div>
 					</view>
 				</view>
+				-->
 			</scroll-view>
 			<view class="fix-block-r" @tap.stop="go_top" :hidden="show_go_top">
 				<a href="javascript:void(0);" class="gotop-btn gotop" id="goTopBtn">
@@ -784,8 +875,8 @@
 
 	.fix-block-r a {
 		display: block;
-		width: 70rpx;
-		height: 70rpx;
+		width: 88rpx;
+		height: 88rpx;
 	}
 
 	.gotop {
@@ -795,10 +886,6 @@
 		width: 100rpx;
 		display: inline-block;
 		text-align: center;
-	}
-
-	.fix-block-r a.gotop-btn {
-		margin-top: 12rpx;
 	}
 
 	.no_cart_goods {
@@ -883,7 +970,7 @@
     align-items: center;
     word-break: break-all;
 		color: #333;
-		font-size: 28rpx;
+		font-size: 25rpx;
     text-align: center;
 		height: 100%;
 		/* line-height: 86rpx; */
@@ -907,4 +994,64 @@
 		background: none;
 		text-decoration: none;
 	}
+
+
+
+	.order{
+		background-color:#fff;
+		margin: 50rpx 30rpx 0 30rpx;
+		border-radius: 15rpx;
+		overflow:hidden;
+	}
+	.order-head{
+		display: flex;
+		justify-content: space-between;
+		font-size: 24rpx;
+		color: #666;
+		padding:20rpx;
+		border-bottom: 1px solid #eee;
+	}
+	.order-head__state{
+
+	}
+	.order-head__actions{
+		display: flex;
+		gap: 10px;
+		a{
+			color: #666;
+		}
+	}
+
+	.order-body{
+		display: flex;
+		padding: 20rpx;
+		gap: 20rpx;
+	}
+	.order-body__items{
+		flex: 1;
+	}
+	.order-body__items-item{
+		display: flex;
+		align-items: center;
+		gap: 20rpx;
+
+		image{
+			flex: 220rpx 0 0;
+			width: 220rpx;
+			height: 220rpx
+		}
+	}
+	.order-body__toDetails{
+		flex: 0 0 30rpx;
+		display: flex;
+		justify-content: center;
+		align-items:center;
+
+		image{
+			width: 30rpx;
+			height: 30rpx;
+		}
+	}
+
+
 </style>

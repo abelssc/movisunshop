@@ -2048,5 +2048,6 @@ export const lang_en = {
   '请输入邮箱验证码':'Verifica tu email',
   'verification_code_sms':'SMS',
   'register_text': '¿Aún no tienes una cuenta? ',
-  'welcome': 'Bienvenido'
+  'welcome': 'Bienvenido',
+  'order_status': 'Estado del pedido:',
 };
