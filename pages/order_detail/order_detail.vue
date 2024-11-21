@@ -2,39 +2,31 @@
 	<view>
 		<view class="order_detail" v-if="order_info">
 			<view class="bbctouch-order-list" id="order-info-container">
-				<view class="bbctouch-oredr-detail-block">
-					<view class="order_det_num">{{$L('订单号：')}}{{order_info.order_sn}}</view>
-					<view class="order-state">{{order_info.state_desc}}</view>
-				</view>
-				<view class="bbctouch-oredr-detail-block">
-					<view class="bbctouch-oredr-detail-add">
-						<i class="icon-add">
-							<image style="width:60%;height:60%;" :src="img_url+'location_b.png'"></image>
-						</i>
-						<dl class="md-addr" v-if="order_info.ziti==1 && order_info.dian_id>0">
-							<dd>{{$L('自提门店：')}}{{order_info.dian.dian_name}} {{order_info.dian.dian_phone[1]}}</dd>
-							<dd>{{$L('门店地址：')}}{{order_info.dian.dian_address}}</dd>
-							<dd v-if="order_info.order_state != 10">{{$L('核销码：')}}{{order_info.hexiao_code}}</dd>
-						</dl>
-						<dl v-else>
-							<dt>{{$L('收货人：')}}
-								<span>{{order_info.reciver_name}}</span>
-								<span>{{order_info.reciver_phone}}</span>
-							</dt>
-							<dd>{{$L('收货地址：')}}{{order_info.reciver_addr}}</dd>
-						</dl>
-
-						<view class="navigate" @tap="showCz" v-if="order_info.ziti==1 && order_info.dian_id>0">
-							<image :src="img_url+'navigate.png'" mode="aspectFit"></image>
-						</view>
+				<view class="order-header">
+					<view class="order_det_num"><span>{{$L('订单号：')}}</span> {{order_info.order_sn}}</view>
+					<view class="order-state"><span>{{$L('order_status')}}</span> {{order_info.state_desc}}</view>
+					<view>
+						<span>{{$L('创建时间：')}}</span>
+						{{
+							(new Date(order_info.add_time.replace(" ", "T"))).toLocaleString("es-ES", { 
+								year: "numeric", 
+								month: "long", 
+								day: "numeric"
+							})
+						}}
 					</view>
 				</view>
+
+			
+		
 				<view class="bbctouch-order-item">
+					<!--
 					<view class="bbctouch-order-item-head" :data-store-id="order_info.vid" @tap.stop="go_vendor">
 						<image src="/static/images/store_b.png" mode="widthFix"></image>
 						<text>{{order_info.store_name}}</text>
 						<image src="/static/images/arrow_right_b.png" mode="widthFix"></image>
 					</view>
+					-->
 					<view class="bbctouch-order-item-con">
 						<view v-for="(item, index) in order_info.goods_list" :key="index" class="goods-block detail">
 							<a :data-goods-id="item.gid" href="javascript:void(0)" @tap.stop="go_goods_detail">
@@ -43,73 +35,117 @@
 										<image :src="item.image_url"></image>
 									</view>
 								</view>
-								<dl class="goods-info">
-									<dt class="goods-name">{{item.goods_name}}</dt>
-									<dt class="goods-type" v-if="item.goods_type_cn!=''">{{item.goods_type_cn}}</dt>
-								</dl>
-								<view class="goods-subtotal">
-									<span class="goods-price">{{$L('￥')}}
-										<em>{{item.goods_price}}</em>
-									</span>
-									<span class="goods-num">x{{item.goods_num}}</span>
-									<view class="refund">
-										<view class="re_btn" :data-order-id="item.order_id" :data-gid="item.rec_id" data-type="refund" @tap.stop="refund"
-										 v-if="item.refund==1&&item.goods_type!=5||item.refund==3&&item.goods_type!=5">{{$L('退款')}}</view>
-										<view class="re_btn" :data-order-id="item.order_id" :data-gid="item.rec_id" data-type="return" @tap.stop="sales_return"
-										 v-if="item.refund==1&&item.goods_type!=5">{{$L('退货')}}</view>
-										<view class="re_btn" v-if="order_info.order_state > 20&&item.refund == 0">{{$L('退款退货中···')}}</view>
+								<view class="goods-info">
+									<view>
+										<div class="goods-name">{{item.goods_name}}</div>
+										<div class="goods-type" v-if="item.goods_type_cn!=''">{{item.goods_type_cn}}</div>
+									</view>
+									<view class="goods-subtotal">
+										<div class="goods-num">{{item.goods_num}} {{$L('unid')}}</div>
+										<div class="goods-price">{{$L('￥')}}<em>{{item.goods_price}}</em></div>
+										<div class="sales_by"> {{$L('sales_by')}} {{order_info.store_name}}</div>
+										<view class="refund">
+											<view class="re_btn" :data-order-id="item.order_id" :data-gid="item.rec_id" data-type="refund" @tap.stop="refund"
+											v-if="item.refund==1&&item.goods_type!=5||item.refund==3&&item.goods_type!=5">{{$L('退款')}}</view>
+											<view class="re_btn" :data-order-id="item.order_id" :data-gid="item.rec_id" data-type="return" @tap.stop="sales_return"
+											v-if="item.refund==1&&item.goods_type!=5">{{$L('退货')}}</view>
+											<view class="re_btn" v-if="order_info.order_state > 20&&item.refund == 0">{{$L('退款退货中···')}}</view>
+										</view>
 									</view>
 								</view>
 							</a>
 						</view>
+					</view>
+				</view>
 
-						<view class="goods-subtotle">
-							<view :hidden="order_info.promotion.length>0?false:true">
-								<dl>
-									<dt>{{$L('优惠')}}</dt>
-									<dd v-for="(item, index) in order_info.promotion" :key="index">
-										<span>{{item['1']}}</span>
-									</dd>
-								</dl>
-							</view>
-							<dl v-if="order_info.red_money">
-								<dt class="grade_discount">{{$L('平台优惠券')}}</dt>
-								<dd>{{$L('￥')}}
-									<em>{{order_info.red_money}}</em>
-								</dd>
-							</dl>
-							
-							<dl v-if="order_info.vred_money">
-								<dt class="grade_discount">{{$L('店铺优惠券')}}</dt>
-								<dd>{{$L('￥')}}
-									<em>{{order_info.vred_money}}</em>
-								</dd>
-							</dl>
-							<dl v-if="order_info.extend_order_common.grade_discount">
-								<dt class="grade_discount">{{$L('商品总价')}}
-									<view>
-										<image :src="img_url+'V2@2x.png'"></image> <text>{{$L('会员')}}{{order_info.extend_order_common.grade_discount}}{{$L('折')}}</text>
-									</view>
-								</dt>
-								<dd>{{$L('￥')}}
-									<em>{{order_info.order_amount}}</em>
-								</dd>
-							</dl>
+				<view class="summary">
+					<view class="summary-head">
+						{{$L('summary_title')}}
+					</view>
+					<view class="summary-body">
+						<view class="sada" :hidden="order_info.promotion.length>0?false:true">
 							<dl>
-								<dt>{{$L('运费')}}</dt>
-								<dd>{{$L('￥')}}
-									<em>{{order_info.shipping_fee}}</em>
-								</dd>
-							</dl>
-							<dl class="t">
-								<dt>{{$L('实付款（含运费）')}}</dt>
-								<dd>{{$L('￥')}}
-									<em>{{order_info.order_amount}}</em>
+								<dt>{{$L('优惠')}}</dt>
+								<dd v-for="(item, index) in order_info.promotion" :key="index">
+									<span>{{item['1']}}</span>
 								</dd>
 							</dl>
 						</view>
+						<dl v-if="order_info.red_money">
+							<dt class="grade_discount">{{$L('平台优惠券')}}</dt>
+							<dd>{{$L('￥')}}
+								<em>{{order_info.red_money}}</em>
+							</dd>
+						</dl>
+						
+						<dl v-if="order_info.vred_money">
+							<dt class="grade_discount">{{$L('店铺优惠券')}}</dt>
+							<dd>{{$L('￥')}}
+								<em>{{order_info.vred_money}}</em>
+							</dd>
+						</dl>
+						<dl v-if="order_info.extend_order_common.grade_discount">
+							<dt class="grade_discount">{{$L('商品总价')}}
+								<view>
+									<image :src="img_url+'V2@2x.png'"></image> <text>{{$L('会员')}}{{order_info.extend_order_common.grade_discount}}{{$L('折')}}</text>
+								</view>
+							</dt>
+							<dd>{{$L('￥')}}
+								<em>{{order_info.order_amount}}</em>
+							</dd>
+						</dl>
+						<dl>
+							<dt>{{$L('运费')}}</dt>
+							<dd>{{$L('￥')}}
+								<em>{{order_info.shipping_fee}}</em>
+							</dd>
+						</dl>
+						<dl class="t">
+							<dt>{{$L('实付款（含运费）')}}</dt>
+							<dd>{{$L('￥')}}
+								<em>{{order_info.order_amount}}</em>
+							</dd>
+						</dl>
 					</view>
 				</view>
+
+				<view class="tracing">
+					<view class="tracing-head">{{$L('tracing')}}</view>
+					<view class="tracing-body">
+						<view>
+							{{$L('创建时间：')}}
+							{{
+								(new Date(order_info.add_time.replace(" ", "T"))).toLocaleString("es-ES", { 
+									year: "numeric", 
+									month: "long", 
+									day: "numeric"
+								})
+							}}
+						</view>
+						<view :hidden="order_info.payment_time?false:true">{{$L('付款时间：')}} {{order_info.payment_time}} </view>
+						<view :hidden="order_info.shipping_time?false:true">{{$L('发货时间：')}}{{order_info.shipping_time}}</view>
+						<view :hidden="order_info.finnshed_time?false:true">{{$L('完成时间：')}}{{order_info.finnshed_time}}</view>
+					</view>
+				</view>
+
+				<view class="address">
+					<view class="address-head">{{$L('mailing_address')}}</view>
+					<view class="address-body">
+						<dl class="md-addr" v-if="order_info.ziti==1 && order_info.dian_id>0">
+							<dd><span>{{$L('门店地址：')}}</span>{{order_info.dian.dian_address}}</dd>
+							<dd v-if="order_info.order_state != 10"><span>{{$L('核销码：')}}</span>{{order_info.hexiao_code}}</dd>
+							<dd><span>{{$L('自提门店：')}}</span>{{order_info.dian.dian_name}} {{order_info.dian.dian_phone[1]}}</dd>
+						</dl>
+						<dl v-else>
+							<dd><span>{{$L('收货地址：')}}</span>{{order_info.reciver_addr}}</dd>
+							<dt><span>{{$L('收货人：')}}</span>{{order_info.reciver_name}} {{order_info.reciver_phone}}</dt>
+						</dl>
+						<view class="navigate" @tap="showCz" v-if="order_info.ziti==1 && order_info.dian_id>0">
+							<image :src="img_url+'navigate.png'" mode="aspectFit"></image>
+						</view>			
+					</view>
+				</view>
+
 				<view v-if="order_info.order_message" class="bbctouch-oredr-detail-block">
 					<view class="beizhu">
 						<i class="msg">
@@ -128,19 +164,10 @@
 					<view class="info">{{order_info.invoice}}</view>
 				</view>
 
-				<view :hidden="order_info.payment_name?false:true" class="bbctouch-oredr-detail-block">
-					<view class="beizhu">
-						<i class="pay">
-							<image style="width: 60%;height: 60%;" :src="img_url+'mcc_06_b.png'"></image>
-						</i>{{$L('付款方式')}}</view>
-					<view class="info">{{order_info.payment_name}}</view>
-				</view>
-				<view class="bbctouch-oredr-detail-block">
-					<view class="order-log">
-						<view>{{$L('创建时间：')}}{{order_info.add_time}}</view>
-						<view :hidden="order_info.payment_time?false:true">{{$L('付款时间：')}}{{order_info.payment_time}}</view>
-						<view :hidden="order_info.shipping_time?false:true">{{$L('发货时间：')}}{{order_info.shipping_time}}</view>
-						<view :hidden="order_info.finnshed_time?false:true">{{$L('完成时间：')}}{{order_info.finnshed_time}}</view>
+				<view :hidden="order_info.payment_name?false:true" class="payment_method">
+					<view class="payment_method-head">{{$L('付款方式')}}</view>
+					<view class="payment_method-body">
+						{{order_info.payment_name}}
 					</view>
 				</view>
 
@@ -376,106 +403,35 @@
 	.order_detail {
 		border-top: 1rpx solid #e3e5e9;
 	}
+	.order-header{
+		background-color:#fff;
+		margin: 30rpx;
+		border-radius: 15rpx;
+		overflow:hidden;
 
-	.bbctouch-oredr-detail-block {
-		position: relative;
-		z-index: 1;
-		display: block;
-		padding: 18rpx 0;
-		background: #fff;
-		clear: both;
-		overflow: hidden;
-	}
-
-	.bbctouch-oredr-detail-block .order_det_num {
-		display: inline-block;
-		vertical-align: top;
-		height: 46rpx;
-		margin-left: 18rpx;
-		font-size: 28rpx;
-		line-height: 46rpx;
-		color: #252525;
-		float: left;
-	}
-
-	.bbctouch-oredr-detail-block .order-state {
-		float: right;
-		height: 46rpx;
-		margin-right: 23rpx;
-		font-size: 28rpx;
-		color: #f15353;
-		line-height: 46rpx;
-	}
-
-	.bbctouch-oredr-detail-block {
-		position: relative;
-		z-index: 1;
-		display: block;
-		padding: 17rpx 0;
-		background: #fff;
-		clear: both;
-		overflow: hidden;
-		margin-top: 20rpx;
-	}
-
-	.bbctouch-oredr-detail-add {
-		position: relative;
-		z-index: 1;
-		width: 100%;
-	}
-
-	.bbctouch-oredr-detail-add i.icon-add {
-		position: absolute;
-		z-index: 1;
-		top: -4rpx;
-		left: 18rpx;
-		display: block;
-		width: 46rpx;
-		height: 46rpx;
-		background-repeat: no-repeat;
-		background-position: 50% 50%;
-		background-size: 80%;
-		text-align: center;
-	}
-
-	.bbctouch-oredr-detail-add dl {
-		margin: 0 0 0 74rpx;
-		padding: 0 23rpx 0 0;
-		display: block;
-	}
-
-	.bbctouch-oredr-detail-add dt {
-		display: block;
-		height: 46rpx;
-		font-size: 28rpx;
-		line-height: 46rpx;
-	}
-
-	.bbctouch-oredr-detail-add dt span {
-		margin-left: 14rpx;
-		font-family: Helvetica;
-	}
-
-	.bbctouch-oredr-detail-add dt span {
-		margin-left: 14rpx;
-		font-family: Helvetica;
-	}
-
-	.bbctouch-oredr-detail-add dd {
-		display: block;
-		width: 500rpx;
-		min-height: 42rpx;
-		max-height: 74rpx;
+		font-weight: normal;
 		font-size: 26rpx;
-		line-height: 42rpx;
-		color: #848689;
+		padding:20rpx;
+		color: #666;
+		border-bottom: 1px solid #eee;
+	}
+	.order-header span{
+		font-weight: bold;
+	}
+
+	.order-header .order_det_num {
+
+	}
+
+	.order-header .order-state {
+
 	}
 
 	.bbctouch-order-item {
-		width: 100%;
-		background-color: #fff;
-		margin-top: 20rpx;
-		display: block;
+		background-color:#fff;
+		margin: 30rpx;
+		border-radius: 15rpx;
+		overflow:hidden;
 	}
 
 	.bbctouch-order-item-head {
@@ -499,105 +455,98 @@
 	}
 
 	.bbctouch-order-item-con {
-		padding: 0 2.5%;
-		background: #f8f8f8;
+		padding:20rpx;
 		display: block;
+		font-size: 26rpx;
+		color: #666;
+		border-bottom: solid #eee 1rpx;
+	}
+	.bbctouch-order-item-con:nth-last-child(1){
+		border-bottom: none;
 	}
 
 	.bbctouch-order-item-con .goods-block.detail {
-		height: 166rpx;
 		position: relative;
 		z-index: 1;
-		border-bottom: solid #eee 1rpx;
 		display: block;
 	}
 
 	.bbctouch-order-item-con .goods-block a {
-		display: block;
+		display: flex;
+		gap: 20rpx;
+		align-items:center;
 		color: #111;
 	}
 
 	.bbctouch-order-item-con .goods-pic {
 		display: block;
-		width: 130rpx;
-		height: 130rpx;
-		position: absolute;
-		z-index: 1;
-		top: 18rpx;
-		left: 0;
+		flex: 180rpx 0 0;
+		width: 180rpx;
+		height: 180rpx;
 	}
 
 	.goods-pic .goods-pic-middle {
-		width: 130rpx;
-		height: 130rpx;
-		display: table-cell;
-		vertical-align: middle;
+		width: 180rpx;
+		height: 180rpx;
 	}
 
 	.bbctouch-order-item-con .goods-pic image {
-		max-width: 130rpx;
-		max-height: 130rpx;
+		max-width: 180rpx;
+		max-height: 180rpx;
 	}
 
 	.bbctouch-order-item-con .goods-info {
-		display: block;
-		height: 168rpx;
-		padding: 18rpx 0;
-		margin: 0 184rpx 0 143rpx;
-		position: relative;
-		z-index: 1;
-		overflow: hidden;
-		/* display: -webkit-box; */
-		/* -webkit-box-align: center; */
+		flex: 1;
+		color: #666;
 	}
 
 	.bbctouch-order-item-con .goods-info .goods-name {
-		overflow: hidden;
-		height: 72rpx;
-		font-size: 26rpx;
-		line-height: 40rpx;
-		margin-bottom: 0;
-		color: #333;
-		display: -webkit-box !important;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
+		font-weight: bold;
 	}
 
 	.bbctouch-order-item-con .goods-subtotal {
-		display: block;
-		position: absolute;
-		z-index: 1;
-		top: 20rpx;
-		right: 0;
-		text-align: right;
-		overflow: hidden;
+
 	}
 
 	.bbctouch-order-item-con .goods-subtotal .goods-price {
-		display: block;
-		font-size: 26rpx;
-		line-height: 42rpx;
+
+	}
+	.bbctouch-order-item-con .goods-subtotal .sales_by{
+		font-size:22rpx;
 	}
 
 	.bbctouch-order-item-con .goods-subtotal .goods-price em {
-		font-size: 26rpx;
-		font-family: Helvetica;
-		display: inline-block;
+
 	}
 
 	.bbctouch-order-item-con .goods-subtotal .goods-num {
+		color: #666;
+	}
+
+	.summary,.tracing,.payment_method,.address{
+		background-color:#fff;
+		margin: 30rpx;
+		border-radius: 15rpx;
+		overflow:hidden;
+	}
+	.summary-head,.tracing-head,.payment_method-head,.address-head{
+		font-weight: bold;
+		font-size: 26rpx;
+		padding:20rpx;
+		color: #666;
+		border-bottom: 1px solid #eee;
+	}
+	.address-body span{
+		font-weight: bold;
+	}
+	.summary-body,.tracing-body,.payment_method-body,.address-body {
+		padding:20rpx;
 		display: block;
 		font-size: 26rpx;
-		line-height: 42rpx;
-		color: #999;
+		color: #666;
 	}
 
-	.bbctouch-order-item-con .goods-subtotle {
-		padding: 18rpx 0;
-		display: block;
-	}
-
-	.bbctouch-order-item-con .goods-subtotle dl {
+	.summary-body dl {
 		font-size: 26rpx;
 		line-height: 42rpx;
 		overflow: hidden;
@@ -605,41 +554,33 @@
 		display: block;
 	}
 
-	.bbctouch-order-item-con .goods-subtotle dt {
+	.summary-body dt {
 		float: left;
 		color: #555;
 	}
 
-	.bbctouch-order-item-con .goods-subtotle dd {
+	.summary-body dd {
 		float: right;
 		color: #000;
 		text-align: right;
 	}
 
-	.bbctouch-order-item-con .goods-subtotle dl.t {
-		font-size: 28rpx;
-		line-height: 46rpx;
+	.summary-body dl.t {
+		font-weight: bold;
 	}
 
-	.bbctouch-order-item-con .goods-subtotle dt {
+	.summary-body dt {
 		float: left;
 		color: #555;
 	}
 
-	.bbctouch-order-item-con .goods-subtotle dd {
+	.summary-body dd {
 		float: right;
 		color: #000;
 		text-align: right;
 	}
-
-	.bbctouch-oredr-detail-block {
-		position: relative;
-		z-index: 1;
-		display: block;
-		padding: 17rpx 0;
-		background: #fff;
-		clear: both;
-		overflow: hidden;
+	.summary-body dl dd em {
+		display: inline-block;
 	}
 
 	.bbctouch-oredr-detail-block .beizhu {
@@ -663,26 +604,6 @@
 		background-repeat: no-repeat;
 		background-size: 60%;
 		opacity: 0.9;
-	}
-
-	.bbctouch-oredr-detail-block {
-		position: relative;
-		z-index: 1;
-		display: block;
-		padding: 18rpx 0;
-		background: #fff;
-		clear: both;
-		overflow: hidden;
-	}
-
-	.bbctouch-oredr-detail-block .beizhu {
-		display: inline-block;
-		vertical-align: top;
-		height: 46rpx;
-		margin-left: 18rpx;
-		font-size: 28rpx;
-		line-height: 46rpx;
-		color: #252525;
 	}
 
 	.bbctouch-oredr-detail-block h3 i {
@@ -716,12 +637,14 @@
 		margin-top: 20rpx;
 	}
 
-	.bbctouch-oredr-detail-block .order-log {
+	
+
+	.order-log {
 		padding: 0 23rpx;
 		display: block;
 	}
 
-	.bbctouch-oredr-detail-block .order-log view {
+	.order-log view {
 		font-size: 26rpx;
 		line-height: 42rpx;
 		color: #6d6d6d;
@@ -759,7 +682,8 @@
 	}
 
 	.botton_btn .btn {
-		background-color: #fff;
+		color: #fff;
+		background-color: #000;
 		padding: 0 30rpx;
 		height: 70rpx;
 		border-radius: 8rpx;
@@ -810,10 +734,6 @@
 	.navigate image {
 		width: 100%;
 		height: 100%;
-	}
-
-	.goods-subtotle dl dd em {
-		display: inline-block;
 	}
 	a{
 		text-decoration: none;

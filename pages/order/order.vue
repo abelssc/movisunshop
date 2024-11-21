@@ -999,7 +999,7 @@
 
 	.order{
 		background-color:#fff;
-		margin: 50rpx 30rpx 0 30rpx;
+		margin: 30rpx 30rpx 0 30rpx;
 		border-radius: 15rpx;
 		overflow:hidden;
 	}
@@ -1036,9 +1036,9 @@
 		gap: 20rpx;
 
 		image{
-			flex: 220rpx 0 0;
-			width: 220rpx;
-			height: 220rpx
+			flex: 180rpx 0 0;
+			width: 180rpx;
+			height: 180rpx
 		}
 	}
 	.order-body__toDetails{
