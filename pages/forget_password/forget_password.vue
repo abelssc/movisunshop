@@ -113,7 +113,7 @@
 				if (this.countDownM) {
 					return;
 				}
-				var reg = /(1[3-9]\d{9}$)/;
+				var reg = /^\d{7,15}$/;
 
 				if (this.mobile == "") {
 					uni.showToast({

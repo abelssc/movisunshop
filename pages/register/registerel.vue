@@ -150,8 +150,19 @@
 					imgCodeKey,
 					logining
 				} = this;
-				if (!(email && smsCode && imgCode) || logining) {
-					return;
+				if (!(email && smsCode && imgCode && this.password)) {
+					uni.showToast({
+						title: this.$L('fill_all_inputs'),
+						icon: 'none'
+					});
+					return false;
+				}
+				if(logining){
+					uni.showToast({
+						title: this.$L('logining'),
+						icon: 'none'
+					});
+					return false;
 				}
 				if (!this.check_agreement) {
 					uni.showToast({
@@ -197,6 +208,7 @@
 								title: res.data.datas.msg,
 								icon: 'none'
 							});
+							this.logining = false;
 						} else {
 							uni.showToast({
 								title: this.$L('注册成功'),
@@ -258,12 +270,12 @@
 						success: res => {
 
 							if (res.data.datas == '200') {
-                uni.showToast({
-                	title: this.$L('已发送'),
-                	icon: 'none'
-                });
-                	this.countDownM = 60;
-                	this.countDown();
+								uni.showToast({
+									title: this.$L('已发送'),
+									icon: 'none'
+								});
+								this.countDownM = 60;
+								this.countDown();
 								
 							} else {
 								uni.showToast({

@@ -541,7 +541,11 @@
 			},
 			toLogin() {
 				if (this.password == '' || this.username == '') {
-					return;
+					uni.showToast({
+						title: this.$L('fill_all_inputs'),
+						icon: 'none'
+					});
+					return false;
 				}
 				// #ifdef APP-PLUS
 				if (!this.check_agreement) {
