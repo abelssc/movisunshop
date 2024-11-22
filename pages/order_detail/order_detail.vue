@@ -122,9 +122,36 @@
 								})
 							}}
 						</view>
-						<view :hidden="order_info.payment_time?false:true">{{$L('付款时间：')}} {{order_info.payment_time}} </view>
-						<view :hidden="order_info.shipping_time?false:true">{{$L('发货时间：')}}{{order_info.shipping_time}}</view>
-						<view :hidden="order_info.finnshed_time?false:true">{{$L('完成时间：')}}{{order_info.finnshed_time}}</view>
+						<view :hidden="order_info.payment_time?false:true">
+							{{$L('付款时间：')}}
+							{{
+								(new Date(order_info.payment_time.replace(" ", "T"))).toLocaleString("es-ES", { 
+									year: "numeric", 
+									month: "long", 
+									day: "numeric"
+								})
+							}}
+						</view>
+						<view :hidden="order_info.shipping_time?false:true">
+							{{$L('发货时间：')}}
+							{{
+								(new Date(order_info.shipping_time.replace(" ", "T"))).toLocaleString("es-ES", { 
+									year: "numeric", 
+									month: "long", 
+									day: "numeric"
+								})
+							}}
+						</view>
+						<view :hidden="order_info.finnshed_time?false:true">
+							{{$L('完成时间：')}}
+							{{
+								(new Date(order_info.finnshed_time.replace(" ", "T"))).toLocaleString("es-ES", { 
+									year: "numeric", 
+									month: "long", 
+									day: "numeric"
+								})
+							}}
+						</view>
 					</view>
 				</view>
 

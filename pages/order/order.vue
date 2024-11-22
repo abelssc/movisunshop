@@ -25,74 +25,64 @@
 			<scroll-view scroll-y="true" @scroll="scroll" :scroll-top="scroll_height" @scrolltolower="loadMore">
 				<view class="order" v-for="(order, order_index) in order_list" :key="order_index" :data-order-id="order.order_list[0].order_id">
 					<view class="order-head">
-						<view class="order-head__state">
-							<block v-if="order.order_list[0].pin">
-								<navigator :url="'../found/import?u=/pin_detail_xcx.html&id=' + order.order_list[0].pin.sld_team_id">
-									<span>{{order.order_list[0].state_desc}}</span>
-								</navigator>
-							</block>
-							<block v-else>
-								<span>{{$L('order_status')}} {{order.order_list[0].state_desc}}</span>
-							</block>
-						</view>
 						<view class="order-head__actions">
-							<div v-if="(order.order_list[0].order_state != 10 && order.order_list[0].payment_code != 'offline')||(order.order_list[0].payment_code == 'offline' && order.order_list[0].order_state != 10 && order.order_list[0].order_state != 20)">
+							<div v-if="(order.order_list[0].order_state != 10 && order.order_list[0].payment_code != 'offline')||(order.order_list[0].payment_code == 'offline' && order.order_list[0].order_state != 10 && order.order_list[0].order_state != 20)" class="bg-yellow">
 								<a href="javascript:void(0)" :data-promotion-type="order.order_list[0].promotion_type" :data-promotions-id="order.order_list[0].extend_order_goods[0].promotions_id"
 									:data-order-id="order.order_list[0].order_id" :data-order-index="order_index" @tap.stop="again_order">
 									<div>{{$L('再来一单')}}</div>
 								</a>
 							</div>
 
-							<div v-if="order.order_list[0].order_state==10">
+							<div v-if="order.order_list[0].order_state==10" class="bg-blue">
 								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
 									:data-pay-sn="order.pay_sn" :data-price="order.order_list[0].order_amount" @tap.stop="go_pay">
 									<div>{{$L('去支付')}}</div>
 								</a>
 							</div>
 
-							<div v-if="order.order_list[0].if_delete">
+							<div v-if="order.order_list[0].if_delete" class="bg-white">
 								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
 									:data-pay-sn="order.pay_sn" :data-price="order.order_list[0].order_amount" @tap.stop="del_order">
 									<div>{{$L('删除订单')}}</div>
 								</a>
 							</div>
 
-							<div v-if="order.order_list[0].if_deliver">
+							<div v-if="order.order_list[0].if_deliver" class="bg-white">
 								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
 									@tap.stop="show_wuliu">
 									<div>{{$L('物流信息')}}</div>
 								</a>
 							</div>
 
-							<div v-if="order.order_list[0].order_state==40&&order.order_list[0].evaluation_state==0">
+							<div v-if="order.order_list[0].order_state==40&&order.order_list[0].evaluation_state==0" class="bg-white">
 								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
 									@tap.stop="pinjia">
 									<div>{{$L('评价订单')}}</div>
 								</a>
 							</div>
 
-							<div v-if="order.order_list[0].if_cancel">
+							<div v-if="order.order_list[0].if_cancel" class="bg-white">
 								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
 									@tap.stop="cancle_order">
 									<div>{{$L('取消订单')}}</div>
 								</a>
 							</div>
 
-							<div v-if="order.order_list[0].if_refund_cancel">
+							<div v-if="order.order_list[0].if_refund_cancel" class="bg-white">
 								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
 									@tap.stop="refund">
 									<div>{{$L('申请退款')}}</div>
 								</a>
 							</div>
 
-							<div v-if="order.order_list[0].if_receive">
+							<div v-if="order.order_list[0].if_receive" class="bg-blue">
 								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
 									@tap.stop="confirm_order">
 									<div>{{$L('确认收货')}}</div>
 								</a>
 							</div>
 
-							<div v-if="order.order_list[0].order_state == 30 && order.order_list[0].if_refund_cancel==1">
+							<div v-if="order.order_list[0].order_state == 30 && order.order_list[0].if_refund_cancel==1" class="bg-white">
 								<a href="javascript:void(0)" :data-order-id="order.order_list[0].order_id" :data-order-index="order_index"
 									@tap.stop="refund">
 									<div>{{$L('申请退货')}}</div>
@@ -100,6 +90,16 @@
 							</div>
 
 							<view v-if="order.order_list[0].if_lock">{{$L('退款/退货中...')}}</view>
+						</view>
+						<view class="order-head__state" v-if="s=='all'">
+							<block v-if="order.order_list[0].pin">
+								<navigator :url="'../found/import?u=/pin_detail_xcx.html&id=' + order.order_list[0].pin.sld_team_id">
+									<span>{{order.order_list[0].state_desc}}</span>
+								</navigator>
+							</block>
+							<block v-else>
+								<span>{{order.order_list[0].state_desc}}</span>
+							</block>
 						</view>
 					</view>
 					<view class="order-body" :data-order-id="order.order_list[0].order_id" @tap.stop="go_order_detail">
@@ -250,7 +250,7 @@
 			</view>
 		</view>
 		<view class="no_cart_goods" v-if="!order_list.length && isloading">
-			<image :src="img_url+'no_order_list.png'"></image>
+			<image :src="img_url+'cart.svg'"></image>
 			<text>{{$L('抱歉！该分类暂无订单')}}</text>
 		</view>
 		<view class="error-tips" :hidden="is_show_tip==1?false:true">
@@ -1006,6 +1006,7 @@
 	.order-head{
 		display: flex;
 		justify-content: space-between;
+		align-items:center;
 		font-size: 24rpx;
 		color: #666;
 		padding:20rpx;
@@ -1050,6 +1051,36 @@
 		image{
 			width: 30rpx;
 			height: 30rpx;
+		}
+	}
+	.bg-white{
+		background-color: #fff;
+		border-radius: 8px;
+		padding: 4px 8px;
+		border: 1px solid #eee;
+		box-sizing: border-box;
+		a{
+			color: #666;
+		}
+	}
+	.bg-blue{
+		background-color: #6c7fd6;
+		border-radius: 8px;
+		padding: 4px 8px;
+		border: 1px solid #eee;
+		box-sizing: border-box;
+		a{
+			color: #fff;
+		}
+	}
+	.bg-yellow{
+		background-color: #ffd800;
+		border-radius: 8px;
+		padding: 4px 8px;
+		border: 1px solid #eee;
+		box-sizing: border-box;
+		a{
+			color: #666;
 		}
 	}
 

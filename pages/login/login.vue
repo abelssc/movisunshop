@@ -859,6 +859,7 @@
 		.mobile-login {
 			color: #1e2a74;
 			text-decoration: underline;
+			display: none;
 		}
 	}
 	.login-register {

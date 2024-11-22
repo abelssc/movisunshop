@@ -20,16 +20,15 @@
 					<text class="clear-account iconfont iconziyuan34" v-show="email&&curFocus=='email'" @click="clearContent('email')"></text>
 				</view>
 				<view class="input-item">
-					<input type="text" :value="imgCode" maxlength="5" :placeholder="$L('请输入图形验证码')" data-key="imgCode" @input="inputChange"
-					 @focus="setFocus" style="width:100%" />
-					<view class="pwd-right">
-						<text class="clear-pwd iconfont iconziyuan34" v-show="imgCode&&curFocus=='imgCode'" @click="clearContent('imgCode')"></text>
-						<image @click="getImgCode" :src='showCodeImg' />
-					</view>
+					<input type="password" :value="password" :placeholder="$L('请设置您的密码')" data-key="password" @input="inputChange"
+						@focus="setFocus" style="width:100%"/>
+					<text class="clear-account iconfont iconziyuan34" v-show="password&&curFocus=='password'" @click="clearContent('password')"></text>
 				</view>
 				<view class="input-item">
-					<input type="number" :value="smsCode" maxlength="6" :placeholder="$L('请输入邮箱验证码')" data-key="smsCode" @input="inputChange"
-					 @confirm="toRegist" @focus="setFocus" style="width:100%" />
+					<input type="number" :value="smsCode" maxlength="6" 
+						:placeholder="$L('请输入邮箱验证码')" data-key="smsCode" @input="inputChange"
+						@confirm="toRegist" @focus="setFocus" style="width:100%" 
+					/>
 					<view class="pwd-right">
 						<text class="clear-pwd iconfont iconziyuan34" v-show="smsCode&&curFocus=='smsCode'" @click="clearContent('smsCode')"></text>
 						<view :style="{opacity: countDownM?0.3:1}" class="sms-code-view" @click="getSmsCode">
@@ -38,9 +37,12 @@
 					</view>
 				</view>
 				<view class="input-item">
-				<input type="password" :value="password" :placeholder="$L('请设置您的密码')" data-key="password" @input="inputChange"
-					 @focus="setFocus" style="width:100%"/>
-					<text class="clear-account iconfont iconziyuan34" v-show="password&&curFocus=='password'" @click="clearContent('password')"></text>
+					<input type="text" :value="imgCode" maxlength="5" :placeholder="$L('请输入图形验证码')" data-key="imgCode" @input="inputChange"
+					 @focus="setFocus" style="width:100%" />
+					<view class="pwd-right">
+						<text class="clear-pwd iconfont iconziyuan34" v-show="imgCode&&curFocus=='imgCode'" @click="clearContent('imgCode')"></text>
+						<image @click="getImgCode" :src='showCodeImg' />
+					</view>
 				</view>
 				<!-- #ifdef H5 -->
 				<view class="agreement-part">
@@ -148,9 +150,11 @@
 					smsCode,
 					imgCode,
 					imgCodeKey,
-					logining
+					logining,
+					password
 				} = this;
-				if (!(email && smsCode && imgCode && this.password)) {
+				console.log(this);
+				if (email=='' || smsCode==''|| imgCode=='' || password=='') {
 					uni.showToast({
 						title: this.$L('fill_all_inputs'),
 						icon: 'none'
@@ -196,7 +200,7 @@
 						'client': 'wx_xcx' ,
 						'shareId':shareId?shareId:'',
 						'ukey': uni.getStorageSync('uuid'),
-						'email_code':smsCode
+						'email_code':this.smsCode
 					},
 					header: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -214,11 +218,7 @@
 								title: this.$L('注册成功'),
 								icon: 'none'
 							});
-						    setTimeout(()=>{
-								uni.redirectTo({
-									url:'/pages/login/login'
-								})
-							},1500) 
+						
 						}
 					}
 				});
@@ -405,30 +405,7 @@
 			font-size: 26rpx;
 			color: #ddd;
 		}
-
-		&:nth-child(2) {
-			.pwd-right {
-				position: absolute;
-				right: 6rpx;
-				top: 14rpx;
-				display: flex;
-				align-items: center;
-
-				.clear-pwd {
-					font-size: 26rpx;
-					color: #ddd;
-				}
-
-				image {
-					width: 128rpx;
-					height: 50rpx;
-					box-shadow: 0px 5rpx 9rpx 1rpx rgba(102, 102, 102, 0.1);
-					border-radius: 6rpx;
-					margin-left: 20rpx;
-				}
-			}
-		}
-
+		
 		&:nth-child(3) {
 			.pwd-right {
 				position: absolute;
@@ -457,6 +434,30 @@
 				}
 			}
 		}
+
+		&:nth-child(4) {
+			.pwd-right {
+				position: absolute;
+				right: 6rpx;
+				top: 14rpx;
+				display: flex;
+				align-items: center;
+
+				.clear-pwd {
+					font-size: 26rpx;
+					color: #ddd;
+				}
+
+				image {
+					width: 128rpx;
+					height: 50rpx;
+					box-shadow: 0px 5rpx 9rpx 1rpx rgba(102, 102, 102, 0.1);
+					border-radius: 6rpx;
+					margin-left: 20rpx;
+				}
+			}
+		}
+
 
 		.tit {
 			height: 50upx;
