@@ -559,7 +559,7 @@
 	}
 
 	body {
-		font-family: "PingFangSC-Regular", "Microsoft YaHei", "Helvetica", "Droid Sans", "Arial", "sans-serif";
+		font-family: "Urbanist", "sans-serif";
 	}
 
 	* {

@@ -179,31 +179,31 @@
 
 <view class="order-list">
     <view class="order-item" data-url="/pages/order/order?s=1" @tap="drup">
-        <text class="iconfont sld_mdaifahuo-"></text>
+        <image :src="img_url+'por_pagar.png'"></image>
         <view>{{$L('待付款')}}</view>
         <text class="item-num" v-if="member_info.dai_fu> 0">{{member_info.dai_fu}}</text>
     </view>
 
     <view class="order-item" data-url="/pages/order/order?s=256" @tap="drup">
-        <text class="iconfont sld_mdaifahuo-1"></text>
+        <image :src="img_url+'en_camino.png'"></image>
         <view>{{$L('待发货')}}</view>
         <text class="item-num" v-if="member_info.dai_fahuo > 0">{{member_info.dai_fahuo}}</text>
     </view>
 
     <view class="order-item" data-url="/pages/order/order?s=1024" @tap="drup">
-        <text class="iconfont sld_mdaifahuo-3"></text>
+        <image :src="img_url+'entregado.png'"></image>
         <view>{{$L('待收货')}}</view>
         <text class="item-num" v-if="member_info.dai_send > 0">{{member_info.dai_send}}</text>
     </view>
 
     <view class="order-item" data-url="/pages/order/order?s=nocomment" @tap="drup">
-        <text class="iconfont sld_mdaifahuo-4"></text>
+        <image :src="img_url+'comentarios.png'"></image>
         <view>{{$L('待评价')}}</view>
         <text class="item-num" v-if="member_info.dai_ping > 0">{{member_info.dai_ping}}</text>
     </view>
 
     <view class="order-item" data-url="/pages/refund/list" @tap="drup">
-        <text class="iconfont sld_mdaifahuo-2"></text>
+        <image :src="img_url+'devoluciones.png'"></image>
         <view>{{$L('退款/退货')}}</view>
         <text class="item-num" v-if="member_info.refund_count > 0">{{member_info.refund_count}}</text>
     </view>
@@ -1542,12 +1542,13 @@ page {
     box-sizing: border-box;
 }
 
-.order-item .iconfont {
+.order-item image {
     display: block;
     color: #565656;
-    font-size: 48rpx;
+    width: 60rpx;
+    height: 60rpx;
     text-align: center;
-    margin-bottom: 10rpx;
+    margin: 0 auto 10rpx;
 }
 
 .order-item .item-num {
