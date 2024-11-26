@@ -384,7 +384,7 @@ export default {
   min-height: calc(100vh - 30rpx);
   padding-top: 30rpx;
   background-color: #f5f5f5;
-  font-family: 'PingFangSC-Light';
+  font-family: "Urbanist", "sans-serif";
 }
 
 .input {

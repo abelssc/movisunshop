@@ -281,7 +281,7 @@ page {
   color: #6a6c78;
   line-height: 36rpx;
   margin: 20rpx 10rpx;
-  font-family: PingFangSC-Regular;
+  font-family: "Urbanist", "sans-serif";
   word-break: break-all;
   text-overflow: ellipsis;
   display: -webkit-box;
