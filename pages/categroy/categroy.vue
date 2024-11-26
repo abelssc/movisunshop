@@ -190,7 +190,7 @@
 				var that = this; //获取相应分类下面的二三级分类
 				that.topSwiperData = cat_one_list_array[sele_index].ad_logo;
 				that.topSwiperData = that.topSwiperData && that.topSwiperData.filter(item => item.imgUrl != '');
-				console.log(that.topSwiperData);
+
 				uni.request({
 					url: getApp().globalData.ser_url + '/index.php?app=goods_cat&mod=get_sec_third_class_xcx',
 					dataType: 'json',
@@ -414,7 +414,6 @@
 
 	.cat_swiper {
 		width: 100%;
-		padding: 0 36rpx;
 		box-sizing: border-box;
 	}
 
