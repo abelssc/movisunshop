@@ -1083,7 +1083,7 @@ export const lang_en = {
   "商品信息发生变化，请刷新购物车重新结算":"La información del  producto ha cambiado, actualice  el carrito de  compras  y reinstalarse",
   "搜索商品": "Buscar en movisunshop.com", 
   "超过购买上限":  "Superó el límite de  compra", 
-  "商品分类":  "Clasificación de productos", 
+  "商品分类":  "Menú", 
   "修改登录密码":  "Modificar contraseña de  inicio de sesión", 
   "修改密码":  "Cambiar contraseña", 
   "请输入城市搜索":  "Por favor, introduzca una  búsqueda de ciudad",    
