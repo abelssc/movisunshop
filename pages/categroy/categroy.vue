@@ -331,7 +331,7 @@
 		justify-content: start;
 		align-items:center;
 		gap: 10rpx;
-		padding: 36rpx;
+		padding: 36rpx 36rpx 0;
 		font-weight: bold;
 		font-size: 36rpx;
 	}
@@ -413,26 +413,25 @@
 	}
 
 	.cat_swiper {
-		width: 520rpx;
-		margin: 22rpx auto 0;
+		width: 100%;
+		padding: 0 36rpx;
+		box-sizing: border-box;
 	}
 
 	.swiper-box {
-		width: 520rpx;
-		height: 210rpx;
+		width: 100%;
+		height: 200px;
 		border-radius: 10rpx;
 		overflow: hidden;
 	}
 
 	.swiper-item {
-		width: 520rpx;
-		height: 210rpx;
+		width: 100%;
 
 	}
 
 	.item_img {
-		width: 520rpx;
-		height: 210rpx;
+		width: 100%;
 		border-radius: 10rpx;
 		overflow: hidden;
 	}
