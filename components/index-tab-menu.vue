@@ -1,16 +1,6 @@
 <template>
-	<view class="content" :style="{background:backGround}">
-		<view class="nav_wrap">
-			<view class="nav_item" v-for="(item,index) in tabInfo" :key="index" @click="changeTab(index,item.gc_id)">
-				<view :class="currIndex == index?'active_nav nav_text':'nav_text'">{{item.gc_name}}</view>
-				<image :src="icon" mode="" class="nav_icon" v-if="currIndex == index"></image>
-			</view>
-		</view>
-		<view class="gap_line"></view>
-		<view class="sort_wrap" @click="toSortPage">
-			<image :src="sortImg" mode=""></image>
-			<text>{{$L('分类')}}</text>
-		</view>
+	<view class="sort_wrap" @click="toSortPage">
+		<image :src="sortImg" mode=""></image>
 	</view>
 </template>
 
@@ -23,7 +13,7 @@
 		data(){
 			return {
 				icon:getApp().globalData.img_url+'index/icon.png',
-				sortImg:getApp().globalData.img_url+'index/sort.png',
+				sortImg:getApp().globalData.img_url+'menu.svg',
 				currIndex:0,
 				gc_id: '',
 				pn: 1,
@@ -81,83 +71,11 @@
 </script>
 
 <style lang='scss'>
-	.content{
-		position:fixed;
-		top:0;
-		/* left:0; */
-		width:750rpx;
-		padding:0 20rpx;
-		box-sizing: border-box;
-		display: flex;
-		align-items: center;
-		padding-top:88rpx;
-		background: linear-gradient(90deg, #FC1D1C 0%, #FF7A18 100%);
-		z-index: 1000;
-		/* #ifndef H5 */
-		left: 0;
-		/* #endif */
-		/* #ifdef APP-PLUS */
-		top:var(--status-bar-height);
-		/* #endif */
-		.nav_wrap{
-			width:580rpx; 
-			height:70rpx;
-			display:flex;
-			overflow-x: scroll;
-			float: left;
-			.nav_item{
-				margin-right:35rpx;
-				display:flex;
-				flex-direction: column;
-				align-items: center;
-				padding-top:12rpx;
-				box-sizing: border-box;
-				flex-shrink: 0;
-				.nav_text{
-					font-size:32rpx;
-					color:#fff;
-					white-space: nowrap;
-					line-height: 38rpx;
-				}
-				.nav_icon{
-					width:27rpx;
-					height:9rpx;
-				}
-			}	
+	.sort_wrap{
+		image{
+			width:50rpx;
+			height:50rpx;
+			padding: 15rpx;
 		}
-		.gap_line{
-			width:13rpx;
-			height:30rpx;
-			background: linear-gradient(-90deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);
-			opacity: 0.8;
-			float: left;
-			margin-right:6rpx;
-			margin-left: 4rpx;
-			// align-self: end;
-			// margin-top: 17rpx;
-		}
-		.sort_wrap{
-			font-size:30rpx;
-			color:#fff;
-			display: flex;
-			justify-content: flex-start;
-			box-sizing: border-box; 
-			float: right;
-			text-align: right;
-			width: max-content;
-			// margin-top: -9rpx;
-			image{
-				width:32rpx;
-				height:26rpx;
-				margin:0 7rpx 0 7rpx;
-			}
-			text{
-				line-height:30rpx;
-			}
-		}
-	}
-	.active_nav{
-		font-weight: bold;
-		margin-bottom:6rpx;
 	}
 </style>

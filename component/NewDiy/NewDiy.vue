@@ -8,30 +8,31 @@
 			<view class="topic_name">{{topic_name}}</view>
 		</view> -->
 		<!-- <view class="container" :style="{paddingTop:is_show_empty == true?'54rpx':'68rpx'}"> -->
-		<view class="mp-search-box" :style="{background:tab_index == 0?pure_bg_color:top_bg}" v-if="is_show_top == true">
-			<view class="city_wrap" v-if="city_site_open" @click="chooseCity" >
-				<text>{{city}}</text>
-			</view>
-			<image v-if="city_site_open" mode="aspectFit" :src="img_url+'more_site.png'" class="top_icon"></image>
-			<view class="search_con">
-				<image :src="img_url+'search.png'" mode="aspectFit" class="search_img"></image>
-				<input class="ser-input" type="text" :value="$L('输入关键字搜索')"  @click="toSearchPage" placeholder-class="search_input" />
-			</view>
-			<!-- #ifdef APP-PLUS -->
-			<view class="scan" @click="scanCode">
-				<image :src="img_url+'scanning.png'" mode=""></image>
-				<text>{{$L('扫一扫')}}</text>
-			</view>
-			<!-- #endif -->
-			<view class="message" @click="toMessage">
-				<image :src="img_url+'message.png'" mode=""></image>
-				<text>{{$L('消息')}}</text>
-			</view>
+		<view class="mp-search-box" v-if="is_show_top == true">
+				<view class="avatar-container">
+					<image class="avatar" src="https://www.movisunshop.com/data/upload/mall/store/07656731789056289.jpg" mode="aspectFit"></image>
+				</view>
+				<view v-if="city_site_open" class="city_wrap" @click="chooseCity" >
+					<text>{{city}}</text>
+				</view>
+				<image v-if="city_site_open" mode="aspectFit" :src="img_url+'more_site.png'" class="top_icon"></image>
+				<view class="search_con">
+					<image :src="img_url+'search.svg'" mode="aspectFit" class="search_img" @click="toSearchPage"></image>
+				</view>
+				<!-- #ifdef APP-PLUS -->
+				<view class="scan" @click="scanCode">
+					<image :src="img_url+'scanning.png'" mode=""></image>
+					<text>{{$L('扫一扫')}}</text>
+				</view>
+				<!-- #endif -->
+				<view class="message" @click="toMessage">
+					<image :src="img_url+'notification.svg'" mode=""></image>
+				</view>
+				<!-- 头部分类 -->
+				<tab-menu :backGround="tab_index == 0?pure_bg_color:top_bg" :tabInfo="sort_nav_list" @getChildList="getChildList"
+				v-if="is_show_top == true&&home_is_show_top_cat" ref="menuTab"></tab-menu>
 		</view>
 
-		<!-- 头部分类 -->
-		<tab-menu :backGround="tab_index == 0?pure_bg_color:top_bg" :tabInfo="sort_nav_list" @getChildList="getChildList"
-		 v-if="is_show_top == true&&home_is_show_top_cat" ref="menuTab"></tab-menu>
 		<!-- 头部轮播 -->
 		<!-- 首页装修 -->
 		<view v-if="is_show_index == true && isShow == true" :class="isShowTab == true?(home_is_show_top_cat?'deco_wrap':'deco_wrap_no_top_cat'):'deco_wrap2'">
@@ -41,7 +42,7 @@
 					<view :class="decoItem.swiper_bg_style == 1?'titleNview-background top_swiper_style1':'titleNview-background top_swiper_style2'"
 					 :style="{background:titleNViewBackground,borderRadius:decoItem.swiper_bg_style == 1?'border_radius':'0'}"></view>
 					<uni-swiper-dot :current="swiperCurrent" :info="decoItem.data" mode="round" :dotsStyles="dotsStyles" @click="skipTo()">
-						<swiper class="carousel" :style="{margin:isIos?'10rpx 0':0}" circular @change="swiperChange" autoplay="true">
+						<swiper class="carousel" circular @change="swiperChange" autoplay="true">
 							<swiper-item v-for="(item, index) in decoItem.data" :key="index" class="carousel-item" @click.stop="skipTo(item.url_type,item.url,item.info)">
 								<image :src="item.img" />
 							</swiper-item>
@@ -1288,13 +1289,13 @@
 	
 	/* #ifdef H5 */
 	.container1 {
-		padding-top: 158rpx !important;
+		padding-top: 108rpx !important;
 	}
 	/* #endif */
 	
 	/* #ifdef APP-PLUS */
 	.container1 {
-		padding-top: 158rpx !important; 
+		padding-top: 108rpx !important; 
 	}
 	/* #endif */
 
@@ -1318,12 +1319,12 @@
 		/* #endif */
 		z-index: 9999;
 		width: 750rpx;
-		height: 88rpx;
+		height: 108rpx;
 		padding: 0 23rpx 0 20rpx;
 		display: flex;
 		box-sizing: border-box;
 		align-items: center;
-		background: linear-gradient(90deg, #FC1D1C 0%, #FF7A18 100%);
+		background: #fff;
 
 		.ser-input {
 			flex: 1;
@@ -1337,6 +1338,14 @@
 			padding-left: 58rpx;
 			box-sizing: border-box;
 			background-color: #fff;
+		}
+	}
+	.avatar-container{
+		width: 100%;
+		.avatar{
+			width: auto;
+			height: 18px;
+			aspect-ratio:390/44;
 		}
 	}
 
@@ -1355,7 +1364,6 @@
 		}
 
 		.carousel-section {
-			padding: 0 20rpx;
 			box-sizing: border-box;
 			background-color: #FFFFFF;
 
@@ -1378,13 +1386,9 @@
 	}
 
 	.search_img {
-		position: absolute;
-		width: 30rpx;
-		height: 36rpx;
-		left: 16rpx;
-		top: 50%;
-		transform: translateY(-50%);
-		z-index: 99;
+		width: 50rpx;
+		height: 50rpx;
+		padding: 15rpx;
 	}
 
 
@@ -1400,7 +1404,6 @@
 	/* 头部 轮播图 */
 	.carousel-section {
 		position: relative;
-		padding-top: 10px;
 
 		.titleNview-placing {
 			height: var(--status-bar-height);
@@ -1433,7 +1436,6 @@
 		image {
 			width: 100%;
 			height: 100%;
-			border-radius: 10rpx;
 			overflow: hidden;
 		}
 	}
@@ -3727,22 +3729,10 @@ text-overflow: ellipsis;
 
 	.scan,
 	.message {
-		margin-left: 18rpx;
-		display: flex;
-		align-items: center;
-		flex-direction: column;
-		flex-shrink: 0;
-
 		image {
-			width: 34rpx;
-			height: 34rpx;
-		}
-
-		text {
-			color: white;
-			font-size: 20rpx;
-			line-height: 22rpx;
-			margin-top: 6rpx;
+			width: 50rpx;
+			height: 50rpx;
+			padding: 15rpx;
 		}
 	}
 

@@ -746,7 +746,7 @@ export function UpdateCart() {
  * */
 export function getCurLanguage(key) {
  // let curLang = getApp().globalData.curLang;
- let curLang = uni.getStorageSync('curLang') || 'zh_cn';
+ let curLang = uni.getStorageSync('curLang') || 'en';
  if (curLang == 'zh_cn') {
   return key;
  } else {
