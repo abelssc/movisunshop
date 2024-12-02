@@ -41,8 +41,8 @@
 					<!-- 背景色区域 -->
 					<view :class="decoItem.swiper_bg_style == 1?'titleNview-background top_swiper_style1':'titleNview-background top_swiper_style2'"
 					 :style="{background:titleNViewBackground,borderRadius:decoItem.swiper_bg_style == 1?'border_radius':'0'}"></view>
-					<uni-swiper-dot :current="swiperCurrent" :info="decoItem.data" mode="round" :dotsStyles="dotsStyles" @click="skipTo()">
-						<swiper class="carousel" circular @change="swiperChange" autoplay="true">
+					<uni-swiper-dot :current="swiperCurrent" :info="decoItem.data" mode="round" :dotsStyles="dotsStyles" @click="skipTo()" >
+						<swiper class="carousel" circular @change="swiperChange" autoplay="true" interval="8000">
 							<swiper-item v-for="(item, index) in decoItem.data" :key="index" class="carousel-item" @click.stop="skipTo(item.url_type,item.url,item.info)">
 								<image :src="item.img" />
 							</swiper-item>
