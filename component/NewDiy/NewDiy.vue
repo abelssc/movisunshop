@@ -25,12 +25,13 @@
 					<text>{{$L('扫一扫')}}</text>
 				</view>
 				<!-- #endif -->
-				<view class="message" @click="toMessage">
+				
+				<view class="message" @click="toMessage" style="display:none">
 					<image :src="img_url+'notification.svg'" mode=""></image>
 				</view>
-				<!-- 头部分类 -->
 				<tab-menu :backGround="tab_index == 0?pure_bg_color:top_bg" :tabInfo="sort_nav_list" @getChildList="getChildList"
-				v-if="is_show_top == true&&home_is_show_top_cat" ref="menuTab"></tab-menu>
+				v-if="is_show_top == true&&home_is_show_top_cat" ref="menuTab" style="display:none"></tab-menu>
+				
 		</view>
 
 		<!-- 头部轮播 -->

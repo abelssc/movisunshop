@@ -38,7 +38,7 @@ export default {
         // tabBar 配置
         color: "#5C5C5C",
         // 文字颜色
-        selectedColor: "#FC3559",
+        selectedColor: "#091552",
         // 选中的颜色
         selectItem: 1,
         list: [{
