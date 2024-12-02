@@ -34,7 +34,7 @@
 					<view class="cat_swiper" v-if="topSwiperData && topSwiperData.length>0">
 						<uni-swiper-dot :info="topSwiperData" :current="current" field="content" :mode="topSwiperData && topSwiperData.length > 1 ? 'dot' : ''"
 						:dotsStyles="dotsStyles">
-							<swiper class="swiper-box" @change="change" autoplay circular >
+							<swiper class="swiper-box" @change="change" interval="8000"  circular >
 								<swiper-item v-for="(item_top ,index_top) in topSwiperData" :key="index_top" @click="skipTo(item_top.link_type,item_top.link_value,item_top.info)">
 									<view class="swiper-item">
 										<image class="item_img" :src='item_top.imgUrl' mode="aspectFit" />
@@ -296,7 +296,6 @@
 			width: 30rpx;
 			height: 30rpx;
 			transform: rotate(180deg);
-			border:2px dotted #000;
 		}
 	}
 	.categroy_content{
@@ -305,7 +304,7 @@
 		overflow: hidden;
 		.categroy_menu{
 			width:100vw;
-			transition: transform 0.3s ease;
+			transition: transform .3s ease;
 			transform: translateX(0);
 
 			display: flex;
@@ -359,7 +358,6 @@
 
 		&.sele{
 			font-weight: bold;
-			border: 2px dotted #000;
 		}
 	}
 	/*===============================================
@@ -419,7 +417,7 @@
 
 	.swiper-box {
 		width: 100%;
-		height: 200px;
+		height: 375rpx;
 		border-radius: 10rpx;
 		overflow: hidden;
 	}
@@ -430,7 +428,8 @@
 	}
 
 	.item_img {
-		width: 100%;
+		width: 750rpx;
+		height: 375rpx;
 		border-radius: 10rpx;
 		overflow: hidden;
 	}
