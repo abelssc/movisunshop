@@ -77,7 +77,7 @@
 					<view class="cate-section" v-if="decoItem.style_set == 'nav' && decoItem.icon_set == 'up' && decoItem.is_show == true || decoItem.icon_set == 'no-icon' && decoItem.is_show == true">
 						<view class="cate-item" v-for="(item,index) in decoItem.data" :key="index" @click="skipTo(item.url_type,item.url,item.info)">
 							<image :src="item.img" v-if="decoItem.icon_set == 'up'"></image>
-							<text>{{filters.toSubstring(item.name,0,9)}}</text>
+							<text>{{item.name}}</text>
 						</view>
 					</view>
 
@@ -284,7 +284,7 @@
 				<!-- 推荐商品样式一 --> 
 				<view class="recommend_goods_wrap" v-if="decoItem.type == 'tuijianshangpin' && decoItem.show_style == 'small' && decoItem.is_show == true"
 				 style="padding:0">
-					<view :style="{backgroundColor:decoItem.border_style == 'border_none_grey_bg'?'f8f8f8':'#fff',paddingLeft:decoItem.page_margin*2+'rpx',paddingRight:decoItem.page_margin*2+'rpx',paddingTop:'20rpx'}"
+					<view :style="{backgroundColor:decoItem.border_style == 'border_none_grey_bg'?'f8f8f8':'#fff',paddingLeft:decoItem.page_margin*2+'rpx',paddingRight:decoItem.page_margin*2+'rpx',paddingTop:'40rpx'}"
 					 class="rec_goods_wrap">
 						<goods-item-v :goods_info="item" :show_sale="decoItem.isshow_sales == 1?true:false" :icon_type="decoItem.cart_icon_type"
 						 :border_radius="decoItem.border_radius" :border_style="decoItem.border_style" :goods_margin="decoItem.goods_margin"
@@ -796,7 +796,9 @@
 			goodsItemV
 		},
 		props: ['deco_info', 'city','city_site_open' ,'is_show_top', 'topic_name', 'home_is_show_top_cat'],
-		onShow: function() {},
+		onShow: function() {
+			console.log(deco_info);
+		},
 		watch: {
 			deco_info(val) {
 				val && val.map((item,index) => {
@@ -828,7 +830,7 @@
 			// this.loadData();
 			this.getSortList();
 			this.getPlatform();
-
+			console.log(this.deco_info);
 			if (this.deco_info != null && this.deco_info != undefined && this.deco_info && this.is_show_top == true) {
 				let cur = this.deco_info.filter(item => item.type == 'fuwenben');
 				if (cur && cur.length > 0) {
@@ -1475,24 +1477,30 @@
 	.cate-section {
 		display: flex;
 		justify-content: space-around;
-		align-items: center;
-		flex-wrap: wrap;
-		padding: 20rpx 0;
+		align-items: start;
+		gap:10rpx;
+		//flex-wrap: wrap;
+		padding: 40rpx 0;
 		background: #fff;
 
 		.cate-item {
+			flex:1;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			font-size: 26upx;
-			color: #303133;
+			color: #666666;
+
+			text{
+				text-align: center;
+			}
 		}
 
 		.cate-item2 {
 			display: flex;
 			align-items: center;
 			font-size: 26upx;
-			color: #303133;
+			color: #666666;
 		}
 
 		.cate_name {
@@ -1501,10 +1509,13 @@
 
 		/* 原图标颜色太深,不想改图了,所以加了透明度 */
 		image {
-			width: 88upx;
-			height: 88upx;
+			width: 120upx;
+			height: 120upx;
 			margin-bottom: 14upx;
 			border-radius: 50%;
+			border: 1px solid #ccc;
+			padding: 20upx;
+			box-sizing: border-box;
 		}
 	}
 
@@ -1641,10 +1652,13 @@
 	.rich_text_wrap {
 		font-size: 28rpx;
 		background: #fff;
-		padding: 30rpx;
+		padding: 30rpx 30rpx 0;
 		box-sizing: border-box;
 		margin-top: 20rpx;
 		white-space: pre-line;
+	}
+	.ql-size-large{
+		font-size: 18px;
 	}
 
 	.match_wrap {
@@ -1780,7 +1794,6 @@
 		justify-content: space-between;
 		flex-wrap: wrap;
 		padding: 0 20rpx;
-		margin-top: 20rpx;
 	}
 
 	.carousel_img {
@@ -3411,8 +3424,8 @@
 		margin-left: -2rpx;
 		width: 72rpx;
 		overflow: hidden;
-white-space: nowrap;
-text-overflow: ellipsis;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 	}
 
 	.active_panic_time {

@@ -286,7 +286,14 @@ export function linkTo(key, url, info) {
 	let token = uni.getStorageSync('token');
 	if (key == 'url') { //链接地址
 		// #ifdef H5
-		window.open(url)
+		uni.navigateTo({
+			url: url,
+			fail: function(e) {
+				console.log(e);
+				window.open(url);
+			}
+		})
+		//window.open(url)
 		// #endif
 
 		// #ifdef APP-PLUS

@@ -5,8 +5,8 @@
 <template name="goodsItemV">                                                                             
 	<view class="goods_v_item flex_column_start_start" @click="goGoodsDetail(goods_info.gid)" :style="{width:'calc((750rpx - '+page_margin*4+'rpx - '+goods_margin*2+'rpx)/2)',border:border_style == 'border_eee'?'1rpx solid #eee':'',boxShadow:border_style == 'card-shadow'?'rgba(93, 113, 127, 0.08) 0px 2px 8px':'',marginRight:goods_margin+'px',borderRadius:border_radius+'px'}">
 		<view class="goods-img" v-if='goods_info.goods_image_url' :style="{backgroundImage: 'url('+goods_info.goods_image_url+')',borderRadius:border_radius+'px',width:'calc((750rpx - '+page_margin*2+'rpx - '+goods_margin*2+'rpx)/2)'}"></view>
-		<view class="goods-img" v-else :style="{backgroundImage: 'url('+goods_info.goods_image+')',width:'calc((750rpx - '+page_margin*2+'px - '+goods_margin*2+'rpx)/2)'}"></view>
-		<text class="goods-name">{{goods_info.goods_name}}</text>
+		<view class="goods-img" v-else :style="{backgroundImage: 'url('+goods_info.goods_image+')',width:'calc((450rpx - '+page_margin*2+'px - '+goods_margin*2+'rpx)/2)'}"></view>
+		<text class="goods-name">{{goods_info.goods_name.toLowerCase()}}</text>
 		<view :class="show_sale == true?'goods-price flex_row_between_center':'goods-price flex_row_between_center have_no_sale'">
 			<view class="left">
 				<text class="unit">{{$L('￥')}}</text>
@@ -200,35 +200,40 @@
 			background-position: center center;
 			background-repeat: no-repeat;
 			/* width: calc((750rpx - 60rpx)/2); */
-			height: calc((750rpx - 60rpx)/2);
+			height: calc((450rpx - 60rpx)/2);
 			overflow: hidden;
 			background-color: #fff;
+			margin: 0 auto;
 		}
 
 		.goods-name {
-			margin-top: 20rpx;
-			font-size: 28rpx;
-			color: #2d2d2d;
+			margin: 20rpx auto 0;
+			font-size: 26rpx;
+			color: #666;
 			line-height: 40rpx;
-			height: 80rpx;
+			max-height: 80rpx;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			display: -webkit-box;
 			-webkit-line-clamp: 2;
 			-webkit-box-orient: vertical;
 			word-break: break-word;
-			padding: 0 20rpx;
+			white-space: pre-line;
+			padding: 0 40rpx;
+			text-transform: capitalize;
+			text-align: center;
 		}
 
 		.goods-price {
-			padding: 0 20rpx;
+			padding: 0 40rpx;
 			width: 100%;
 			box-sizing: border-box;
 			display: flex;
 			flex-direction: column;
+			margin-bottom: 60rpx;
 			.left {
 				width:100%;
-				color: #FC1C1C;
+				color: #2d2d2d;
 				
 				.unit,
 				.price_decimal {
@@ -236,16 +241,6 @@
 					margin-right: 3rpx;
 					font-weight: 500;
 				}
-				/* #ifdef APP-PLUS */
-				.unit{
-					font-weight: 600;
-				}
-				/* #endif */
-				/* #ifndef APP-PLUS */
-				.unit{
-					font-weight: 700;
-				}
-				/* #endif */
 				.price_int {
 					font-size: 34rpx;
 					line-height: 34rpx;
@@ -274,6 +269,6 @@
 		width: 100%;
 		flex-direction: row !important;
 		justify-content: space-between !important;
-		padding:20rpx !important;
+		padding:20rpx 40rpx !important;
 	}
 </style>
