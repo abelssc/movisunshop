@@ -2,38 +2,46 @@
 	<view>
 		<view class="sea_input_part">
 			<!-- #ifndef MP-WEIXIN -->
-			<image src="../../static/integral/images/crright.png" mode="" style="transform:rotate(180deg);" class="go_back" @click="goBack"></image>
+			<image src="/static/images/arrow_right_b.png" class="go_back" @click="goBack"></image>
 			<!-- #endif -->
 			<view>
 				<image class="search" :src="img_url+'search.png'"></image>
-				<input confirm-type="search" class="sea_input" type="text" v-model="in_value" @input="input" :placeholder="$L('请输入关键词')"
+				<input confirm-type="search" class="sea_input" type="text" focus  v-model="in_value" @input="input" :placeholder="$L('请输入关键词')"
 				 @confirm="in_confirm"></input>
 				<image v-if="in_value" class="clear_input" @tap.stop="clear_input" :src="img_url+'clear_input.png'"></image>
 			</view>
-			<label class="sea_btn" @tap.stop="btn_search">{{$L('搜索')}}</label>
+			<image class="sea_btn" :src="img_url+'search.png'" @tap.stop="btn_search"></image>
 		</view>
+		<view class="search-item" v-if="list_search.length || in_value.length">
+			<view class="list_search">
+				<view v-for="item in list_search" :key="item.gid" :data-gid="item.gid" @click="skipTo('goods',item.gid)">
+					<text v-html="item.goods_name_en"></text>
+				</view>
+			</view>
+		</view>
+		<view v-else>
+			<view class="search-item" v-if="history_val && history_val.length">
+				<view class="search-title">
+					<text>{{$L('搜索历史')}}</text>
+					<view class="del" @tap.stop="clear_history">
+						<image :src="img_url+'del_search.png'"></image>
+					</view>
+				</view>
 
-		<view class="search-item" v-if="history_val && history_val.length">
-			<view class="search-title">
-				<text>{{$L('搜索历史')}}</text>
-				<view class="del" @tap.stop="clear_history">
-					<image :src="img_url+'del_search.png'"></image>
+				<view class="search-con">
+					<view v-for="(item, index) in history_val" :key="index" class="item" :data-keyword="item" @tap.stop="go_glist">{{item}}</view>
 				</view>
 			</view>
 
-			<view class="search-con">
-				<view v-for="(item, index) in history_val" :key="index" class="item" :data-keyword="item" @tap.stop="go_glist">{{item}}</view>
-			</view>
-		</view>
+			<view class="search-item" v-if="list_info && list_info.hot_list && list_info.hot_list.length">
+				<view class="search-title">
+					<text>{{$L('热门搜索')}}</text>
+				</view>
 
-		<view class="search-item" v-if="list_info && list_info.hot_list && list_info.hot_list.length">
-			<view class="search-title">
-				<text>{{$L('热门搜索')}}</text>
-			</view>
-
-			<view class="search-con">
-				<view v-for="(item, index) in list_info.hot_list" :key="index" class="item" :data-keyword="item" @tap.stop="go_glist">
-					{{item}}
+				<view class="search-con">
+					<view v-for="(item, index) in list_info.hot_list" :key="index" class="item" :data-keyword="item" @tap.stop="go_glist">
+						{{item}}
+					</view>
 				</view>
 			</view>
 		</view>
@@ -44,7 +52,7 @@
 
 <script>
 	import {
-		checkSpace
+		checkSpace, debounce, linkTo
 	} from "../../utils/common";
 
 	export default {
@@ -52,6 +60,7 @@
 			return {
 				img_url: getApp().globalData.img_url,
 				in_value: '',
+				list_search:[],
 				history_val: '',
 				list_info: ""
 			};
@@ -60,9 +69,9 @@
 		components: {},
 		props: {},
 		onLoad: function(options) {
-      uni.setNavigationBarTitle({
-          title: this.$L('搜索')
-      });
+			uni.setNavigationBarTitle({
+				title: this.$L('搜索')
+			});
 			// 	生命周期函数--监听页面加载
 			var that = this;
 			uni.request({
@@ -112,16 +121,42 @@
 				});
 			},
 
-			input(e) {
-				this.setData({
-					in_value: e.detail.value
+			skipTo(type, url, info) {
+				linkTo(type, url, info)
+			},
+
+			input: debounce(function() {
+				if (this.in_value.trim() === ''){
+					this.list_search=[];
+					return;
+				}
+				this.searchServer(this.in_value); 
+			}, 300),
+
+			searchServer(query) {
+				uni.request({
+					url: getApp().globalData.ser_url + '/index.php?app=goods&mod=goods_list_search',
+					data: { q: query },
+					dataType: 'json',
+					success: (res) => {
+						let data=res.data.datas.goods;
+						if(data){
+							this.list_search=data;
+						}else{
+							this.list_search=[];
+						}
+					},
+					fail: (err) => {
+						console.error('Error al buscar:', err);
+					}
 				});
 			},
 
 			//清空搜索内容
 			clear_input() {
 				this.setData({
-					in_value: ''
+					in_value: '',
+					list_search:[]
 				});
 			},
 
@@ -149,9 +184,17 @@
 				});
 			},
 			goBack(){
-				uni.navigateBack({
-					delta:1
-				})
+				const pages = getCurrentPages();
+
+				 if (pages.length > 1) {
+					uni.navigateBack({
+						delta: 1
+					});
+				} else {
+					uni.reLaunch({ 
+						url: '/pages/index/index'
+					});
+				}
 			}
 		}
 	};
@@ -164,8 +207,10 @@
 	}
 
 	.go_back{
-		width: 20rpx;
-		height: 28rpx;
+		padding: 30rpx;
+		width: 30rpx;
+		height: 30rpx;
+		transform: rotate(180deg);
 	}
 
 
@@ -184,7 +229,7 @@
 	.sea_input_part .search {
 		width: 30rpx;
 		height: 30rpx;
-		margin-right: 22rpx;
+		margin: 0 20rpx;
 	}
 
 	.sea_input_part .clear_input {
@@ -198,50 +243,37 @@
 	.sea_input_part view {
 		display: flex;
 		align-items: center;
-		border: none;
-		width: 80%;
-		/* #ifdef APP-PLUS || H5 */
-		width: 78%;
-		/* #endif */
-		margin-left: 20rpx;
-		height: 65rpx;
-		padding-left: 20rpx;
-		border-radius: 32.5rpx;
-		background-color: #f5f5f5;
+		font-size: 26rpx;
+		flex: 1;
+		color: #949494;
+		background: #F7F7F7;
+		border-radius: 30rpx;
+		height: 80rpx;
+		line-height: 60rpx;
 	}
 
 	.sea_btn {
-		font-size: 30rpx;
-		color: #2D2D2D;
-		padding: 10rpx 0 10rpx 25rpx;  
+		padding: 30rpx;
+		width: 30rpx;
+		height: 30rpx;
+		background: #F7F7F7;
+		border-radius:50%;
 	}
 
 	.sea_input_part {
 		position: relative;
 		display: flex;
 		align-items: center;
-		height: 88rpx;
-		width: 100%;
-		display: flex;
-		align-items: center;
+		height: 108rpx;
+		background: #fff;
+		padding: 0 30rpx 30rpx;
+		gap:20rpx;
 		justify-content: space-between;
-		padding: 0 20rpx;
-		box-sizing: border-box;
-	}
-
-	.sea_input_part::after {
-		position: absolute;
-		content: '';
-		left: 0;
-		bottom: 0;
-		width: 100%;
-		height: 1rpx;
-		background-color: #eee;
-		transform: scaleY(0.5);
 	}
 
 	.search-item {
-		padding: 30rpx 28rpx;
+		padding: 30rpx 50rpx;
+		border-top:1px solid #eee;
 	}
 
 	.search-item .search-title {
@@ -250,13 +282,14 @@
 		justify-content: space-between;
 		height: 48rpx;
 		color: #2D2D2D;
-		font-size: 28rpx;
+		font-size: 26rpx;
 		font-weight: bold;
+		text-transform: uppercase;
 	}
 
 	.search-item .search-title image {
-		width: 48rpx;
-		height: 48rpx;
+		width: 38rpx;
+		height: 38rpx;
 	}
 
 	.search-item .search-con {
@@ -270,10 +303,23 @@
 		padding: 0 18rpx;
 		color: #2D2D2D;
 		line-height: 50rpx;
-		font-size: 24rpx;
+		font-size: 26rpx;
 		background-color: #F5F5F5;
 		border-radius: 25rpx;
 		margin-right: 20rpx;
 		margin-top: 20rpx;
+	}
+	.list_search{
+		view{
+			margin-bottom: 20rpx;
+		}
+		text{
+			color: #666666;
+			text-transform: uppercase;
+			font-size: 26rpx;
+			b{
+				color: #2D2D2D;
+			}
+		}
 	}
 </style>

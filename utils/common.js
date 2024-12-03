@@ -764,3 +764,11 @@ export function getCurLanguage(key) {
   return curData != undefined && curData ? curData : '语言包中缺少该数据'; //此处不要翻译
  }
 }
+
+export const debounce=(func, delay) => {
+	let timer;
+	return function (...args) {
+	  clearTimeout(timer);
+	  timer = setTimeout(() => func.apply(this, args), delay);
+	};
+  }
