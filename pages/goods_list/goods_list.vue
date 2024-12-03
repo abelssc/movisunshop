@@ -9,7 +9,8 @@
 		<view class="header">
 			<view class="top_w">
 				<!-- #ifdef H5 ||APP-PLUS -->		
-				<image class="top_w_b" @tap="go_back" :src="img_url+'to_right.png'" mode="widthFix"></image>
+				<image class="top_w_b" @tap="go_back" src="/static/images/arrow_right_b.png"></image>
+
 				<!-- #endif -->
 				<view class="search" @tap="go_search">
 					<image :src="img_url+'goods_list_search_icon.png'" mode="widthFix"></image>
@@ -20,11 +21,11 @@
 			<view class="sel-condition">
 				<view class="filter">
 					<view :class="'sel-item ' + ((seleindex==1||seleindex==5||seleindex==6||seleindex==7)?'current':'')" data-index="1"
-					 @tap.stop="getGoodslist">
+					 @tap.stop="getGoodslist" style="display:none">
 						<text class="txt">{{$L('综合')}}</text>
 						<text class="iconfont sld_mxiala"></text>
 					</view>
-					<view :class="'sel-item ' + (seleindex==2?'current':'')" data-order="2" data-key="1" data-index="2" @tap.stop="getGoodslist">
+					<view :class="'sel-item ' + (seleindex==2?'current':'')" data-order="2" data-key="1" data-index="2" @tap.stop="getGoodslist" style="display:none">
 						<text class="txt">{{$L('销量')}}</text>
 					</view>
 					<view :class="'sel-item sel-price ' + (seleindex==4?'current':'')" data-order="1" data-key="3" data-index="4"
@@ -35,7 +36,7 @@
 							<text style="margin-top: 5rpx;" :class="'iconfont sld_mxiala down  ' + (order==2?'red':'')"></text>
 						</view>
 					</view>
-					<view :class="'sel-item ' + (hasFilter?'current':'')" data-order data-index="3" @tap.stop="getGoodslist">
+					<view :class="'sel-item ' + (hasFilter?'current':'')" data-order data-index="3" @tap.stop="getGoodslist" style="display:none">
 						<text class="txt">{{$L('筛选')}}</text>
 						<text class="iconfont sld_mshaixuan"></text>
 					</view>
@@ -81,37 +82,28 @@
 						{{item.goods_name}}
 					</navigator>
 
-					<view class="jingle">{{item.goods_jingle}}</view>
+					<view v-if="item.goods_jingle" class="jingle">{{item.goods_jingle}}</view>
 
 					<view class="goods-price">
 						<view class="price">{{$L('￥')}}
 							<text>{{item.show_price}}</text>
 						</view>
-						<view class="sale">{{item.goods_salenum}}{{$L('人付款')}}</view>
 					</view>
 
-					<view class="goods-type-wrap">
-						<text class="goods-type jtt" v-if="item.promotion_type && item.promotion_type=='pin_ladder_tuan'">{{$L('阶梯团')}}</text>
-						<text class="goods-type tuan" v-if="item.promotion_type && item.promotion_type=='tuan'">{{$L('团购')}}</text>
-						<text class="goods-type xszk" v-if="item.promotion_type && item.promotion_type=='xianshi'">{{$L('限时折扣')}}</text>
-						<text class="goods-type sjzx" v-if="item.promotion_type && item.promotion_type=='p_mbuy'">{{$L('手机专享')}}</text>
-						<text class="goods-type pt" v-if="item.promotion_type && item.promotion_type=='pin_tuan'">{{$L('拼团')}}</text>
-						<text class="goods-type ys" v-if="item.promotion_type && item.promotion_type=='sld_presale'">{{$L('预售')}}</text>
-						<text class="goods-type speckill" v-if="item.promotion_type && item.promotion_type=='seckill'">{{$L('秒杀')}}</text>
-					</view>
-
-					<view class="store">
-						<text class="store-name">{{item.store_name}}</text>
-						<navigator hover-class="none" :url="'/pages/shopHomePage/shopHomePage?vid=' + item.vid">
-							{{$L('去店铺')}}
-							<image src="../../static/images/arrow_right_b.png" mode="" style="width: 24rpx;height: 24rpx;"></image>
-						</navigator>
+					<view class="goods-type-wrap" v-if="item.promotion_type">
+						<text class="goods-type jtt" v-if="item.promotion_type=='pin_ladder_tuan'">{{$L('阶梯团')}}</text>
+						<text class="goods-type tuan" v-if="item.promotion_type=='tuan'">{{$L('团购')}}</text>
+						<text class="goods-type xszk" v-if="item.promotion_type=='xianshi'">{{$L('限时折扣')}}</text>
+						<text class="goods-type sjzx" v-if="item.promotion_type=='p_mbuy'">{{$L('手机专享')}}</text>
+						<text class="goods-type pt" v-if="item.promotion_type=='pin_tuan'">{{$L('拼团')}}</text>
+						<text class="goods-type ys" v-if="item.promotion_type=='sld_presale'">{{$L('预售')}}</text>
+						<text class="goods-type speckill" v-if="item.promotion_type=='seckill'">{{$L('秒杀')}}</text>
 					</view>
 				</view>
 			</view>
 		</view>
 
-		<view class="no-has-more" v-if="!hasmore" :style="'background-color: ' + (showType=='list'?'#fff':'transparent')">
+		<view class="no-has-more" v-if="!hasmore" :style="'background-color: ' + (showType=='list'?'#fff':'transparent')" style="display:none">
 			<text class="iconfont sld_mbiaoqingwunai1-copy-copy"></text> {{$L('我也是有底线的~')}}
 		</view>
 
@@ -244,7 +236,7 @@
 				isloading: false,
 				refresh: false,
 				gids: [],
-				showType: 'list',
+				showType: 'grid',
 				red_id: '',
 				own_shop: '',
 				area: '',
@@ -360,7 +352,17 @@
 				}
 			},
 			go_back: function(e) {
-				uni.navigateBack({})
+				const pages = getCurrentPages();
+
+				 if (pages.length > 1) {
+					uni.navigateBack({
+						delta: 1
+					});
+				} else {
+					uni.reLaunch({ 
+						url: '/pages/index/index'
+					});
+				}
 			},
 			inputHandle: function(e) {
 				var type = e.currentTarget.dataset.type;
@@ -507,44 +509,35 @@
 		z-index: 9;
 		margin: 0 auto;
 		right: 0;
+		border-bottom:1px solid #eee;
 	}
 
 	.header .search {
-		flex: 1;
 		display: flex;
 		align-items: center;
-		height: 65rpx;
-		border-radius: 32.5rpx;
-		background-color: #f5f5f5;
-		color: #333;
-		margin: 10rpx 40rpx;
-		padding-right: 10rpx;
+		font-size: 26rpx;
+		flex: 1;
+		color: #949494;
+		background: #F7F7F7;
+		border-radius: 30rpx;
+		height: 80rpx;
+		line-height: 60rpx;
 	}
 
-	/* #ifdef H5 ||APP-PLUS */
-	.header .search {
-		margin: 10rpx 40rpx 10rpx 0;
-		
-	}
-	/* #endif */
-	 .header .search text {
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		overflow: hidden;
-		flex: 1;
+	.header .search text {
+		color: #000;
+		font-size: 28rpx;
 	}
 
 	.header .search .empty_color {
-		color: #999 !important;
-		font-size: 24rpx;
+		color: #949494 !important;
+		font-size: 26rpx;
 	}
 
 	.header .search image {
-		width: 30rpx;
-		height: 30rpx !important;
-		height: 0;
-		margin: 0 15rpx 0 20rpx;
-		flex-shrink: 0;
+		width: 28rpx;
+		height: 28rpx;
+		margin: 0 20rpx;
 	}
 
 	.header .sel-condition {
@@ -604,7 +597,7 @@
 		position: relative;
 		display: flex;
 		align-items: center;
-		justify-content: center;
+		justify-content: end;
 		flex: 1;
 		text-align: center;
 		/* line-height: 70rpx; */
@@ -617,7 +610,7 @@
 	}
 
 	.header .sel-item.current {
-		color: #E1251B;
+		color: #1e2a74;
 	}
 
 	.header .sel-item .txt {
@@ -633,15 +626,15 @@
 	}
 
 	.sel-price.current .iconfont.red {
-		color: #E1251B;
+		color: #1e2a74;
 	}
 
 	.show-list {
 		/* #ifdef MP || H5 */
-		margin-top: 190rpx;
+		margin-top: 240rpx;
 		/* #endif */
 		/* #ifdef APP-PLUS */
-		margin-top: 200rpx;
+		margin-top: 240rpx;
 		/* #endif */
 		background-color: #fff;
 	}
@@ -650,13 +643,15 @@
 		display: flex;
 		align-items: center;
 		flex-wrap: wrap;
-		margin-top: 170rpx;
+		margin-top: 220rpx;
 	}
 
 	.show-list .item {
 		display: flex;
 		align-items: center;
-		padding: 20rpx 20rpx 0;
+		padding: 20rpx 0;
+		margin: 0 20rpx;
+		border-bottom: 1px solid #eee;
 	}
 
 	.grid-list .item {
@@ -665,6 +660,7 @@
 		background-color: #fff;
 		border-radius: 14rpx;
 		margin-left: 20rpx;
+		border: 1px solid #eee;
 	}
 
 	.item .img {
@@ -676,9 +672,9 @@
 	}
 
 	.show-list .item .img {
-		flex: 0 0 294rpx;
-		width: 294rpx;
-		height: 294rpx;
+		flex: 0 0 200rpx;
+		width: 200rpx;
+		height: 200rpx;
 	}
 
 	.grid-list .item .img {
@@ -693,7 +689,6 @@
 
 	.show-list .item .goods-info {
 		flex: 1;
-		height: 294rpx;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
@@ -712,7 +707,7 @@
 	}
 
 	.show-list .item .goods-name {
-		height: 78rpx;
+		max-height: 78rpx;
 		padding-top: 10rpx;
 		width: 405rpx;
 		word-break: break-all;
@@ -720,6 +715,7 @@
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 2;
+		white-space:pre-line;
 	}
 
 	.grid-list .item .goods-name {
@@ -741,18 +737,16 @@
 	.item .goods-price {
 		display: flex;
 		align-items: center;
-		margin-top: 30rpx;
 	}
 
 	.item .goods-price .price {
-		color: #e1251b;
-		font-size: 24rpx;
+		color: #2d2d2d;
+		font-size: 28rpx;
 		margin-right: 10rpx;
 	}
 
 	.goods-price .price text {
 		font-size: 34rpx;
-		font-weight: bold;
 	}
 
 	.item .goods-price .sale {
@@ -869,7 +863,7 @@
 	}
 
 	.pricearea .pri-item.current {
-		color: #E1251B;
+		color: #1e2a74;
 	}
 
 	.pricearea .pri-item.current image {
@@ -922,7 +916,7 @@
 	}
 
 	.no-has-more text {
-		color: #E1251B;
+		color: #1e2a74;
 		margin-right: 10rpx;
 	}
 
@@ -946,16 +940,20 @@
 	}
 
 	.top_w {
+		position: relative;
 		display: flex;
-		flex-direction: row;
 		align-items: center;
+		height: 108rpx;
+		background: #fff;
+		padding: 0 30rpx 30rpx;
+		gap:20rpx;
 	}
 
 	.top_w_b {
-		height: 30rpx;
+		padding: 30rpx;
 		width: 30rpx;
-		margin: 0 20rpx;
-		display: block;
+		height: 30rpx;
+		transform: rotate(180deg);
 	}	
 	.fixed_top_status_bar{
 	 	position: fixed;

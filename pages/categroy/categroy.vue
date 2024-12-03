@@ -334,7 +334,6 @@
 		font-weight: bold;
 		font-size: 36rpx;
 	}
-    /* #endif */
 	.con_left ul li {
 		position: relative;
 		display: flex;

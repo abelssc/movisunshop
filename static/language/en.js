@@ -1389,7 +1389,7 @@ export const lang_en = {
   "没有搜索到相关产品~": "No  se encontraron productos relacionados~", 
   "暂无帮助信息":  "No hay información de ayuda temporalmente", 
   "秒杀": "Seckill", 
-  "商城首页":"Página de inicio del centro comercial", 
+  "商城首页":"Movisunshop", 
   "帮助详情": "Detalles de la ayuda", 
   "帮助中心": "Centro de ayuda", 
   "用户隐私政策":  "Política de privacidad del usuario", 
