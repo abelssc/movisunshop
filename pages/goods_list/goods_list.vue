@@ -552,7 +552,7 @@
 		flex: 1;
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: end;
 		height: 74rpx;
 	}
 
@@ -598,7 +598,6 @@
 		display: flex;
 		align-items: center;
 		justify-content: end;
-		flex: 1;
 		text-align: center;
 		/* line-height: 70rpx; */
 		font-size: 28rpx;
