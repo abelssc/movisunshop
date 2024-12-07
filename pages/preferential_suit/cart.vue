@@ -22,10 +22,8 @@
     </view>
     <view class="pre_right">
       <view class="goods_name">{{goods_item.name}}</view>
-      <view class="goods_jingle">{{goods_item.goods_jingle}}</view>
       <view class="goods_spec">
-        <text></text>
-        <text>*1</text>
+        <text>Cant: 1</text>
       </view>
       <view class="pre_price">
         <view class="bl_goods_price">
@@ -274,13 +272,12 @@ page{
   white-space: normal;
   text-align: center;
   margin-right: 60rpx;
-  color:rgba(251,27,27,1);
+  color: #2d2d2d;
   font-weight: bold;
   line-height: 50rpx;
   font-size: 30rpx;
-  font-family:PingFang SC;
   z-index: 20;
-  border-bottom: 5rpx solid red;
+  border-bottom: 5rpx solid #2d2d2d;
 }
 
 
@@ -379,45 +376,41 @@ page{
   display: flex;
   padding: 20rpx 20rpx 0;
   box-sizing: border-box;
+  gap: 20rpx;
 }
 .pre_left{
-  width:294rpx;
-  height:294rpx;
+  width:200rpx;
+  height:200rpx;
   border-radius:15rpx;
 }
 .pre_left image{
-  width:294rpx;
-  height:294rpx;
+  width:200rpx;
+  height:200rpx;
   border-radius:15rpx;
 }
 .pre_right{
   display: flex;
   flex-direction: column;
   width: 395rpx;
-  margin-left: 20rpx;
-  justify-content: space-between;
-  padding: 20rpx 0;
+  justify-content: center;
   box-sizing:border-box;
 }
-.goods_name{
-  width: 395rpx;
-  font-size:28rpx;
-  font-family:PingFang SC;
-  font-weight:500;
-  color:rgba(45,45,45,1);
-  line-height:39rpx;
-  text-overflow: -o-ellipsis-lastline;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
+.goods_name {
+    color: #2d2d2d;
+    font-size: 30rpx;
+    max-height: 40px;
+    line-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    word-break: break-word;
+    white-space: pre-line;
 }
 .goods_jingle{
   width: 395rpx;
   font-size:24rpx;
-  font-family:PingFang SC;
   font-weight:500;
   color:rgba(101,101,101,1);
   line-height:40rpx;
@@ -427,50 +420,26 @@ page{
   word-break: break-all;
 }
 .goods_spec{
-  display: flex;
-  align-items: center;
-}
-.goods_spec text:nth-child(1){
-  font-size:24rpx;
-  font-family:PingFang SC;
+  font-size:28rpx;
   font-weight:500;
-  color:rgba(153,153,153,1);
-  line-height:39rpx;
-  width: 385rpx;
-  justify-content: space-between;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  word-break: break-all;
+  color:#2d2d2d;
 }
-.goods_spec text:nth-child(2){
-  font-size:24rpx;
-  font-family:PingFang SC;
-  font-weight:500;
-  color:rgba(101,101,101,1);
-  line-height:39rpx;
-}
+
 .pre_price{
   display: flex;
   align-items: flex-end;
+  gap:20rpx;
 }
 .bl_goods_price{
-  font-size:22rpx;
-  font-family:PingFang SC;
+  font-size:30rpx;
   font-weight:600;
-  color:rgba(251,27,27,1);
+  color:#2d2d2d;
 }
-.bl_goods_price text:nth-child(2){
-  font-size: 34rpx;
-}
+
 .old_price{
-  font-size:20rpx;
-  font-family:PingFang SC;
-  font-weight:500;
+  font-size:28rpx;
   text-decoration:line-through;
-  color:rgba(153,153,153,1);
-  line-height:36rpx;
-  margin-left: 9rpx;
+  color:#949494;
 }
 .package_amount{
   display: flex;
@@ -478,52 +447,44 @@ page{
   padding: 0 20rpx;
   box-sizing: border-box;
   margin: 20rpx 0;
+  gap: 20rpx;
 }
 .package_amount_title{
   font-size:30rpx;
-  font-family:PingFang SC;
-  font-weight:500;
-  color:rgba(45,45,45,1);
+  color:#2d2d2d;
   line-height:32rpx;
 }
 .package_price{
-  font-size:24rpx;
-  font-family:PingFang SC;
+  font-size:30rpx;
+  color:#2d2d2d;
   font-weight:bold;
-  color:rgba(252,28,28,1);
-  line-height:32rpx;
 }
-.package_price text:nth-of-type(2){
-  font-size:34rpx;
-}
+
 .preferential_amount{
   display: flex;
   justify-content: flex-end;
   padding: 0 20rpx;
   box-sizing: border-box;
+  gap: 20rpx;
 }
 .preferential_amount_title{
-  font-size:26rpx;
-  font-family:PingFang SC;
-  font-weight:500;
+  font-size:30rpx;
   color:rgba(45,45,45,1);
-  line-height:32rpx;
 }
 .preferential_price{
-  font-size:20rpx;
-  font-family:PingFang SC;
-  font-weight:600;
-  color:rgba(252,28,28,1);
-  line-height:32rpx;
+  font-size:32rpx;
+  color:#2d2d2d;
+    font-weight:bold;
 }
 .all_amount{
   position: fixed;
   bottom: 0;
   width: 100%;
-  height:98rpx;
+  height:150rpx;
   background:rgba(255,255,255,1);
   box-shadow:0px 0px 20px 0px rgba(86,86,86,0.08);
   display: flex;
+  gap: 40rpx;
   align-items: center;
   justify-content: flex-end;
   padding: 0 20rpx;
@@ -531,25 +492,21 @@ page{
 }
 .all_amount_price{
   display: flex;
+  gap: 20rpx;
 }
 .all_amout_title{
   font-size:30rpx;
-  font-family:PingFang SC;
   font-weight:500;
-  color:rgba(45,45,45,1);
+  color: #2d2d2d;
   line-height:32rpx;
 }
 .all_amout_price{
-  font-size:24rpx;
-  font-family:PingFang SC;
-  font-weight:500;
-  color:rgba(252,28,28,1);
+  font-size:30rpx;
+  font-weight:bold;
+  color: #2d2d2d;
   line-height:32rpx;
 }
-.all_amout_price text:nth-of-type(2){
-  font-size: 34rpx;
-  font-weight: bold;
-}
+
 .all_amount_btn{
   display: flex;
   align-items: center;
@@ -562,7 +519,6 @@ page{
   text-align: center;
   line-height: 70rpx;
   font-size:28rpx;
-  font-family:PingFang SC;
   font-weight:500;
   color:rgba(255,255,255,1);
 }
@@ -572,23 +528,19 @@ page{
   background:linear-gradient(45deg,rgba(252,45,45,1) 0%,rgba(253,87,43,1) 100%);
   border-radius:0 35rpx 35rpx 0;
   font-size:28rpx;
-  font-family:PingFang SC;
   font-weight:500;
   color:rgba(255,255,255,1);
   line-height:70rpx;
   text-align: center;
 }
 .all_amount_btn1{
-  width:180rpx;
-  height:60rpx;
-  background:rgba(251,27,27,1);
+  background:#FFA41C;
   border-radius:30rpx;
-  font-size:28rpx;
-  font-family:PingFang SC;
-  font-weight:500;
-  color:rgba(255,255,255,1);
-  line-height:60rpx;
+  font-size:30rpx;
+  color:#2d2d2d;
   text-align: center;
-  margin-left: 20rpx;
+  padding: 20rpx 30rpx;
+  flex: 1;
+  text-transform: uppercase;
 }
 </style>

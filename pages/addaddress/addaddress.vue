@@ -3,19 +3,19 @@
 		<form v-if="isShow" @submit="submit">
 
 			<view class="form-item border-bottom-1px">
-				<label class="xinghao">{{$L('收货人')}}</label>
+				<label>{{$L('收货人')}}</label>
 				<input class="input" type="text" name="true_name" maxlength="50" data-type="true_name" :value="true_name" :placeholder="$L('请输入收货人姓名')"
 				 @input="changText"></input>
 			</view>
 
 			<view class="form-item border-bottom-1px">
-				<label class="xinghao">{{$L('联系方式')}}</label>
-				<input class="input" type="number" maxlength="11" name="mob_phone" data-type="mob_phone" :value="mob_phone"
+				<label>{{$L('联系方式')}}</label>
+				<input class="input" type="number" maxlength="20" name="mob_phone" data-type="mob_phone" :value="mob_phone"
 				 :placeholder="$L('请输入手机号码')"></input>
 			</view>
 
 			<view class="form-item border-bottom-1px">
-				<label class="xinghao">{{$L('地区选择')}}</label>
+				<label>{{$L('地区选择')}}</label>
 				<view class="input">
 					<addressSelect :addressArea="area_info" @confirm="confirmSelectAddr"></addressSelect>
 				</view>
@@ -25,7 +25,7 @@
 			</view>
 
 			<view class="form-item border-bottom-1px">
-				<label class="xinghao">{{$L('详细地址')}}</label>
+				<label>{{$L('详细地址')}}</label>
 				<input class="input" maxlength="60" type="text" name="address" data-type="address" :value="address" @input="changTextAddress" :placeholder="$L('请输入详细地址')"></input>
 			</view>
 
@@ -126,7 +126,7 @@
 				let arr = e.detail;
 				let city_id = arr[1].area_id;
 				let area_id = arr[2].area_id;
-				let area_info = `${arr[0].area_name} ${arr[1].area_name} ${arr[2].area_name}`;
+				let area_info = `${arr[0].area_name} / ${arr[1].area_name} / ${arr[2].area_name}`;
 				this.setData({
 					city_id,
 					area_id,
@@ -136,7 +136,7 @@
 
 			// 提交表单
 			submit(e) {
-				let phoneReg = /(1[3-9]\d{9}$)/;
+				let phoneReg = /^\d+$/;
 				let params = e.detail.value;
 				let {
 					key,
@@ -252,7 +252,7 @@
 
 			changText(e) {
 				let val = e.detail.value;
-				val = val.replace(/[^\a-\z\A-\Z0-9\u4E00-\u9FA5·]/g, '');
+				val =  val.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]/g, '');
 				if(val.length>=50){
 					uni.showToast({
 						title: this.$L('字数已到达最大值50字，不支持继续输入'),
@@ -273,7 +273,7 @@
 					});
 				}
 				this.setData({
-					true_name: val
+					address: val
 				});
 			}
 
@@ -292,35 +292,29 @@
 	}
 
 	.form-item {
-		display: flex;
-		align-items: center;
-		height: 100rpx;
 		font-size: 28rpx;
 		color: #232326;
-		padding: 0 30rpx;
+		padding: 30rpx;
 		background-color: #fff;
+		margin-top: 30rpx;
 	}
 
 	.form-item label {
-		flex: 0 0 160rpx;
 		text-align: center;
 	}
 
 	.form-item .input {
-		flex: 1;
+		padding: 10rpx 0;
+		border-bottom: 1px solid #ccc;
 	}
 
 	button {
 		height: 80rpx;
 		line-height: 80rpx;
 		margin: 40rpx 30rpx;
-		background-color: #f23030;
+		background-color: #000;
 		color: #fff;
 		font-size: 30rpx;
 		border: none;
-	}	
-	.xinghao::before {
-		content: '* ';
-		color: #f23030;
 	}
 </style>

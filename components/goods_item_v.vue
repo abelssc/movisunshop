@@ -125,7 +125,7 @@
 						success:function(res){
 							if(res.data.datas.status == true){
 								uni.showToast({
-									title:this.$L('加入购物车成功'),
+									title: that.$L('加入购物车成功'),
 									icon:'none'
 								})
 							}else{
@@ -157,7 +157,7 @@
 						success: function(res) {
 							if (res.data.code == 200 && res.data.datas.status == '1') {
 								uni.showToast({
-									title: this.$L('加入购物车成功'),
+									title: that.$L('加入购物车成功'),
 									duration: 500,
 									icon: 'none'
 								}); //一键回到页面顶部

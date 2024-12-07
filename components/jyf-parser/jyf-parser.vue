@@ -532,7 +532,7 @@
 			_handleHtml(html, append) {
 				if (!append) {
 					// 处理 tag-style 和 userAgentStyles
-					var style = '<style>@keyframes _show{0%{opacity:0}100%{opacity:1}}img{max-width:100%;display:block;float:left}';
+					var style = '<style>@keyframes _show{0%{opacity:0}100%{opacity:1}}img{max-width:100%;display:block;}img + br{display:none}';
 					for (var item in cfg.userAgentStyles)
 						style += `${item}{${cfg.userAgentStyles[item]}}`;
 					for (item in this.tagStyle)

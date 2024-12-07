@@ -3,19 +3,16 @@
 		<view  v-if="isDataLoading == true">
 			
 			<!--底部 购物车  加车 立即购买功能  -->
-			<div class="goods-detail-foot" :style="'height:' + (bottomSateArea?'122rpx':'')">
+			<div style="display:none" class="goods-detail-foot" :style="'height:' + (bottomSateArea?'122rpx':'')">
 				<div class="otreh-handle footer_btn">
-					<view class="footer_btn_pre store_btn" @tap="go_vendor">
+					<view class="footer_btn_pre store_btn" @tap="go_vendor" style="display:none">
 						<image :src="img_url + 'site/dianpu.png'"></image>
-						<text>{{$L('店铺')}}</text>
 					</view>
 					<view class="footer_btn_pre customer_service" @tap="kefu">
 						<image :src="img_url + 'site/kefu.png'"></image>
-						<text>{{$L('客服')}}</text>
 					</view>
 					<view class="footer_btn_pre goods_cart_btn" @tap.stop="go_cart">
 						<image :src="img_url + 'site/gouwuche.png'"></image>
-						<text>{{$L('购物车')}}</text>
 						<view class="goods_cart_num" v-if="cart_count">{{cart_count*1>99?'99+':cart_count}}</view>
 					</view>
 				</div>
@@ -71,7 +68,59 @@
 					
 				</div>
 			</div>
-			
+			<div class="goods-detail-foot" :style="'height:' + (bottomSateArea?'122rpx':'')">
+				<div class="buy-handle group_shopping">
+					<!-- 拼团购买 按钮 -->
+					<block v-if="data_info.goods_info.promotion_type == 'pin_tuan' && data_info.goods_info.promotion_start_flag == 2">
+						<view class="group_shopping_alone" @tap.stop="switchSpecifications" data-type="separately_buy">
+							<view class="group_alone_price">{{$L('￥')}}{{data_info.goods_info.goods_price*1}}</view>
+							<view class="group_alone_title">{{$L('单独买')}}</view>
+						</view>
+						<view class="go_group" @tap.stop="switchSpecifications" data-type="go_league">
+							<view class="go_group_price">{{$L('￥')}}{{data_info.pin.sld_pin_price}}</view>
+							<view class="go_group_title">{{data_info.pin.pinging?$L('拼团中'):$L('去开团')}}</view>
+						</view>
+					</block>
+
+					<!-- 预售按钮 start  promotion_type=='sld_presale' && !showDefaultBtn && presaleInfo.pre_run_flag == 2-->
+					<block v-else-if="promotion_type=='sld_presale' && presaleInfo.pre_run_flag == 2">
+						<view @tap="switchSpecifications" class="presale_btn">
+							<view class="pre_price">
+								<view class="despoit_pay_now">{{$L('立即支付定金')}}</view>
+								<view class="despoit_pay_price"><text>{{$L('￥')}}</text>{{presaleInfo.pre_deposit_price}}</view>
+							</view>
+						</view>
+					</block>
+					<!-- 预售按钮 end -->
+					<!-- 阶梯团 start -->
+					<block v-else-if="promotion_type=='pin_ladder_tuan' && !showDefaultBtn">
+						<view @tap.stop="switchSpecifications" :class="'ladder_btn ' + (ladderPinInfo.pay_status==2 || ladderPinInfo.pay_status==4 ? 'no_ladder_btn' : '')"
+						 data-type="jtt">
+							{{ladderPinInfo.pay_status==1?$L('立即付定金'): ladderPinInfo.pay_status== 2 ? $L('待付尾款'): ladderPinInfo.pay_status==3 ? $L('去付尾款'):$L('已付尾款')}}
+						</view>
+					</block>
+					<!-- 阶梯团 end -->
+					<!-- 手机专享   团购  限时活动-->
+					<block v-else-if="data_info.goods_info.promotion_type=='p_mbuy' || data_info.goods_info.promotion_type == 'tuan' && data_info.goods_info.promotion_start_flag == 2 || data_info.goods_info.promotion_type == 'xianshi' && data_info.goods_info.promotion_run_flag == 1">
+						<view class="mobile_buy_now" @tap.stop="switchSpecifications" data-type="buy">{{$L('立即购买')}}</view>
+					</block>
+
+					<!-- 秒杀活动  立即秒杀 已抢完 start -->
+					<block v-else-if="data_info.goods_info.promotion_type=='seckill' && secKillInfo.activity_state == 2">
+						<view class="mobile_buy_now" @tap.stop="switchSpecifications" data-type="second_kill" v-if="secKillInfo.seckill_storage > 0">{{$L('立即秒杀')}}</view>
+						<view class="mobile_buy_now seckill_finished" @tap.stop="switchSpecifications" data-type="second_kill" v-else>{{$L('已抢完')}}</view>
+					</block>
+					<!-- 秒杀活动 立即秒杀 已抢完 end -->
+						
+					<!-- 正常商品 start -->
+					<block v-else>
+						<a class="add-cart add_cart" @tap="switchSpecifications" data-type="add">{{$L('加入购物车')}}</a>
+						<a href="javascript:void(0);" class="buy-now buy_now" @tap.stop="switchSpecifications" data-type="buy">{{$L('立即购买')}}</a>
+					</block>
+					<!-- 正常商品 end -->
+					
+				</div>
+			</div>
 			<!-- 选择规格弹框 -->
 			<view class="specifications" v-if="Specifications" @touchmove.stop.prevent="moveHandle">
 				<view class="specifications_con">
@@ -121,21 +170,6 @@
 									<text class="group_buying_tips" v-if="data_info.goods_info.promotion_type=='tuan' && data_info.goods_info.promotion_start_flag == 2">{{$L('团购')}}</text>
 									<text class="ladder_regiment_tips" v-if="data_info.goods_info.promotion_type=='pin_ladder_tuan' && !showDefaultBtn">{{$L('阶梯团')}}</text>
 									<text class="sec_kill_tips" v-if="data_info.goods_info.promotion_type=='seckill' && secKillInfo.activity_state == 2">{{$L('限时秒杀')}}</text>
-								</view>
-								<view class="specifications_des_store">
-									{{$L('库存：')}}{{data_info.goods_info.promotion_type=='sld_presale'?presaleInfo.goods_stock: data_info.goods_info.promotion_type=='pin_ladder_tuan' ?
-									ladderPinInfo.sld_stock : data_info.goods_info.promotion_type=='pin_tuan' && switchSpecifications_add != '3' ? data_info.pin.sld_stock : data_info.goods_info.promotion_type=='seckill' && secKillInfo.activity_state == 2?
-									secKillInfo.seckill_storage :  data_info.goods_info.goods_storage}}
-								</view>
-								<view class="specifications_des_txt">
-									<view v-if="data_info.goods_info.goods_spec" class="specifications_des_view">
-										{{$L('已选：')}}
-										<block v-for="(specval, specid) in data_info.goods_info.goods_spec" :key="specid">
-											<text v-if="specval!=null">{{specval}}</text>
-										</block>
-			
-									</view>
-									<text v-if="!data_info.goods_info.goods_spec">{{$L('默认')}}</text>
 								</view>
 							</view>
 						</view>
@@ -246,9 +280,6 @@
 			<scroll-view :style="'height:' + systemInfo.windowHeight + 'px;width:750rpx'" scroll-y="true" :scroll-into-view="toView" @scroll="scroll">
 				<view>
 					<!-- #ifndef MP-WEIXIN -->
-					<view class="go_back" @click="goBack()">
-						<image :src="img_url + 'site/back.jpg'" mode=""></image>
-					</view>
 					<!-- #endif -->
 					<!-- 透明遮罩层 -->
 					<view class="transparent_mask" v-if="transparent_mask" @tap="hideMask"></view>
@@ -264,14 +295,9 @@
 							<image :src="img_url + 'site/go_back.jpg'" mode=""></image>
 						</view>
 						<!-- #endif -->
-						<view :class="'nav_pre ' + (NavIndex == 0 ? 'active' : '')" @tap="handleNav" data-hash="hash1" data-index="0">{{$L('商品')}}</view>
-						<view :class="'nav_pre ' + (NavIndex == 1 ? 'active' : '')" @tap="handleNav" data-hash="hash2" data-index="1">{{$L('评价')}}</view>
-						<view :class="'nav_pre ' + (NavIndex == 2 ? 'active' : '')" @tap="handleNav" data-hash="hash3" data-index="2">{{$L('推荐')}}</view>
-						<view :class="'nav_pre ' + (NavIndex == 3 ? 'active' : '')" @tap="handleNav" data-hash="hash4" data-index="3">{{$L('详情')}}</view>
 						<view class="more_tips" @tap="tipsShow">
 							<image class="more" :src="img_url + 'site/good_det_more.png'"></image>
 							<block v-if="tips_show">
-								<view class="triangle-up"> </view>
 								<view class="tips">
 									<button v-for="(item, index) in tips" :key="index" class="tips_pre" @tap="handleLink" :data-link="item.tips_link"
 									 :open-type="item.type" :data-type="item.type" plain="true">
@@ -284,31 +310,31 @@
 					</view>
 					<!-- 轮播图 -->
 					<view class="goods_lunbo" id="hash1" v-if="rotationChartImage !== undefined  && rotationChartImage &&rotationChartImage.length > 0">
-					<uni-swiper-dot :info="rotationChartImage_all" :current="current" :showControls='showControls' field="content" :mode="mode">
-					    <swiper  class="swiper-box" @change="change">
-							<!-- #ifdef H5 || APP-PLUS -->
-							<block v-if="data_info.goods_info.video_url">
-								<swiper-item>
-									<image :src="rotationChartImage[0] + ' '" class="slide-image"></image>
-									<image :src="img_url+'play.png'" class="play_btn" @click="toPlayPage"></image>
-								</swiper-item>
-							</block>
-							<!-- #endif -->
-							<!-- #ifdef MP-WEIXIN -->
-							<block v-if="data_info.goods_info.video_url">
-								<swiper-item>
-									<video controls @play='playVideo' @ended='endVideo'  :src="data_info.goods_info.video_url" loop class="video_btn"  :poster="rotationChartImage[0]">
-									</video>
-								</swiper-item>
-							</block>
-							<!-- #endif -->
-					      <block v-for="(item, index) in rotationChartImage" :key="index">
-					      		<swiper-item class="swiper_item">
-					      			<image :src="item + ' '" class="slide-image" :data-img="item" @tap="previewImage"></image>
-					      		</swiper-item>		
-					      </block>
-					    </swiper>
-					</uni-swiper-dot>
+						<uni-swiper-dot :info="rotationChartImage_all" :current="current" :showControls='showControls' field="content" :mode="mode">
+							<swiper  class="swiper-box" @change="change">
+								<!-- #ifdef H5 || APP-PLUS -->
+								<block v-if="data_info.goods_info.video_url">
+									<swiper-item>
+										<image :src="rotationChartImage[0] + ' '" class="slide-image"></image>
+										<image :src="img_url+'play.png'" class="play_btn" @click="toPlayPage"></image>
+									</swiper-item>
+								</block>
+								<!-- #endif -->
+								<!-- #ifdef MP-WEIXIN -->
+								<block v-if="data_info.goods_info.video_url">
+									<swiper-item>
+										<video controls @play='playVideo' @ended='endVideo'  :src="data_info.goods_info.video_url" loop class="video_btn"  :poster="rotationChartImage[0]">
+										</video>
+									</swiper-item>
+								</block>
+								<!-- #endif -->
+								<block v-for="(item, index) in rotationChartImage" :key="index">
+										<swiper-item class="swiper_item">
+											<image :src="item + ' '" class="slide-image" :data-img="item" @tap="previewImage"></image>
+										</swiper-item>		
+								</block>
+							</swiper>
+						</uni-swiper-dot>
 						<!-- 直播按钮 -->
 						<view class="detail_top_radio" style="background-image: url({img_url}}detail_radio.pn);" v-if="data_info.goods_info.replay_live_id>0"
 						 @tap="go_huifnag">
@@ -458,75 +484,25 @@
 
 					<!--------------------限时折扣-------------------------  -->
 					<block v-if="data_info.goods_info.promotion_type">
-						<view class="youhui" v-if="data_info.goods_info.promotion_type == 'xianshi' && data_info.goods_info.promotion_run_flag!=-1"
-						 :style="'background: url(' + img_url + 'site/show_discount_bg.png) no-repeat;background-size:100% 100%;'">
-							<!--未开始  -->
-							<block v-if="data_info.goods_info.promotion_run_flag == 0">
-								<view class="youhui-left">
-									<view class="jge" v-if="filters.toSplit(data_info.goods_info.promotion_price)[0] && filters.toSplit(data_info.goods_info.promotion_price)[1]">
-										<text>{{$L('￥')}}</text><text>{{filters.toSplit(data_info.goods_info.promotion_price)[0]}}</text>.<text>{{filters.toSplit(data_info.goods_info.promotion_price)[1]}}</text>
-									</view>
-									<view class="zekou111">
-										<view class="zhekou1"><text>{{data_info.goods_info.remark?data_info.goods_info.remark:$L('限时折扣')}}</text><text>{{data_info.goods_info.xianshi_discount}}</text></view>
-										<view class="zhekou_origin_price">
-											<!-- <text wx:if="{{filters.toLength(data_info.goods_info.goods_price) < 8}}">原价:</text> -->
-											<text>{{data_info.goods_info.goods_price}}</text>
+						<view class="promo_time" v-if="data_info.goods_info.promotion_type == 'xianshi' && data_info.goods_info.promotion_run_flag!=-1">
+								<view class="promo_time-left">
+									<text class="promo_text_fast">Oferta relámpago</text>		
+									<text class="promo_text_info">Compra mínima 2 items</text>
+								</view>
+								<view class="promo_time-right">
+									<view class="promo_mini_time" v-if="hours< '00' || minutes < '00' || seconds < '00'">{{$L('已结束')}}</view>
+									<view v-else class="promo_count_down">
+										<view class="promo_count_down_counter" :data-end_time_str="data_info.goods_info.promotion_end_time">
+											<text class="promo_day">{{day}}</text>
+											<text class="promo_flag">:</text>
+											<text class="promo_hours">{{hours}}</text>
+											<text class="promo_flag">:</text>
+											<text class="promo_minutes">{{minutes}}</text>
+											<text class="promo_flag">:</text>
+											<text class="promo_seconds">{{seconds}}</text>
 										</view>
 									</view>
 								</view>
-								<view class="right">
-									<view class="rtop">
-										{{$L('活动未开始')}}
-									</view>
-									<view class="dime">
-										<view class="dime_text" v-if="hours< '00' || minutes < '00' || seconds < '00'">{{$L('已结束')}}</view>
-										<view v-else class="count_down1">
-											<text class="count_down_title">{{$L('距开始')}}</text>
-											<div class="countdown" :data-end_time_str="data_info.goods_info.promotion_start_time">
-												<text class="count_down_day ">{{day}}{{$L('天')}}</text>
-												<text class="count_down_hours limited_discount_hours">{{hours}}</text>
-												<text class="count_down_flag">:</text>
-												<text class="count_down_minutes limited_discount_minutes">{{minutes}}</text>
-												<text class="countdown-break-flag">:</text>
-												<text class="count_down_seconds limited_discount_seconds">{{seconds}}</text>
-											</div>
-										</view>
-									</view>
-								</view>
-							</block>
-							<!-- 进行中 -->
-							<block v-if="data_info.goods_info.promotion_run_flag == 1">
-								<view class="youhui-left">
-									<view class="jge" v-if="filters.toSplit(data_info.goods_info.promotion_price)[0] && filters.toSplit(data_info.goods_info.promotion_price)[1]">
-										<text>{{$L('￥')}}</text><text>{{filters.toSplit(data_info.goods_info.promotion_price)[0]}}</text>.<text>{{filters.toSplit(data_info.goods_info.promotion_price)[1]}}</text>
-									</view>
-									<view class="zekou111">
-										<view class="zhekou1"><text>{{data_info.goods_info.remark?data_info.goods_info.remark:$L('限时折扣')}}</text><text>{{data_info.goods_info.xianshi_discount}}</text></view>
-										<view class="zhekou_origin_price">
-											<text>{{data_info.goods_info.goods_price}}</text>
-										</view>
-									</view>
-								</view>
-								<view class="right">
-									<view class="rtop">
-										{{$L('最少购买')}}{{data_info.goods_info.lower_limit}}{{$L('件')}}
-									</view>
-									<view class="dime">
-										<view class="dime_text" v-if="hours< '00' || minutes < '00' || seconds < '00'">{{$L('已结束')}}</view>
-										<view v-else class="count_down1">
-											<text class="count_down_title">{{$L('距结束')}}</text>
-											<view class="countdown" :data-end_time_str="data_info.goods_info.promotion_end_time">
-												<text class="count_down_day ">{{day}}{{$L('天')}}</text>
-												<text class="count_down_hours limited_discount_hours">{{hours}}</text>
-												<text class="count_down_flag">:</text>
-												<text class="count_down_minutes limited_discount_minutes">{{minutes}}</text>
-												<text class="countdown-break-flag">:</text>
-												<text class="count_down_seconds limited_discount_seconds">{{seconds}}</text>
-											</view>
-										</view>
-									</view>
-								</view>
-							</block>
 						</view>
 						<!----------------------团购-----------------------------  -->
 						<view class="pingtuan1" v-if="data_info.goods_info.promotion_type == 'tuan'" :style="'background: url(' + img_url + 'site/group_buying_bg.png) no-repeat;background-size:100% 100%;'">
@@ -642,20 +618,34 @@
 							<!-- 商品的具体详细信息 -->
 							<view class="goods-detail-price">
 								<!-- 商品名称和商品介绍 -->
-								<view class="goods-detail-name">
+								<view class="goods-detail-name pt-30">
 									<dl>
 										<view style="display:flex;justify-content:space-between;">
-											<text class="goods_name_new">{{data_info.goods_info.goods_name}}</text>
+											<view>
+											<view class="price_new">
+										<view class="new_goods_marketprice" v-if="data_info.goods_info.goods_price">
+											<text>{{$L('￥')}}</text>
+											<text>{{data_info.goods_info.goods_marketprice}}</text>
+										</view>
+										<view class="new_show_price" v-if="filters.toSplit(filters.toFix(data_info.goods_info.show_price))[0] && filters.toSplit(filters.toFix(data_info.goods_info.show_price))[1] && data_info.goods_info.promotion_type!='p_mbuy'">
+											<text>{{$L('￥')}}</text>
+											<text>{{filters.toSplit(filters.toFix(data_info.goods_info.show_price))[0]}}</text>.<text>{{filters.toSplit(filters.toFix(data_info.goods_info.show_price))[1]}}</text>
+										</view>
+										<view class="new_show_price" v-if="filters.toSplit(filters.toFix(data_info.goods_info.mobile_price))[0] && filters.toSplit(filters.toFix(data_info.goods_info.mobile_price))[1] && data_info.goods_info.promotion_type=='p_mbuy'">
+											<text>{{$L('￥')}}</text>
+											<text>{{filters.toSplit(data_info.goods_info.mobile_price)[0]}}</text>.<text>{{filters.toSplit(data_info.goods_info.mobile_price)[1]}}</text>
+										</view>
+									</view>
+												<text class="goods_name_new">{{data_info.goods_info.goods_name}}</text>
+											</view>
 											<!-- 商品价格 -->
 											<view class="goods_price_new goods_price_new1">
 												<view class="goods_opt">
 													<view class="collection" @tap="favorate">
 														<image :src="data_info.is_favorate ? img_url + 'site/shoucang.png' : img_url + 'site/shoucang2.png'"></image>
-														<text>{{data_info.is_favorate ? $L('已收藏') : $L('收藏')}}</text>
 													</view>
 													<view class="share" @tap="showShare">
 														<image :src="img_url + 'site/fenxiang.png'"></image>
-														<text>{{$L('分享')}}</text>
 													</view>
 												</view>
 											</view>
@@ -692,18 +682,25 @@
 								<!-- 商品价格 -->
 								<view class="goods_price_new">
 									<view class="price_new">
-										<view class="new_show_price" v-if="filters.toSplit(filters.toFix(data_info.goods_info.show_price))[0] && filters.toSplit(filters.toFix(data_info.goods_info.show_price))[1] && data_info.goods_info.promotion_type!='p_mbuy'"><text>{{$L('￥')}}</text><text>{{filters.toSplit(filters.toFix(data_info.goods_info.show_price))[0]}}</text>.<text>{{filters.toSplit(filters.toFix(data_info.goods_info.show_price))[1]}}</text></view>
-										<view class="new_show_price" v-if="filters.toSplit(filters.toFix(data_info.goods_info.mobile_price))[0] && filters.toSplit(filters.toFix(data_info.goods_info.mobile_price))[1] && data_info.goods_info.promotion_type=='p_mbuy'"><text>{{$L('￥')}}</text><text>{{filters.toSplit(data_info.goods_info.mobile_price)[0]}}</text>.<text>{{filters.toSplit(data_info.goods_info.mobile_price)[1]}}</text></view>
-										<view class="new_goods_marketprice" v-if="data_info.goods_info.goods_price"><text>{{$L('原价：')}}</text><text>{{data_info.goods_info.goods_marketprice}}</text></view>
+										<view class="new_goods_marketprice" v-if="data_info.goods_info.goods_price">
+											<text>{{$L('￥')}}</text>
+											<text>{{data_info.goods_info.goods_marketprice}}</text>
+										</view>
+										<view class="new_show_price" v-if="filters.toSplit(filters.toFix(data_info.goods_info.show_price))[0] && filters.toSplit(filters.toFix(data_info.goods_info.show_price))[1] && data_info.goods_info.promotion_type!='p_mbuy'">
+											<text>{{$L('￥')}}</text>
+											<text>{{filters.toSplit(filters.toFix(data_info.goods_info.show_price))[0]}}</text>.<text>{{filters.toSplit(filters.toFix(data_info.goods_info.show_price))[1]}}</text>
+										</view>
+										<view class="new_show_price" v-if="filters.toSplit(filters.toFix(data_info.goods_info.mobile_price))[0] && filters.toSplit(filters.toFix(data_info.goods_info.mobile_price))[1] && data_info.goods_info.promotion_type=='p_mbuy'">
+											<text>{{$L('￥')}}</text>
+											<text>{{filters.toSplit(data_info.goods_info.mobile_price)[0]}}</text>.<text>{{filters.toSplit(data_info.goods_info.mobile_price)[1]}}</text>
+										</view>
 									</view>
 									<view class="goods_opt">
 										<view class="collection" @tap="favorate">
 											<image :src="data_info.is_favorate ? img_url + 'site/shoucang.png' : img_url + 'site/shoucang2.png'"></image>
-											<text>{{data_info.is_favorate ? $L('已收藏') : $L('收藏')}}</text>
 										</view>
 										<view class="share" @tap="showShare">
 											<image :src="img_url + 'site/fenxiang.png'"></image>
-											<text>{{$L('分享')}}</text>
 										</view>
 									</view>
 								</view>
@@ -797,7 +794,7 @@
 							</block>
 
 						</block>
-						<view @tap.stop="show_spec">
+						<view @tap.stop="show_spec" style="display:none;">
 							<div class="goods-detail-item" id="goods_spec_selected" style="display:flex;justify-content:space-between;" @tap="switchSpecifications">
 								<div class="itme-name">{{$L('已选')}}</div>
 								<div class="item-con" v-if="data_info.goods_info.goods_spec">
@@ -815,8 +812,33 @@
 							</div>
 						</view>
 
+							<view class="delivery_methods">
+								<text class="badge-success">
+									¡Envío GRATIS en cada pedido!
+								</text>
+								<view>
+									<image src="/static/images/icon-express.svg"/>
+									<view>
+										<text>¡Recíbelo hoy!</text>
+										<p class="text-info">Lima metropolitana y Callao</p>
+									</view>
+								</view>
+								<view>
+									<image src="/static/images/icon-despacho.svg"/>
+									<view>
+										<text>Envío a domicilio</text>
+										<p class="text-info">Todo el Perú</p>
+									</view>
+								</view>
+								<view>
+									<image src="/static/images/icon-store.svg"/>
+									<text>Retiro en tienda</text>
+								</view>
+							</view>
+
+
 						<!-- 发货，门店自提 -->
-						<view class="deliver_goods">
+						<view class="deliver_goods" style="display:none">
 							<!-- 发货 -->
 							<view class="deliver_good">
 								<!-- 有发货地时 -->
@@ -827,7 +849,7 @@
 										<text>{{data_info.goods_info.city_name}}</text>
 									</view>
 									<!-- <view class="express_fee">快递：{{data_info.goods_info.goods_freight == '0.00' ? '包邮' : data_info.goods_info.goods_freight}}</view> -->
-                  <view class="express_fee">{{$L('快递')}}</view>
+                  					<view class="express_fee">{{$L('快递')}}</view>
 								</block>
 								<!-- 无发货地时 -->
 								<block v-else>
@@ -835,7 +857,7 @@
 										<text>{{$L('发货')}}</text>
 										<image :src="img_url + 'site/dizhi.png'" mode="aspectFit"></image>
 									<!-- 	<view class="express_fee">快递：{{data_info.goods_info.goods_freight == '0.00' ? '包邮' : data_info.goods_info.goods_freight}}</view> -->
-                    <view class="express_fee">{{$L('快递')}}</view>
+                    					<view class="express_fee">{{$L('快递')}}</view>
 									</view>
 								</block>
 								<!-- <view class="deliver_goods_sold">{{$L('已售')}}{{data_info.goods_info.goods_salenum}}</view> -->
@@ -992,29 +1014,27 @@
 						<view :class="kaiguan" v-if="data_info.has_bundling_data">
 							<view class="biaoti">
 								<span>{{$L('优惠套装')}}</span>
-								<em>({{$L('共')}}{{data_info.bundling_data.bundling_count}}{{$L('套')}})</em>
 							</view>
 
-							<view v-for="(bl_item, i) in data_info.bundling_data.bundling_array" :key="i" class="titlea" v-if="i < 1">
-								<view class="goodsBox Discount">
-									<block v-for="(b_goods_array_item, j) in data_info.bundling_data.b_goods_array[bl_item.id]" :key="j" v-if="j < 3">
+							<view v-for="(bl_item, i) in data_info.bundling_data.bundling_array" :key="i" class="combo">
+								<view class="combo_title">{{bl_item.name}}</view>
+								<view class="goodsBox">
+									<block v-for="(b_goods_array_item, j) in data_info.bundling_data.b_goods_array[bl_item.id]" :key="j">
 										<navigator :url="'../goods_detail/goods_detail?gid=' + b_goods_array_item.id" hover-class="none">
 											<image style="width:160rpx;height:160rpx;border-radius:15rpx;" :src="b_goods_array_item.image"></image>
+											<view class="goodsBox_text">
+												<text class="goodsBox_name">{{b_goods_array_item.name}}</text>
+												<view class="goodsBox_prices">
+													<span class="goodsBox_price">{{$L('￥')}}{{b_goods_array_item.price}}</span>
+													<span class="goodsBox_shop_price">{{$L('￥')}}{{b_goods_array_item.shop_price}}</span>
+												</view>
+											</view>
 										</navigator>
-										<block v-if="data_info.bundling_data.b_goods_array[bl_item.id].length < 3">
-											<span v-if="j != data_info.bundling_data.b_goods_array[bl_item.id].length-1">+</span>
-										</block>
-										<block v-else-if="j != data_info.bundling_data.b_goods_array[bl_item.id].length - 1">
-											<span>+</span>
-										</block>
-
 									</block>
 								</view>
-								<view class="combination_More" :data-bl_id="bl_item.id" @tap="gmBtn" style="margin-top:20rpx;width:64rpx;">
-									<image class="ellipsis_image" :src="img_url + 'site/png.png'" v-if="data_info.bundling_data.b_goods_array[bl_item.id].length > 3"></image>
-									<image class="more_image" :src="img_url + 'site/taozhuang_rightdown.png'"></image>
+								<view class="view_more" :data-bl_id="bl_item.id" @tap="gmBtn">
+									Ver detalles
 								</view>
-
 							</view>
 						</view>
 						<!----------------优惠套装---------------------------  -->
@@ -1052,6 +1072,14 @@
 								</view>
 							</view>
 
+						</view>
+						<!-- 商品详情页 -->
+						<view class="goods_detail_des" :hidden="show_rich_text?false:true">
+							<!-- 商品详情标题 -->
+							<text class="detail_title">
+								{{$L('详情')}}
+							</text>
+							<jyf-parser :html="show_rich_text" ref="description" class="description"></jyf-parser>
 						</view>
 
 						<!----------------------推荐组合---------------------------  -->
@@ -1135,7 +1163,7 @@
 							</view>
 						</view>
 						<!--店铺入口  -->
-						<div class="goods-detail-store">
+						<div class="goods-detail-store" style="display:none">
 							<view class="goods_detail_store">
 								<view class="goods_store_top">
 									<view class="goods_store_tl">
@@ -1174,10 +1202,6 @@
 						<view class="tuigoods" id="hash3">
 							<view class="tuititle">
 								<text class="tui_title_txt">{{$L('店铺推荐')}}</text>
-								<view class="tui_title_more" @tap="goShopHomePage">
-									<text>{{$L('查看更多')}}</text>
-									<image :src="img_url + 'site/right.png'"></image>
-								</view>
 							</view>
 							<view class="tuigoodslist">
 								<view v-for="(item, index) in data_info.goods_commend_list" :key="index" class="goods_item" :data-id="item.gid"
@@ -1185,28 +1209,11 @@
 									<view class="img">
 										<image :src="item.goods_image_url"></image>
 									</view>
-									<view style="display:flex;flex-direction:column;justify-content:space-between;height:122rpx;">
+									<view class="tuigoodslist_details">
 										<text class="goods_name">{{item.goods_name}}</text>
 										<view class="g_price"><text>{{$L('￥')}}</text><text>{{filters.toSplit(filters.toFix(item.show_price))[0]}}</text>.<text>{{filters.toSplit(filters.toFix(item.show_price))[1]}}</text></view>
 									</view>
 								</view>
-							</view>
-						</view>
-
-						<!-- 商品详情页 -->
-						<view class="goods_detail_des" >
-							<!-- 商品详情标题 -->
-							<view class="detail_title">
-								<image :src="img_url + 'site/detail_left.png'"></image>
-								<text>{{$L('详情')}}</text>
-								<image :src="img_url + 'site/detail_right.png'"></image>
-							</view>
-							<jyf-parser :html="show_rich_text" ref="description" ></jyf-parser>
-						
-							<!--商品详情页没有数据的提示  -->
-							<view class="no_cart_goods" :hidden="show_rich_text?true:false">
-								<image :src="img_url+'no_order_list.png'"></image>
-								<text>{{$L('抱歉！商家未传详情')}}</text>
 							</view>
 						</view>
 
@@ -1692,6 +1699,7 @@
 								autoplay: false
 							})
 						}
+						console.log(data_info);
 						
 						//购物车商品数量
 						that.setData({
@@ -2075,7 +2083,7 @@
 				scrollToHeight: 0, //scroll-view的高度
 				toView: 'default', //用于存储跳转的id
 				NavIndex: 0, //nav默认选中第一个,
-				Nav: false, //Nav是否显示
+				Nav: true, //Nav是否显示
 				vid: '', //店铺id
 				ladderRegimentDay: 0, //天
 				ladderRegimentHour: 0, //时
@@ -2113,6 +2121,18 @@
 						type: 'switchTab'
 					},
 					{
+						tips_img: '/static/images/search1.png',
+						tips_name: this.$L('search'),
+						tips_link: '/pages/search/search',
+						type: 'switchSearch'
+					},
+					{
+						tips_img: '/static/images/menu1.png',
+						tips_name: this.$L('商品分类'),
+						tips_link: '/pages/categroy/categroy',
+						type: 'switchTab'
+					},
+					{
 						tips_img: img_url + 'site/cart.png',
 						tips_name: this.$L('购物车'),
 						tips_link: '/pages/cart/cart',
@@ -2135,7 +2155,7 @@
 				showModalStatus_Red: false,
 				promotion_type: '',
 				current:0,
-				mode:'nav',	
+				mode:'round',	
 				bottomSateArea:getApp().globalData.bottomSateArea?'122rpx':'',//iphone手机底部一条黑线的高度
 				stat_end:1,  //终端，默认为1，pc端
 				showControls:true,//是否显示轮播角标
@@ -2446,15 +2466,6 @@
 			//页面滚动，控制导航条的显示及隐藏
 			scroll: function(e) {
 				let that = this;
-				if (e.detail.scrollTop > 100) { //让导航条切换
-					that.setData({
-						Nav: true
-					})
-				} else {
-					that.setData({
-						Nav: false
-					})
-				}
 				//#ifdef MP-WEIXIN
 				//获取页面元素到顶部的高度
 				wx.createSelectorQuery().in(this).select('#hash2').boundingClientRect(function(rect) {
@@ -3163,7 +3174,7 @@
 						success: function(res) {
 							if (res.data.code == 200 && res.data.datas.status == true) {
 								uni.showToast({
-									title:this.$L('加入购物车成功'),
+									title:acart_data.$L('加入购物车成功'),
 									icon:'none',
 									duration:500
 								})
@@ -3198,7 +3209,7 @@
 						success: function(res) {
 							if (res.data.code == 200 && res.data.datas.status == '1') {
 								wx.showToast({
-									title: this.$L('加入购物车成功'),
+									title: acart_data.$L('加入购物车成功'),
 									duration: 500,
 									icon: 'none'
 								})
@@ -4090,6 +4101,11 @@
 			handleLink(e) {
 				let link = e.currentTarget.dataset.link;
 				let type = e.currentTarget.dataset.type;
+				if(type == 'switchSearch'){
+					uni.navigateTo({
+						url: link
+					});
+				}
 				if (type != 'share') {
 					wx.switchTab({
 						url: link
@@ -4147,26 +4163,17 @@
 			},
 			//返回上一页
 			goBack(){
-				// #ifdef H5
 				const pages = getCurrentPages();
-				//有返回的页面则直接返回，uni.navigateBack默认返回失败之后会自动刷新页面，无法继续返回
-				if(pages.length > 1){
-					uni.navigateBack(1)
-					return;
+
+				 if (pages.length > 1) {
+					uni.navigateBack({
+						delta: 1
+					});
+				} else {
+					uni.reLaunch({ 
+						url: '/pages/index/index'
+					});
 				}
-				//vue router 可以返回uni.navigateBack失败的页面，但是会重新加载
-				let a = this.$router.go(-1);
-				//router.go失败之后则重定向到首页
-				if(a == undefined){
-					uni.reLaunch({
-						url:'/pages/index/index'
-					})
-				}
-				return;
-				// #endif
-				uni.navigateBack({
-					delta:1
-				})
 			}
 
 
@@ -4246,35 +4253,48 @@
 		background-position: center center;
 	}
 
-	.youhui {
-		width: 100%;
-		height: 140rpx;
-		color: #FFFFFF;
+	.promo_time{
+		padding: 32rpx;
 		display: flex;
-		justify-content: space-between;
+		justify-content: space-around;
 		align-items: center;
-		padding: 0 30rpx 0 33rpx;
-		box-sizing: border-box;
+		gap:10rpx;
+		background-color: #7818a0;
+		.promo_time-left text{
+			display: block;
+		}
+		.promo_text_fast{
+			color: #fff;
+			font-size: 32rpx;
+			font-weight: bold;
+			text-transform: uppercase;
+		}
+		.promo_text_info{
+			color: #ccc;
+			font-size: 24rpx;
+		}
+		.promo_time-right{
+			.promo_day,
+			.promo_hours,
+			.promo_minutes,
+			.promo_seconds{
+				padding: 10rpx;
+				background-color: #fff;
+				color: #7818a0;
+				font-size: 28rpx;
+				border-radius: 50%;
+				margin: 0 8rpx;
+				font-weight: bold;
+			}
+			.promo_flag{
+				color: #fff;
+				font-weight: bold;
+			}
+		}
 	}
 
-	.youhui-left {
-		display: flex;
-		flex-direction: column;
-		padding-bottom: 15rpx;
-		box-sizing: border-box;
-	}
 
-	.youhui-left .jge {
-		font-size: 60rpx;
-		font-family: PingFang SC;
-		font-weight: 500;
-		color: rgba(255, 255, 255, 1);
-	}
 
-	.youhui-left .jge text:nth-of-type(1),
-	.youhui-left .jge text:nth-of-type(3) {
-		font-size: 44rpx;
-	}
 
 	.zekou111 {
 		display: flex;
@@ -4296,7 +4316,6 @@
 		background: rgba(255, 255, 255, 1);
 		border-radius: 20rpx 0 0 20rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		color: rgba(191, 0, 254, 1);
 		text-align: center;
@@ -4309,7 +4328,6 @@
 		height: 40rpx;
 		border-radius: 0 24rpx 24rpx 0;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		text-align: center;
@@ -4318,7 +4336,6 @@
 
 	.zhekou_origin_price {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		text-decoration: line-through;
 		color: rgba(254, 254, 254, 1);
@@ -4337,7 +4354,6 @@
 
 	.right .rtop {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		margin-bottom: 22rpx;
@@ -4349,7 +4365,6 @@
 
 	.dime_text {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 	}
@@ -4580,7 +4595,7 @@
 		width: 100%;
 		background-color: #fff;
 		margin-top: 20rpx;
-		padding: 30rpx 20rpx;
+		padding: 30rpx;
 		box-sizing: border-box;
 	}
 
@@ -4611,15 +4626,14 @@
 
 	.biaoti span {
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 30rpx;
+		font-weight: bold;
 	}
 
 	.biaoti em {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 30rpx;
@@ -4628,22 +4642,73 @@
 
 	.titlea {
 		background-color: #fff;
+	}
+	.combo{
+		background-color: #fff;
 		display: flex;
-		justify-content: space-between;
+		flex-direction: column;
+		gap: 10rpx;
+		padding: 30rpx;
+		border: 1px solid #ccc;
+		border-radius: 30rpx;
+		margin-top:30rpx;
+		.combo_title{
+			text-align: center;
+			color: #2d2d2d;
+			font-weight: bold;
+			font-size: 28rpx;
+		}
 	}
 
 	.goodsBox {
-		display: flex;
-		padding-left: 31rpx;
-		padding-right: 84rpx;
-		padding-top: 30rpx;
-		color: #929292;
-		width: 464rpx;
-		align-items: center;
+		navigator{
+			display: flex;
+			align-items:center;
+			gap: 20rpx;
+		}
+		image{
+			flex: 0 0 160rpx;
+		}
+		.goodsBox_text{
+			display: flex;
+			flex-direction: column;
+		}
+		.goodsBox_name{
+			color: #666;
+			font-size: 26rpx;
+			max-height: 80rpx;
+			line-height: 40rpx;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			display:-webkit-box;
+			-webkit-line-clamp:2;
+			-webkit-box-orient:vertical;
+			word-break:break-word;
+			white-space: pre-line;
+		}
+		.goodsBox_prices{
+			display: flex;
+			gap: 20rpx;
+		}
+		.goodsBox_price{
+			color: #2d2d2d;
+			font-size: 28rpx;
+			font-weight: bold;
+		}
+		.goodsBox_shop_price{
+			color: #949494;
+			font-size: 26rpx;
+			text-decoration: line-through;
+		}
 	}
-
-	.goodsBox span {
-		margin: 0 20rpx;
+	.view_more{
+		padding: 10rpx 30rpx;
+		background: #000;
+		color: #fff;
+		font-size: 26rpx;
+		border-radius: 10rpx;
+		margin: 0 auto;
+		font-weight: bold;
 	}
 
 
@@ -4755,7 +4820,6 @@
 
 	.tuijianzuhe text:nth-child(1) {
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 45rpx;
@@ -4763,21 +4827,10 @@
 
 	.tuijianzuhe text:nth-child(2) {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(251, 27, 27, 1);
 		line-height: 45rpx;
 		margin-left: 10rpx;
-	}
-
-	.goodsBox {
-		display: flex;
-		padding-left: 31rpx;
-		padding-right: 84rpx;
-		padding-top: 30rpx;
-		color: #929292;
-		width: 484rpx;
-		box-sizing: border-box;
 	}
 
 	.Discount {
@@ -4815,7 +4868,6 @@
 		left: 0;
 		bottom: 9rpx;
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(254, 254, 254, 1);
 		line-height: 36rpx;
@@ -4948,7 +5000,6 @@
 	.reduction .manjian_goods p {
 		width: 458rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 39rpx;
@@ -4965,7 +5016,6 @@
 	#Open .manjian_goods p {
 		width: 458rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 39rpx;
@@ -5117,7 +5167,6 @@
 		opacity: 0.2;
 		border-radius: 16rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		z-index: 10;
@@ -5132,10 +5181,14 @@
 
 	.goods-detail-name {
 		display: block;
-		padding: 0 20rpx 0;
+		padding: 0 30rpx 30rpx 30rpx;
 		background-color: #fff;
 		position: relative;
 		font-weight: bold;
+
+	}
+	.pt-30{
+		padding-top:30rpx;
 	}
 
 	.goods-detail-name:before {
@@ -5153,7 +5206,6 @@
 	.goods-detail-name dt {
 		display: block;
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(51, 51, 51, 1) !important;
 		line-height: 32rpx;
@@ -5186,7 +5238,6 @@
 		justify-content: space-between;
 		margin-top: 14rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(85, 85, 85, 1);
 		line-height: 36rpx;
@@ -5205,7 +5256,6 @@
 	.goods-jingle1 {
 		width: 681rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #555555;
 		line-height: 36rpx;
@@ -5242,7 +5292,7 @@
 	}
 
 	.goods-detail-price dl {
-		display: inline-block;
+		display: block;
 	}
 
 	.goods-detail-price dt {
@@ -5261,7 +5311,6 @@
 	.goods-detail-price dd {
 		display: inline-block;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(85, 85, 85, 1);
 		line-height: 36rpx;
@@ -5317,7 +5366,6 @@
 		display: block;
 		height: 42rpx;
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 		line-height: 45rpx;
@@ -5342,7 +5390,6 @@
 
 	.specification_default {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #333333;
 		line-height: 45rpx;
@@ -5355,7 +5402,6 @@
 		padding: 0 10rpx;
 		position: relative;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 	}
@@ -5371,7 +5417,6 @@
 
 	.item-more text {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(252, 40, 31, 1);
 		line-height: 45rpx;
@@ -5632,7 +5677,6 @@
 	.show_left {
 		display: flex;
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 45rpx;
@@ -5649,7 +5693,6 @@
 
 	.show_right text {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(252, 40, 31, 1);
 		line-height: 45rpx;
@@ -5700,7 +5743,6 @@
 
 	.buy_show_bottom text {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 39rpx;
@@ -5748,7 +5790,6 @@
 
 	.goods_store_name {
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 45rpx;
@@ -5768,7 +5809,6 @@
 
 	.goods_store_service text {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		margin-right: 12rpx;
@@ -5793,7 +5833,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(45deg, rgba(252, 28, 28, 1) 0%, rgba(255, 114, 10, 1) 100%);
 		border-radius: 24rpx;
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 48rpx;
@@ -5826,7 +5865,6 @@ text-overflow: ellipsis;
 
 	.gooods_bottom_pre text:nth-of-type(1) {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(85, 85, 85, 1);
 		line-height: 45rpx;
@@ -5837,7 +5875,6 @@ text-overflow: ellipsis;
 
 	.gooods_bottom_pre text:nth-of-type(2) {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(252, 40, 31, 1);
 		line-height: 45rpx;
@@ -6031,8 +6068,7 @@ text-overflow: ellipsis;
 		z-index: 1;
 		padding: 23rpx 0;
 		font-size: 30rpx;
-		font-family: PingFang SC;
-		font-weight: 500;
+		font-weight: bold;
 		color: rgba(45, 45, 45, 1);
 		line-height: 45rpx;
 	}
@@ -6054,7 +6090,6 @@ text-overflow: ellipsis;
 
 	.goods-detail-comment .title .rate {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 		line-height: 45rpx;
@@ -6076,7 +6111,7 @@ text-overflow: ellipsis;
 
 	.goods-detail-foot {
 		position: fixed;
-		z-index: 150;
+		z-index: 9;
 		top: auto;
 		left: 0;
 		right: 0;
@@ -6091,7 +6126,6 @@ text-overflow: ellipsis;
 		margin: 0 auto;
 		box-shadow: 0 0 10rpx 0 rgba(155, 143, 143, 0.6);
 		display: flex;
-		padding-right: 20rpx;
 		box-sizing: border-box;
 	}
 
@@ -6153,6 +6187,8 @@ text-overflow: ellipsis;
 	.goods-option-foot .buy-handle {
 		display: flex;
 		align-items: center;
+		justify-content: space-around;
+		width: 100%;
 		/* height: 98rpx; */
 	}
 
@@ -6169,18 +6205,18 @@ text-overflow: ellipsis;
 
 	.goods-detail-foot .buy-handle a.buy-now,
 	.goods-option-foot .buy-handle a.buy-now {
-		background-color: #f4133d;
+		background-color: #FFA41C;
 	}
 
 	.buy-now {
-		background: #f4133d;
+		background: #FFA41C;
 	}
 
 	.goods-detail-foot .buy-handle a.add-cart,
 	.goods-option-foot .buy-handle a.add-cart {
 		float: right;
 		/* width: 50%; */
-		background-color: #ffb03f;
+		background-color: #FFD814;
 	}
 
 	.goods-detail-foot .otreh-handle a i,
@@ -6270,7 +6306,6 @@ text-overflow: ellipsis;
 
 	#goodsExtends .extend-item .label {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 		margin-right: 38rpx;
@@ -6287,7 +6322,6 @@ text-overflow: ellipsis;
 	#goodsExtends .extend-item .jifen .label {
 		margin-right: 39rpx;
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 		line-height: 45rpx;
@@ -6312,7 +6346,6 @@ text-overflow: ellipsis;
 
 	#goodsExtends .extend-item .fuwu .label {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 		line-height: 45rpx;
@@ -6344,7 +6377,6 @@ text-overflow: ellipsis;
 
 	.fuwu_left_title {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #666666;
 		line-height: 90rpx;
@@ -6372,7 +6404,6 @@ text-overflow: ellipsis;
 
 	.fuwu_list_pre text {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		color: #555555;
 		line-height: 90rpx;
@@ -6394,7 +6425,6 @@ text-overflow: ellipsis;
 
 	#goodsExtends .extend-item .item-left .label {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 		line-height: 45rpx;
@@ -6402,7 +6432,6 @@ text-overflow: ellipsis;
 
 	#goodsExtends .extend-item .item-left .label1 {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(252, 45, 45, 1);
 		line-height: 39rpx;
@@ -6416,7 +6445,6 @@ text-overflow: ellipsis;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 45rpx;
@@ -6425,7 +6453,6 @@ text-overflow: ellipsis;
 
 	.highest_points {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #333333;
 		line-height: 45rpx;
@@ -6434,7 +6461,6 @@ text-overflow: ellipsis;
 	.extend-item .item-left-con text {
 		margin-right: 10rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		color: rgba(85, 85, 85, 1);
 		line-height: 45rpx;
@@ -6503,7 +6529,6 @@ text-overflow: ellipsis;
 
 	.goods-tags-intro-top text {
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(51, 51, 51, 1);
 		line-height: 32rpx;
@@ -6538,7 +6563,6 @@ text-overflow: ellipsis;
 
 	.goods-tags-intro-list .goods-tags-intro-item .tags-item-name {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 45rpx;
@@ -6554,7 +6578,6 @@ text-overflow: ellipsis;
 	.goods-tags-intro-list .goods-tags-intro-item .tags-item-intro {
 		display: block;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		color: rgba(153, 153, 153, 1);
 		line-height: 45rpx;
@@ -6813,7 +6836,6 @@ text-overflow: ellipsis;
 		border: 1rpx solid #FF0000;
 		border-radius: 25rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FC1C1C;
 		line-height: 50rpx;
@@ -6826,7 +6848,6 @@ text-overflow: ellipsis;
 		background: #FF3D3D;
 		border-radius: 25rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		border: none;
@@ -6838,7 +6859,6 @@ text-overflow: ellipsis;
 		background: #cbcbcb;
 		border-radius: 25rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		border: none;
@@ -6877,7 +6897,6 @@ text-overflow: ellipsis;
 
 	.comment-item .item-user .user-name {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 45rpx;
@@ -7052,7 +7071,6 @@ text-overflow: ellipsis;
 	.goods-detail-team .teams_a .team_item_h3,
 	.goods-detail-team .teams_a .team_item_h5 {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #333333;
 		line-height: 36rpx;
@@ -7060,7 +7078,6 @@ text-overflow: ellipsis;
 
 	.make_group_end {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #333333;
 		line-height: 36rpx;
@@ -7189,8 +7206,7 @@ text-overflow: ellipsis;
 
 	.tuititle .tui_title_txt {
 		font-size: 30rpx;
-		font-family: PingFang SC;
-		font-weight: 500;
+		font-weight: bold;
 		color: rgba(51, 51, 51, 1);
 		line-height: 45rpx;
 	}
@@ -7202,7 +7218,6 @@ text-overflow: ellipsis;
 
 	.tui_title_more text {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(252, 40, 31, 1);
 		line-height: 45rpx;
@@ -7218,38 +7233,34 @@ text-overflow: ellipsis;
 	.tuigoodslist {
 		display: flex;
 		background-color: #fff;
-		padding: 0 20rpx 20rpx;
+		padding: 0 30rpx 30rpx;
+		gap: 20rpx;
 		box-sizing: border-box;
 		flex-wrap: wrap;
 	}
-
+	.tuigoodslist_details{
+		display: flex;
+		flex-direction:column;
+		height:122rpx;
+		padding: 0 20rpx;
+	}
 	.tuigoodslist .goods_item {
 		/* flex: 1; */
+		width: 216rpx;
+		border:1px solid #eee;
+		border-radius: 10rpx;
 		box-sizing: border-box;
-		margin-right: 20rpx;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		margin-bottom: 30rpx;
+		padding: 20rpx 0;
 	}
-
-	.tuigoodslist .goods_item:nth-of-type(4),
-	.tuigoodslist .goods_item:nth-of-type(5),
-	.tuigoodslist .goods_item:nth-of-type(6) {
-		margin-bottom: 10rpx;
-	}
-
-	.tuigoodslist .goods_item:nth-of-type(3n) {
-		margin-right: 0;
-	}
-
 
 	.tuigoodslist .goods_item .img {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 223rpx;
-		height: 223rpx;
+		height: 214rpx;
 		border-radius: 15rpx;
 		margin-bottom: 20rpx;
 	}
@@ -7262,11 +7273,8 @@ text-overflow: ellipsis;
 
 	.tuigoodslist .goods_name {
 		display: block;
-		width: 220rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
-		font-weight: 600;
-		color: rgba(45, 45, 45, 1);
+		color: #666;
 		line-height: 36rpx;
 		text-overflow: -o-ellipsis-lastline;
 		overflow: hidden;
@@ -7275,34 +7283,32 @@ text-overflow: ellipsis;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
 		-webkit-box-orient: vertical;
+		white-space: pre-line;
 	}
 
 	.tuigoodslist .g_price {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
-		color: rgba(252, 45, 45, 1);
+		color: #666;
 		line-height: 32rpx;
-		margin-top: 23rpx;
+		margin-top: 10rpx;
 		font-weight: bold;
 	}
 
 	.tuigoodslist .g_price text:nth-child(2) {
 		display: inline-block;
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
-		color: rgba(252, 45, 45, 1);
+		color: #2D2D2D;
 		line-height: 32rpx;
 	}
 
 	.tuigoodslist .g_price text:nth-child(1),
 	.tuigoodslist .g_price text:nth-last-child(1) {
 		display: inline-block;
-		font-size: 20rpx;
-		font-family: PingFang SC;
+		font-size: 24rpx;
 		font-weight: bold;
-		color: rgba(252, 45, 45, 1);
+		color: #2D2D2D;
 		line-height: 32rpx;
 	}
 
@@ -7363,7 +7369,6 @@ text-overflow: ellipsis;
 
 	.deposit_wait {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 30rpx;
@@ -7378,7 +7383,6 @@ text-overflow: ellipsis;
 
 	.despoit_pay_now {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 26rpx;
@@ -7386,7 +7390,6 @@ text-overflow: ellipsis;
 
 	.despoit_pay_price {
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 26rpx;
@@ -7428,7 +7431,6 @@ text-overflow: ellipsis;
 
 	.jtt_right .activity_not_started {
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 	}
@@ -7480,7 +7482,6 @@ text-overflow: ellipsis;
 
 	.jtt_right .djs {
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		display: flex;
@@ -7496,7 +7497,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(45deg, rgba(255, 122, 24, 1) 0%, rgba(254, 161, 14, 1) 100%);
 		border-radius: 35rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 70rpx;
@@ -7575,7 +7575,6 @@ text-overflow: ellipsis;
 
 	.p_item_top .on1 {
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FB2D2D;
 		line-height: 20rpx;
@@ -7583,7 +7582,6 @@ text-overflow: ellipsis;
 
 	.p_item_top .on2 {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #333333;
 		line-height: 28rpx;
@@ -7813,7 +7811,6 @@ text-overflow: ellipsis;
 
 	.full_discount .full_discount_title {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(252, 45, 45, 1);
 		line-height: 39rpx;
@@ -7822,7 +7819,6 @@ text-overflow: ellipsis;
 
 	.full_discount .full_discount_con {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 39rpx;
@@ -7983,7 +7979,8 @@ text-overflow: ellipsis;
 		/* width: 100%; */
 		display: flex;
 		justify-content: space-between;
-		padding: 29rpx 30rpx 0 20rpx;
+		align-items:center;
+		padding: 15rpx 30rpx ;
 		box-sizing: border-box;
 		background-color: #FFFFFF;
 	}
@@ -7991,7 +7988,6 @@ text-overflow: ellipsis;
 	.goods_opt {
 		display: flex;
 		align-items: center;
-		margin-bottom: 20rpx;
 	}
 
 	.goods_opt .collection {
@@ -8010,20 +8006,17 @@ text-overflow: ellipsis;
 	.goods_opt .collection image {
 		width: 44rpx;
 		height: 40rpx;
-		margin-bottom: 12rpx;
 	}
 
 	.goods_opt .share image {
 		width: 38rpx;
 		height: 40rpx;
-		margin-bottom: 12rpx;
 	}
 
 	.goods_opt .collection text,
 	.goods_opt .share text {
 		width: 72rpx;
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		overflow: hidden;
@@ -8034,7 +8027,6 @@ text-overflow: ellipsis;
 
 	.new_show_price {
 		font-size: 44rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(252, 28, 28, 1);
 		line-height: 44rpx;
@@ -8042,18 +8034,16 @@ text-overflow: ellipsis;
 
 	.new_show_price text:nth-child(1),
 	.new_show_price text:nth-last-child(1) {
-		font-size: 24rpx;
-		line-height: 24rpx;
+	
 	}
 
 	.new_goods_marketprice {
-		font-size: 24rpx;
-		font-family: PingFang SC;
+		font-size: 28rpx;
 		font-weight: 400;
 		color: rgba(148, 148, 148, 1);
 	}
 
-	.new_goods_marketprice text:nth-of-type(2) {
+	.new_goods_marketprice text{
 		text-decoration: line-through;
 	}
 
@@ -8072,7 +8062,6 @@ text-overflow: ellipsis;
 
 	.view_benefits_title {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		color: #343434;
 		font-weight: 500;
 	}
@@ -8088,7 +8077,6 @@ text-overflow: ellipsis;
 
 	.go_look text {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #343434;
 	}
@@ -8156,7 +8144,6 @@ text-overflow: ellipsis;
 
 	.benefts_model_top text {
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(51, 51, 51, 1);
 		line-height: 32rpx;
@@ -8175,7 +8162,6 @@ text-overflow: ellipsis;
 
 	.grader_title {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 32rpx;
@@ -8226,7 +8212,6 @@ text-overflow: ellipsis;
 
 	.grader_pre_top .grade_name {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #333;
 		line-height: 32rpx;
@@ -8249,7 +8234,6 @@ text-overflow: ellipsis;
 
 	.grader_pre_bottom {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 32rpx;
@@ -8270,11 +8254,42 @@ text-overflow: ellipsis;
 
 	.grader_tips text {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 		line-height: 32rpx;
 		margin-left: 8rpx;
+	}
+
+
+	.delivery_methods{
+		padding: 40rpx;
+		background-color: #ffffff;
+		>view{
+			padding: 10rpx 0;
+			display: flex;
+			gap: 20rpx;
+			align-items:center;
+		}
+		text{
+			font-size: 28rpx;
+			color: #2d2d2d;
+		}
+		image{
+			width: 50rpx;
+			height: 50rpx;
+		}
+		.text-info{
+			font-size: 24rpx;
+			color: #666;
+		}
+		.badge-success{
+			font-size: 24rpx;
+			padding: 8rpx 13rpx;
+			border-radius: 20rpx;
+			background-color: green;
+			color: #fff;
+			margin-bottom: 13rpx;
+		}
 	}
 
 	/* 发货及门店自提 */
@@ -8301,7 +8316,6 @@ text-overflow: ellipsis;
 
 	.deliver_goods_left text:nth-of-type(1) {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #666666;
 		line-height: 45rpx;
@@ -8315,7 +8329,6 @@ text-overflow: ellipsis;
 
 	.deliver_goods_left text:nth-of-type(2) {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #333333;
 		line-height: 45rpx;
@@ -8323,7 +8336,6 @@ text-overflow: ellipsis;
 
 	.express_fee {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #2D2D2D;
 		line-height: 45rpx;
@@ -8331,7 +8343,6 @@ text-overflow: ellipsis;
 
 	.deliver_goods_sold {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #777777;
 		line-height: 45rpx;
@@ -8356,7 +8367,6 @@ text-overflow: ellipsis;
 
 	.store_pick_left text:nth-child(1) {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 		line-height: 45rpx;
@@ -8364,7 +8374,6 @@ text-overflow: ellipsis;
 
 	.store_pick_left text:nth-child(2) {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 45rpx;
@@ -8399,7 +8408,7 @@ text-overflow: ellipsis;
 	}
 	.go_back_nav{
 		width: 50rpx;
-		height: 87rpx;
+		padding: 20rpx;
 		
 	}
 	.go_back_nav image{
@@ -8410,7 +8419,6 @@ text-overflow: ellipsis;
 	.detail_nav .nav_pre,
 	.detail_nav .active {
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 87rpx;
@@ -8439,7 +8447,7 @@ text-overflow: ellipsis;
 		height: 98rpx;
 		padding: 0 33rpx 0 24rpx;
 		box-sizing: border-box;
-		justify-content: space-around;
+		justify-content: start;
 	}
 
 	.footer_btn_pre {
@@ -8455,7 +8463,6 @@ text-overflow: ellipsis;
 
 	.footer_btn_pre text {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 32rpx;
@@ -8477,45 +8484,25 @@ text-overflow: ellipsis;
 		background: rgba(252, 45, 45, 1);
 		border-radius: 50%;
 		font-size: 18rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 30rpx;
-		right: 10rpx;
-		top: -8rpx;
+		right: 0rpx;
+		top: 0rpx;
+		transform: translate(50%,-50%);
 		z-index: 5;
 	}
 
 	.add_cart {
-		width: 220rpx;
-		height: 70rpx;
-		background: linear-gradient(45deg, rgba(255, 122, 24, 1) 0%, rgba(254, 161, 14, 1) 100%);
-		border-radius: 35rpx 0 0 35rpx;
-		font-size: 30rpx;
-		font-family: PingFang SC;
-		font-weight: 500;
-		color: rgba(255, 255, 255, 1);
-		line-height: 70rpx;
-		text-align: center;
-		overflow: hidden;
-		white-space: nowrap;
-		padding: 0 10rpx;
-		text-overflow: ellipsis;
+		color: #2d2d2d;
+		padding: 15rpx 40rpx;
+		border-radius: 30rpx;
 	}
 
 	.buy_now {
-		width: 220rpx;
-		height: 70rpx;
-		background: linear-gradient(45deg, rgba(252, 45, 45, 1) 0%, rgba(253, 87, 43, 1) 100%);
-		border-radius: 0 35rpx 35rpx 0;
-		font-size: 32rpx;
-		font-family: PingFang SC;
-		font-weight: 500;
-		color: rgba(255, 255, 255, 1);
-		line-height: 32rpx;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		color: #2d2d2d;
+		padding: 15rpx 40rpx;
+		border-radius: 30rpx;
 	}
 
 	.exclusive_mobile_phone {
@@ -8531,7 +8518,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(45deg, rgba(252, 45, 45, 1) 0%, rgba(253, 87, 43, 1) 100%);
 		border-radius: 35rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 30rpx;
@@ -8545,7 +8531,6 @@ text-overflow: ellipsis;
 		background: #999999;
 		border-radius: 35rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 30rpx;
@@ -8553,26 +8538,12 @@ text-overflow: ellipsis;
 
 	/* 活动不显示价格时 */
 	.goods_name_new {
-		width: 533rpx;
+		flex: 1;
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(51, 51, 51, 1);
-		line-height: 48rpx;
-		text-overflow: -o-ellipsis-lastline;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		line-clamp: 2;
-		-webkit-box-orient: vertical;
 		padding-top: 17rpx;
 		box-sizing: border-box;
-		height: 115rpx;
-	}
-
-	.goods_price_new1 {
-		padding-right: 0;
 	}
 
 	/* 阶梯团 */
@@ -8601,14 +8572,12 @@ text-overflow: ellipsis;
 
 	.ladder_deposit .deposit_text {
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 	}
 
 	.ladder_deposit .deposit {
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 30rpx;
@@ -8626,14 +8595,12 @@ text-overflow: ellipsis;
 
 	.deposit_price text:nth-child(1) {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 	}
 
 	.deposit_price text:nth-child(2) {
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		text-decoration: line-through;
 		color: rgba(254, 254, 254, 1);
@@ -8645,7 +8612,6 @@ text-overflow: ellipsis;
 	.manjian_des_con {
 		width: 458rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 39rpx;
@@ -8676,7 +8642,6 @@ text-overflow: ellipsis;
 
 	.full_gift_title text {
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(51, 51, 51, 1);
 		line-height: 45rpx;
@@ -8701,7 +8666,6 @@ text-overflow: ellipsis;
 
 	.full_gift_tips text {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(153, 153, 153, 1);
 		line-height: 38rpx;
@@ -8728,7 +8692,6 @@ text-overflow: ellipsis;
 
 	.gift_goods_name {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(51, 51, 51, 1);
 		line-height: 39rpx;
@@ -8750,7 +8713,6 @@ text-overflow: ellipsis;
 
 	.gift_goods_name text:nth-of-type(2) {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: normal;
 		color: #333;
 		line-height: 39rpx;
@@ -8772,7 +8734,6 @@ text-overflow: ellipsis;
 
 	.full_tips_bottom {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(153, 153, 153, 1);
 		line-height: 38rpx;
@@ -8785,7 +8746,6 @@ text-overflow: ellipsis;
 		margin: 0 auto;
 		width: 615rpx;
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(153, 153, 153, 1);
 		line-height: 38rpx;
@@ -8808,7 +8768,6 @@ text-overflow: ellipsis;
 
 	.pintuan_left_price {
 		font-size: 44rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 44rpx;
@@ -8843,7 +8802,6 @@ text-overflow: ellipsis;
 
 	.pintuan_left_num text {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		color: rgba(255, 255, 255, 1);
 	}
@@ -8856,7 +8814,6 @@ text-overflow: ellipsis;
 		background: rgba(255, 255, 255, 1);
 		border-radius: 0 15rpx 0 15rpx;
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		color: rgba(233, 17, 30, 1);
 		display: flex;
@@ -8874,7 +8831,6 @@ text-overflow: ellipsis;
 
 	.pintuan_right_num {
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 	}
@@ -8899,7 +8855,6 @@ text-overflow: ellipsis;
 		background: #DB012F;
 		border-radius: 0 0 15rpx 15rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		display: flex;
@@ -8916,7 +8871,6 @@ text-overflow: ellipsis;
 
 	.tuangou_discount_price {
 		font-size: 44rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 	}
@@ -8927,7 +8881,6 @@ text-overflow: ellipsis;
 
 	.tuangou_original_price {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		text-decoration: line-through;
 		color: rgba(254, 254, 254, 1);
@@ -8944,7 +8897,6 @@ text-overflow: ellipsis;
 
 	.rganized_units_num {
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		margin-bottom: 17rpx;
@@ -8952,7 +8904,6 @@ text-overflow: ellipsis;
 
 	.tuangou_time {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 	}
@@ -8981,7 +8932,6 @@ text-overflow: ellipsis;
 
 	.presale1_title {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(254, 254, 254, 1);
 	}
@@ -9005,14 +8955,12 @@ text-overflow: ellipsis;
 	.presale1_prices {
 		display: flex;
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 	}
 
 	.presale_oragin_price {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		text-decoration: line-through;
 		color: rgba(254, 254, 254, 1);
@@ -9038,7 +8986,6 @@ text-overflow: ellipsis;
 	.collect_deposit {
 		display: flex;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		align-items: center;
@@ -9056,7 +9003,6 @@ text-overflow: ellipsis;
 		background: rgba(255, 255, 255, 1);
 		border-radius: 15rpx;
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(191, 0, 254, 1);
 		text-align: center;
@@ -9070,7 +9016,6 @@ text-overflow: ellipsis;
 		background: #C300FF;
 		border-radius: 15rpx;
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		text-align: center;
@@ -9088,7 +9033,6 @@ text-overflow: ellipsis;
 
 	.count_down_title {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		flex-shrink: 0;
@@ -9102,7 +9046,6 @@ text-overflow: ellipsis;
 
 	.count_down_day {
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		margin: 0 9rpx;
@@ -9156,7 +9099,6 @@ text-overflow: ellipsis;
 
 	.group_alone_price {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 30rpx;
@@ -9164,7 +9106,6 @@ text-overflow: ellipsis;
 
 	.group_alone_title {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 30rpx;
@@ -9183,7 +9124,6 @@ text-overflow: ellipsis;
 
 	.go_group_price {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 30rpx;
@@ -9191,7 +9131,6 @@ text-overflow: ellipsis;
 
 	.go_group_title {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 30rpx;
@@ -9206,7 +9145,6 @@ text-overflow: ellipsis;
 
 	.make_group_num {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 45rpx;
@@ -9219,7 +9157,6 @@ text-overflow: ellipsis;
 
 	.make_groip_more text {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(251, 27, 27, 1);
 	}
@@ -9258,7 +9195,6 @@ text-overflow: ellipsis;
 
 	.make_group_name {
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 45rpx;
@@ -9267,7 +9203,6 @@ text-overflow: ellipsis;
 
 	.make_group_missing {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 36rpx;
@@ -9295,7 +9230,6 @@ text-overflow: ellipsis;
 		background: rgba(252, 28, 28, 1);
 		border-radius: 25rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 50rpx;
@@ -9304,7 +9238,6 @@ text-overflow: ellipsis;
 
 	.make_rroup_time {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 36rpx;
@@ -9340,7 +9273,6 @@ text-overflow: ellipsis;
 
 	.join_group_title text {
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 45rpx;
@@ -9366,7 +9298,6 @@ text-overflow: ellipsis;
 
 	.group_des_title {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 45rpx;
@@ -9375,7 +9306,6 @@ text-overflow: ellipsis;
 
 	.group_des_miss {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #999;
 		line-height: 45rpx;
@@ -9393,7 +9323,6 @@ text-overflow: ellipsis;
 
 	.join_group_time text:nth-child(1) {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(148, 148, 148, 1);
 		line-height: 45rpx;
@@ -9401,7 +9330,6 @@ text-overflow: ellipsis;
 
 	.join_group_time text:nth-child(2) {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FF0000;
 		line-height: 45rpx;
@@ -9433,7 +9361,6 @@ text-overflow: ellipsis;
 		background: rgba(255, 0, 0, 1);
 		border-radius: 13rpx;
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		display: flex;
@@ -9479,7 +9406,6 @@ text-overflow: ellipsis;
 
 	.make_order_title text {
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 45rpx;
@@ -9524,7 +9450,6 @@ text-overflow: ellipsis;
 
 	.make_order_des_top text:nth-child(1) {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(45, 45, 45, 1);
 		line-height: 45rpx;
@@ -9532,7 +9457,6 @@ text-overflow: ellipsis;
 
 	.make_order_des_top text:nth-child(2) {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #999999;
 		line-height: 45rpx;
@@ -9541,7 +9465,6 @@ text-overflow: ellipsis;
 
 	.make_order_des_bot {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(153, 153, 153, 1);
 		line-height: 45rpx;
@@ -9553,7 +9476,6 @@ text-overflow: ellipsis;
 		background: rgba(255, 0, 0, 1);
 		border-radius: 25rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(248, 248, 248, 1);
 		line-height: 50rpx;
@@ -9565,7 +9487,6 @@ text-overflow: ellipsis;
 		bottom: 0;
 		z-index: 250;
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(153, 153, 153, 1);
 		line-height: 45rpx;
@@ -9580,7 +9501,7 @@ text-overflow: ellipsis;
 	/* 选择规格弹框 */
 	.specifications {
 		width: 750rpx;
-		height: 900rpx;
+		height: 400rpx;
 		background: rgba(255, 255, 255, 1);
 		border-radius: 15rpx;
 		position: fixed;
@@ -9594,7 +9515,7 @@ text-overflow: ellipsis;
 	}
 
 	.spec_content {
-		height: 590rpx;
+		height: 450rpx;
 		overflow-y: scroll;
 	}
 
@@ -9631,7 +9552,6 @@ text-overflow: ellipsis;
 
 	.specifications_des_price .des_spec_price {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(252, 28, 28, 1);
 		margin-right: 20rpx;
@@ -9647,7 +9567,6 @@ text-overflow: ellipsis;
 		background: #FF2222;
 		border-radius: 20rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		display: flex;
@@ -9661,7 +9580,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(90deg, #891FF7 0%, #DA01E8 100%);
 		border-radius: 20rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		display: flex;
@@ -9675,7 +9593,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(90deg, #B029FB 0%, #CD30FD 100%);
 		border-radius: 20rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		display: flex;
@@ -9690,7 +9607,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(90deg, #FC1C1C 0%, #FF6C00 100%);
 		border-radius: 20rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		display: flex;
@@ -9704,7 +9620,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(90deg, #F51A3E 0%, #FF4444 100%);
 		border-radius: 20rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		display: flex;
@@ -9719,7 +9634,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(90deg, #FF7A18 0%, #FEA10E 100%);
 		border-radius: 20rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		display: flex;
@@ -9732,7 +9646,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(90deg, #FFAA06 0%, #FF8323 0%, #FC5300 0%, #FF1353 100%);
 		border-radius: 20rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		text-align: center;
@@ -9741,7 +9654,6 @@ text-overflow: ellipsis;
 
 	.specifications_des_store {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(153, 153, 153, 1);
 		margin: 17rpx 0;
@@ -9749,7 +9661,6 @@ text-overflow: ellipsis;
 
 	.specifications_des_txt {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 26rpx;
@@ -9770,7 +9681,6 @@ text-overflow: ellipsis;
 
 	.specifications_des_view text {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		margin-right: 10rpx;
@@ -9789,7 +9699,6 @@ text-overflow: ellipsis;
 
 	.speci_color_title {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 	}
@@ -9820,7 +9729,6 @@ text-overflow: ellipsis;
 
 	.color_list_pre text {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 32rpx;
@@ -9838,7 +9746,6 @@ text-overflow: ellipsis;
 
 	.spec_size_title {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 		margin-bottom: 20rpx;
@@ -9855,7 +9762,6 @@ text-overflow: ellipsis;
 		background: rgba(245, 245, 245, 1);
 		border-radius: 25rpx;
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 32rpx;
@@ -9881,7 +9787,6 @@ text-overflow: ellipsis;
 		display: flex;
 		align-items: center;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(102, 102, 102, 1);
 	}
@@ -9902,7 +9807,6 @@ text-overflow: ellipsis;
 
 	.specifications_buynumber text:nth-child(1) {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		line-height: 30rpx;
 		width: 51rpx;
@@ -9915,7 +9819,6 @@ text-overflow: ellipsis;
 
 	.specifications_buynumber text:nth-child(3) {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		line-height: 30px;
 		width: 51rpx;
@@ -9931,7 +9834,6 @@ text-overflow: ellipsis;
 		height: 50rpx;
 		text-align: center;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: rgba(51, 51, 51, 1);
 		line-height: 30rpx;
@@ -9953,28 +9855,16 @@ text-overflow: ellipsis;
 	.more_tips .more {
 		width: 44rpx;
 		height: 8rpx;
+		padding: 30rpx;
 	}
 
-	.triangle-up {
-		position: absolute;
-		right: 15rpx;
-		top: 11rpx;
-		width: 0;
-		height: 0;
-		border-left: 15rpx solid transparent;
-		border-right: 15rpx solid transparent;
-		border-bottom: 20rpx solid #FFFFFE;
-		/* transform: rotate(120deg); */
-		transform: rotate(0deg);
-		box-shadow: -2rpx 2rpx -1rpx 0rpx rgba(102, 102, 102, 0.1);
-		z-index: 21;
-	}
+
 
 	.tips {
 		position: absolute;
 		z-index: 20;
-		top: 30rpx;
-		right: -30rpx;
+		top: 70rpx;
+		right: -40rpx;
 		width: 226rpx;
 		background: rgba(255, 255, 255, 1);
 		box-shadow: 0px 0px 10rpx 0px rgba(102, 102, 102, 0.2);
@@ -10010,7 +9900,6 @@ text-overflow: ellipsis;
 
 	.tips_pre text {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(51, 51, 51, 1);
 		line-height: 32rpx;
@@ -10021,10 +9910,10 @@ text-overflow: ellipsis;
 		width: 100%;
 		height: 100%;
 		position: fixed;
-		background-color: #FFFFFF;
+		background-color: #000;
 		top: 0;
 		left: 0;
-		opacity: 0;
+		opacity: 0.20;
 		z-index: 10;
 	}
 
@@ -10033,7 +9922,6 @@ text-overflow: ellipsis;
 		display: flex;
 		/* align-items: center; */
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 	}
@@ -10044,7 +9932,6 @@ text-overflow: ellipsis;
 		background: #FFFFFF;
 		border-radius: 50%;
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #F12826;
 		text-align: center;
@@ -10054,7 +9941,6 @@ text-overflow: ellipsis;
 
 	.countdown_group text:nth-of-type(1) {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 	}
@@ -10090,7 +9976,6 @@ text-overflow: ellipsis;
 		display: flex;
 		align-items: center;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 32rpx;
@@ -10130,7 +10015,6 @@ text-overflow: ellipsis;
 		align-items: center;
 		justify-content: center;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 32rpx;
@@ -10142,7 +10026,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(45deg, #FF5C00 0%, #FCE000 0%, #FE8300 0%, #FB9721 100%);
 		border-radius: 35rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 32rpx;
@@ -10157,7 +10040,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(45deg, #FB2D2D 0%, #FC572A 100%);
 		border-radius: 35rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 32rpx;
@@ -10169,12 +10051,11 @@ text-overflow: ellipsis;
 	.specifications_bottom_btn {
 		width: 690rpx;
 		height: 70rpx;
-		background: linear-gradient(45deg, #FF5C00 0%, #FCE000 0%, #FE8300 0%, #FB9721 100%);
+		background: #FFD814;
 		border-radius: 35rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
-		color: #FFFFFF;
+		color: #2D2D2D;
 		line-height: 32rpx;
 		display: flex;
 		align-items: center;
@@ -10184,12 +10065,11 @@ text-overflow: ellipsis;
 	.specifications_bottom_btn1 {
 		width: 690rpx;
 		height: 70rpx;
-		background: linear-gradient(45deg, #FB2D2D 0%, #FC572A 100%);
+		background: #FFA41C;
 		border-radius: 35rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
-		color: #FFFFFF;
+		color: #2D2D2D;
 		line-height: 32rpx;
 		display: flex;
 		justify-content: center;
@@ -10200,7 +10080,6 @@ text-overflow: ellipsis;
 		height: 70rpx;
 		border-radius: 35rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 32rpx;
@@ -10216,7 +10095,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(45deg, #FF5D00 0%, #FCE000 0%, #FE8400 0%, #FB9721 100%);
 		border-radius: 35rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 30rpx;
@@ -10231,7 +10109,6 @@ text-overflow: ellipsis;
 		background: linear-gradient(45deg, #FB2D2D 0%, #FC572A 100%);
 		border-radius: 35rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 30rpx;
@@ -10252,7 +10129,6 @@ text-overflow: ellipsis;
 		border-radius: 35rpx;
 		margin: 14rpx auto;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 1);
 		line-height: 32rpx;
@@ -10264,7 +10140,6 @@ text-overflow: ellipsis;
 	.reditem_str {
 		width: 584rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		color: #333333;
 		line-height: 45rpx;
@@ -10277,7 +10152,6 @@ text-overflow: ellipsis;
 	.reditem_str1 {
 		width: 583rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		color: #333333;
 		line-height: 45rpx;
@@ -10290,10 +10164,10 @@ text-overflow: ellipsis;
 	}
 
 	.detail_title {
-		display: flex;
-		align-items: center;
-		margin-top: 30rpx;
-		justify-content: center;
+		display: block;
+		text-align: center;
+		margin-bottom: 30rpx;
+		font-weight: bold;
 	}
 
 	.detail_title image {
@@ -10304,7 +10178,6 @@ text-overflow: ellipsis;
 
 	.detail_title text {
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 600;
 		color: #2D2D2D;
 		line-height: 30px;
@@ -10320,21 +10193,19 @@ text-overflow: ellipsis;
 
 	.Payment_time {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #999999;
 	}
 
 	.Delivery_time {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #999999;
 		margin-top: 16rpx;
 	}
 
 	.padding_bottom20 {
-		margin-bottom: 20rpx;
+				margin-bottom: 20rpx;
 		box-sizing: border-box;
 		text-overflow: -o-ellipsis-lastline;
 		overflow: hidden;
@@ -10342,7 +10213,7 @@ text-overflow: ellipsis;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
-		-webkit-box-orient: vertical;
+		-webkit-box-orient: vertical;	
 	}
 	.limit_line2{
 		text-overflow: -o-ellipsis-lastline;
@@ -10382,7 +10253,8 @@ text-overflow: ellipsis;
 		transform:translate(-50%,-50%);//水平、垂直都居中,也可以写成下面的方式
 	}
 	.goods_detail_des{
-		padding-bottom: 20rpx;
+		background-color: #fff;
+		padding: 30rpx;
 	}
 	/* 秒杀活动 start */
 	.second_kill{
@@ -10405,7 +10277,6 @@ text-overflow: ellipsis;
 	}
 	.second_kill_goods_price{
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: bold;
 		color: #FFFFFF;
 		margin-bottom: 8rpx;
@@ -10415,7 +10286,6 @@ text-overflow: ellipsis;
 	}
 	.second_kill_price{
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		opacity: 0.8;
@@ -10428,7 +10298,6 @@ text-overflow: ellipsis;
 	}
 	.second_kill_text{
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 600;
 		color: #FF2930;
 		margin-bottom: 20rpx;
@@ -10437,7 +10306,6 @@ text-overflow: ellipsis;
 		display: flex;
 		align-items: center;
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FF333A;
 		line-height: 34rpx;
@@ -10469,7 +10337,6 @@ text-overflow: ellipsis;
 	}
 	.sec_kill_preview_left{
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #666666;
 	}
@@ -10491,7 +10358,6 @@ text-overflow: ellipsis;
 	}
 	.sec_kill_preview_right text{
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 34rpx;
@@ -10503,7 +10369,6 @@ text-overflow: ellipsis;
 		background: #999999;
 		border-radius: 17rpx;
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		text-align: center;
@@ -10511,6 +10376,10 @@ text-overflow: ellipsis;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.description{
+		font-size: 28rpx;
 	}
 	/* 秒杀活动 end */
 </style>

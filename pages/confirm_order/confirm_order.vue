@@ -2,33 +2,23 @@
 	<view>
 		<view class="bbctouch-main-layout mb20">
 
-			<div class="bbctouch-cart-block">
-				<!--正在使用的默认地址Begin-->
+			<div class="bbctouch-cart-block mt039">
 				<div class="bbctouch-cart-add-default" @tap.stop="go_address_list">
 					<a href="javascript:void(0);" id="list-address-valve">
-						<i class="icon-add">
-							<image style="width:100%;height:100%;display:block;" :src="img_url+'location_b.png'"></image>
-						</i>
-						<dl>
-							<dt>
-								<span id="true_name">{{user_address.true_name}}</span>
-								<span id="mob_phone">{{user_address.mob_phone}}</span>
-							</dt>
-							<dd>
-								<span id="address">{{user_address.area_info?user_address.area_info:''}}{{user_address.address?user_address.address:''}}</span>
-							</dd>
-						</dl>
-						<i class="icon-arrow">
-							<image style="width:100%;height:100%;display:block;margin-top:4rpx;" src="/static/images/arrow_right_b.png"></image>
-						</i>
+						<view>
+							<p id="true_name">{{user_address.true_name}}</p>
+							<p id="mob_phone">{{user_address.mob_phone}}</p>
+							<p id="user_address">{{user_address.address?user_address.address:''}} {{user_address.area_info?user_address.area_info:''}}</p>
+						</view>
+						<view>
+							<image src="/static/images/arrow_right_b.png"></image>
+						</view>
 					</a>
 				</div>
-				<image :src="img_url + 'site/line.png'" style="width:100%;height:7rpx;"></image>
-				<!--正在使用的默认地址End-->
 			</div>
 
 			<!--付款方式Begin-->
-			<div class="bbctouch-cart-block mt039">
+			<div class="bbctouch-cart-block mt039" style="display:none">
 				<a href="javascript:void(0);" class="posr" id="select-payment-valve" @tap.stop="showPayModeFun">
 					<view class="let_tip">{{$L('支付方式：')}}</view>
 					<div class="current-con">{{pay_mode=='online'?$L('在线付款'):$L('货到付款')}}</div>
@@ -38,6 +28,7 @@
 				</a>
 			</div>
 			<!--付款方式End-->
+		
 
 			<!--选择付款方式Begin-->
 			<div id="select-payment-wrapper" class="bbctouch-full-mask hide">
@@ -98,18 +89,6 @@
 			</div>
 			<!-- 选择优惠券End -->
 
-			<!--发票信息Begin-->
-			<div class="bbctouch-cart-block mt039" @tap.stop="go_inv">
-				<a href="javascript:void(0);" class="posr" id="invoice-valve">
-					<view class="let_tip">{{$L('发票信息：')}}</view>
-					<div class="current-con">
-						<p id="invContent" class="invoice_info">{{inv_content}}</p>
-					</div>
-					<i class="icon-arrow" style="background-image: url(/static/images/arrow_right_b.png);"></i>
-				</a>
-			</div>
-			<!--发票信息End-->
-
 			<!-- 积分抵扣 start -->
 			<view class="points_pd" v-if="detail_info.member_points*1>0 && detail_info.points_max_use*1>0 && detail_info.allow_use_points==1">
 				<view class="points-top">
@@ -133,80 +112,69 @@
 			<!-- 积分抵扣 end -->
 
 			<!--商品列表Begin-->
-			<div id="goodslist_before" class="mt039" style="margin-bottom: 2.2rem;">
+			<div id="goodslist_before" class="mt039">
 				<div id="deposit">
 					<block v-for="(store_item, store_index) in detail_info.store_cart_list" :key="store_index">
 						<div class="bbctouch-cart-container">
-							<dl class="bbctouch-cart-store">
-								<dt class="flex-row">
-									<image class="icon-store" src="/static/images/store_b.png" mode="widthFix"></image><text class="icon-store_dt">{{store_item.store_name}}</text> 
-								</dt>
-								<!-- <dd class="store-huodong" wx:if="{{store_item.store_mansong_rule_list!= null && store_item.store_mansong_rule_list.desc != null}}">
-							<em>满即送</em>
-							<span>{{store_item.store_mansong_rule_list.desc}}
-								<span wx:if='{{store_item.store_mansong_rule_list.desc.url}}'>，送
-									<image src="{{store_item.store_mansong_rule_list.desc.url}}"></image>
-								</span>
-							</span>
-						</dd> -->
-								<view class="full_gift" v-if="store_item.store_mansong_rule_list!= null && store_item.store_mansong_rule_list.desc != null">{{$L('满赠')}}</view>
-							</dl>
-							<ul class="bbctouch-cart-item" style="display:flex;width:100%;flex-direction:column">
-								<block v-for="(goods_item, goods_index) in store_item.goods_list" :key="goods_index">
-									<li class="buy-item" style="display:flex;">
-										<div class="goods-pic">
-											<a href="javascript:void(0)">
-												<image :src="goods_item.goods_image_url"></image>
-											</a>
-										</div>
-										<view class="goods_desc">
-											<dl class="goods-info">
-												<dt class="goods-name">
-													<a href="javascript:void(0)" class="goods-name-nowrap">{{goods_item.goods_name}}
-													</a>
-												</dt>
-												<view class="guige">
-													<text>*</text>
-													{{goods_item.goods_num}}
-												</view>
-												<dd class="goods-type" v-if="detail_info.pin">[{{detail_info.pin.sld_team_count}}{{$L('人团')}}] | {{$L('已有')}}{{detail_info.pin.sales}}{{$L('人参与')}}</dd>
-												<dd class="goods-type">{{goods_item.goods_spec}}</dd>
-											</dl>
-											<div class="goods-subtotal">
-												<view class="goods-price">
-													<view class="commodity_price" v-if="!goods_item.show_price && !goods_item.goods_price"><text>{{$L('￥')}}</text>0</view>
-													<!-- <em>{{(goods_item.show_price || goods_item.show_price===0) ? goods_item.show_price : goods_item.goods_price}}</em> -->
-													<!-- <em>{{goods_item.goods_price}}</em> -->
-													<block v-if="goods_item.show_price">
-														<view class="commodity_price" v-if="goods_item.promotion_type == 'xianshi' && goods_item.promotion_run_flag == 1  || goods_item.promotion_type == 'tuan' && goods_item.promotion_start_flag == 2 || goods_item.promotion_type=='pin_tuan' && goods_item.promotion_start_flag == 2 || goods_item.promotion_type=='p_mbuy'"><text>{{$L('￥')}}</text><text>{{filters.toSplit(filters.toFix(goods_item.show_price))[0]}}</text>.<text>{{filters.toSplit(filters.toFix(goods_item.show_price))[1]}}</text></view>
-														<view class="commodity_price" v-else><text>{{$L('￥')}}</text><text>{{filters.toSplit(filters.toFix(goods_item.show_price))[0]}}</text>.<text>{{filters.toSplit(filters.toFix(goods_item.show_price))[1]}}</text></view>
-													</block>
-													<block v-if="!goods_item.show_price&&goods_item.goods_price">
-														<view class="commodity_price"><text>{{$L('￥')}}</text><text>{{filters.toSplit(filters.toFix(goods_item.goods_price))[0]}}</text>.<text>{{filters.toSplit(filters.toFix(goods_item.goods_price))[1]}}</text></view>
-													</block>
-
-													<span v-if="detail_info.pin">{{$L('省')}}{{$L('￥')}}{{(detail_info.pin.goods_price-detail_info.pin.sld_pin_price).toFixed(2)}}</span>
-												</view>
+							<view class="cart-items">
+								<view class="cart-title">
+									{{store_item.goods_list.length}} producto(s)
+								</view>
+								<ul class="bbctouch-cart-item">
+									<block v-for="(goods_item, goods_index) in store_item.goods_list" :key="goods_index">
+										<li class="buy-item">
+											<div class="goods-pic">
+												<a href="javascript:void(0)">
+													<image :src="goods_item.goods_image_url"></image>
+												</a>
 											</div>
-											<!-- <div class="goods-num">
-                    <em>{{goods_item.goods_num}}*</em>
-                  </div> -->
-											<view v-if="goods_item.gift_list">
-												<block v-for="(gift_item, index) in goods_item.gift_list" :key="index">
-													<div class="goods-gift">
-														<span>
-															<em>{{$L('赠品')}}</em>{{gift_item.gift_goodsname}}</span>
-													</div>
-												</block>
+											<view class="goods_desc">
+												<dl class="goods-info">
+													<dt class="goods-name">
+														<a href="javascript:void(0)" class="goods-name-nowrap">{{goods_item.goods_name}}
+														</a>
+													</dt>
+													<dd class="goods-type" v-if="detail_info.pin">[{{detail_info.pin.sld_team_count}}{{$L('人团')}}] | {{$L('已有')}}{{detail_info.pin.sales}}{{$L('人参与')}}</dd>
+													<dd class="goods-type">{{goods_item.goods_spec}}</dd>
+												</dl>
+												<div class="goods-subtotal">
+													<view class="goods-price">
+														<view class="commodity_price" v-if="!goods_item.show_price && !goods_item.goods_price"><text>{{$L('￥')}}</text>0</view>
+														<!-- <em>{{(goods_item.show_price || goods_item.show_price===0) ? goods_item.show_price : goods_item.goods_price}}</em> -->
+														<!-- <em>{{goods_item.goods_price}}</em> -->
+														<block v-if="goods_item.show_price">
+															<view class="commodity_price" v-if="goods_item.promotion_type == 'xianshi' && goods_item.promotion_run_flag == 1  || goods_item.promotion_type == 'tuan' && goods_item.promotion_start_flag == 2 || goods_item.promotion_type=='pin_tuan' && goods_item.promotion_start_flag == 2 || goods_item.promotion_type=='p_mbuy'"><text>{{$L('￥')}}</text><text>{{filters.toSplit(filters.toFix(goods_item.show_price))[0]}}</text>.<text>{{filters.toSplit(filters.toFix(goods_item.show_price))[1]}}</text></view>
+															<view class="commodity_price" v-else><text>{{$L('￥')}}</text><text>{{filters.toSplit(filters.toFix(goods_item.show_price))[0]}}</text>.<text>{{filters.toSplit(filters.toFix(goods_item.show_price))[1]}}</text></view>
+														</block>
+														<block v-if="!goods_item.show_price&&goods_item.goods_price">
+															<view class="commodity_price"><text>{{$L('￥')}}</text><text>{{filters.toSplit(filters.toFix(goods_item.goods_price))[0]}}</text>.<text>{{filters.toSplit(filters.toFix(goods_item.goods_price))[1]}}</text></view>
+														</block>
+
+														<span v-if="detail_info.pin">{{$L('省')}}{{$L('￥')}}{{(detail_info.pin.goods_price-detail_info.pin.sld_pin_price).toFixed(2)}}</span>
+													</view>
+													<view class="commodity_cant">
+														Cant: {{goods_item.goods_num}}
+													</view>
+												</div>
+												<!-- <div class="goods-num">
+													<em>{{goods_item.goods_num}}*</em>
+												</div> -->
+												<view v-if="goods_item.gift_list">
+													<block v-for="(gift_item, index) in goods_item.gift_list" :key="index">
+														<div class="goods-gift">
+															<span>
+																<em>{{$L('赠品')}}</em>{{gift_item.gift_goodsname}}</span>
+														</div>
+													</block>
+												</view>
+												<div class="notransport transportId<%=v1.transport_id%>" style="display:none;">
+													<p>{{$L('该商品不支持配送')}}</p>
+												</div>
 											</view>
-											<div class="notransport transportId<%=v1.transport_id%>" style="display:none;">
-												<p>{{$L('该商品不支持配送')}}</p>
-											</div>
-										</view>
-									</li>
-								</block>
-							</ul>
-
+										</li>
+									</block>
+								</ul>
+							</view>
 							<div class="bbctouch-cart-subtotal">
 								<dl class="discount_wrap" v-if="store_item.goods_list[0].grade_discount">
 									<dt class="discount">
@@ -225,15 +193,24 @@
 									</dd>
 								</dl>
 								<!-- <dl wx:if="{{!detail_info.dian_list}}">
-							<dt>物流配送</dt>
-							<dd>运费
-								<em id="storeFreight{{store_index}}">{{store_item.yunfei_price}}</em>元</dd>
-							<dd class="store_yunfei_tip">
-								<span id="yunfei_tip{{store_index}}">{{store_item.yunfei_info}}</span>
-							</dd>
-						</dl> -->
+									<dt>物流配送</dt>
+									<dd>运费
+										<em id="storeFreight{{store_index}}">{{store_item.yunfei_price}}</em>元</dd>
+									<dd class="store_yunfei_tip">
+										<span id="yunfei_tip{{store_index}}">{{store_item.yunfei_info}}</span>
+									</dd>
+								</dl> -->
 
-								<view class="dian-sel border-bottom-1px border-top-1px">
+								<div class="bbctouch-cart-block mt039 shipping_method">
+									<text class="shipping_method-title">Método de envío</text>
+									<view class="shipping_method-content">
+										<p class="shipping-price">{{Number(store_item.yunfei_price)>0?store_item.yunfei_price:'GRATIS'}}</p>
+										<p>Entrega estándar</p>
+										<p>Su pedido puede llegar entre 1-7 días habiles</p>
+									</view>
+								</div>
+
+								<view class="dian-sel border-bottom-1px border-top-1px" style="display:none">
 									<view class="dain-title">{{$L('配送方式')}}</view>
 									<view class="ps-mode">
 										<view :class=" dian_type=='exp'?'on ps-item':'ps-item'" data-type="exp" @click="changeDianType">{{$L('普通快递')}}</view>
@@ -258,11 +235,11 @@
 									 auto-height="true" cursor-spacing="0"></textarea>
 								</div>
 								<!-- <div class="store-total">
-							本店合计
-							<span>
-								<em id="storeTotal{{store_index}}">{{dian_type=='exp'?store_item.store_goods_total:store_item.store_goods_total-store_item.yunfei_price}}</em>
-							</span>元
-						</div> -->
+									本店合计
+									<span>
+										<em id="storeTotal{{store_index}}">{{dian_type=='exp'?store_item.store_goods_total:store_item.store_goods_total-store_item.yunfei_price}}</em>
+									</span>元
+								</div> -->
 							</div>
 						</div>
 						<view id="store_red_wrap" @tap="hide_store_red" v-if="store_item.red&&store_item.red.length && store_show_flag && select_red_index == store_index">
@@ -315,6 +292,30 @@
 				</div>
 			</div>
 			<!--商品列表End-->
+
+			<div class="bbctouch-cart-block mt039 payment_methods">
+				<text class="payment_methods-title">Método de pago</text>
+				<view class="payment_methods-content">
+					<image style="height:33rpx;width:110rpx;" src="/static/images/payme.jpg"></image>
+					<view>
+						<text class="payme-bold">Pay-me</text>
+						<text>Tarjeta de Crédito / Débito</text>
+						<image style="height:33rpx;width:175rpx;" src="/static/images/payments.jpg"></image>
+					</view>
+				</view>
+			</div>
+			
+			<!--发票信息Begin-->
+			<div class="bbctouch-cart-block mt039" @tap.stop="go_inv">
+				<a href="javascript:void(0);" class="posr" id="invoice-valve">
+					<view class="let_tip">{{$L('发票信息：')}}</view>
+					<div class="current-con">
+						<p id="invContent" class="invoice_info">{{inv_content}}</p>
+					</div>
+					<i class="icon-arrow" style="background-image: url(/static/images/arrow_right_b.png);"></i>
+				</a>
+			</div>
+			<!--发票信息End-->
 
 			<!--红包使用Begin-->
 			<div id="rptVessel" class="bbctouch-cart-block mt039" style="display: none;">
@@ -1528,78 +1529,82 @@
 	}
 
 	.bbctouch-cart-add-default {
-		position: relative;
-		z-index: 1;
 		width: 100%;
 		display: block;
+		a {
+			display:flex;
+			gap:20rpx;
+			color: #2d2d2d;
+			font-size: 24rpx;
+			padding: 20rpx; 
+		}
+		#true_name{
+			font-weight:bold;
+			font-size: 32rpx;
+		}
+		#mob_phone {
+			line-height: 50rpx;
+		}
+		#user_address{
+		}
+		image{
+			width: 30rpx;
+			height: 30rpx;
+		}
 	}
-
-	.bbctouch-cart-add-default a {
-		color: #555;
+	.payment_methods{
+		padding: 20rpx;
 	}
-
-	.bbctouch-cart-add-default i.icon-add {
-		position: absolute;
-		z-index: 1;
-		top: 86rpx;
-		left: 23rpx;
-		display: block;
-		width: 33rpx;
-		height: 33rpx;
-		background-repeat: no-repeat;
-		background-position: 50% 50%;
-		background-size: 100%;
-	}
-
-	.bbctouch-cart-add-default dl {
-		margin: 0 0 0 74rpx;
-		padding: 23rpx 0 14rpx;
-		display: block;
-	}
-
-	.bbctouch-cart-add-default dt {
-		display: block;
-		font-size: 28rpx;
-		font-family: PingFang SC;
-		font-weight: 500;
-		color: rgba(51, 51, 51, 1);
-		line-height: 45rpx;
-		margin-bottom: 20rpx;
-	}
-
-	#mob_phone {
-		margin-left: 69rpx;
-	}
-
-	.bbctouch-cart-add-default dt span {
-		color: #252525;
-	}
-
-	.bbctouch-cart-add-default dd {
-		display: block;
-		width: 550rpx;
-		min-height: 42rpx;
-		max-height: 84rpx;
-		font-size: 32rpx;
-		font-family: PingFang SC;
+	.payment_methods-title{
+		color: #2d2d2d;
 		font-weight: bold;
-		color: rgba(45, 45, 45, 1);
-		line-height: 45rpx;
+		font-size: 32rpx;	
+	}
+	.payment_methods-content{
+		display: flex;
+		gap: 20rpx;
+		margin-top: 20rpx;
+		align-items:center;
+		image{
+
+		}
+		text{
+			display:block;
+			font-size: 26rpx;
+			color: #2d2d2d;
+		}
+		.payme-bold{
+			font-weight:bold;
+		}
+	}
+	.cart-items{
+		background: #fff;
+		padding: 20rpx;
+	}
+	.cart-title{
+		color: #2d2d2d;
+		font-weight: bold;
+		font-size: 32rpx;	
 	}
 
-	.bbctouch-cart-block i.icon-arrow {
-		position: absolute;
-		z-index: 1;
-		top: 50%;
-		right: 23rpx;
-		display: block;
-		width: 23rpx;
-		height: 23rpx;
-		margin-top: -12rpx;
-		background-repeat: no-repeat;
-		background-position: 50% 50%;
-		background-size: 100%;
-		opacity: 0.5;
+	.shipping_method{
+		padding: 20rpx;
+	}	
+	.shipping_method-title{
+		color: #2d2d2d;
+		font-weight: bold;
+		font-size: 32rpx;
+	}
+	.shipping_method-content{
+		font-size: 26rpx;
+		border: 1px solid #1e2a74;
+		border-radius: 20rpx;
+		padding: 20rpx;
+		margin-top: 20rpx;
+	}
+	.shipping-price{
+		font-weight: bold;
+		color: #2d2d2d;
 	}
 
 	.hide {
@@ -1860,10 +1865,10 @@
 		margin: 0 auto;
 		height: 98rpx;
 		background-color: #fff;
-		width: 750rpx;
 		display: flex;
 		align-items: center;
-		justify-content: flex-end;
+		justify-content: space-between;
+		padding: 0 20rpx;
 	}
 
 	.bbctouch-cart-bottom .total {
@@ -1895,44 +1900,23 @@
 	}
 
 	.bbctouch-cart-bottom .check-out.ok {
-		background-color: #f23030;
-		width: 180rpx;
-		height: 60rpx;
-		background: rgba(252, 28, 28, 1);
-		border-radius: 30rpx;
-		font-size: 28rpx;
-		font-family: PingFang SC;
-		font-weight: 500;
-		color: rgba(254, 254, 254, 1);
-		line-height: 32rpx;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		margin-left: 20rpx;
-		margin-right: 22rpx;
+		background-color: #000;
+		padding: 10rpx 40rpx;
+		border-radius: 20rpx;
 	}
 
 	.bbctouch-cart-bottom .check-out {
-		display: block;
-		float: right;
-		width: 25%;
-		height: 97rpx;
 		background-color: #bbb;
 	}
 
 	.bbctouch-cart-bottom .check-out #ToBuyStep2 {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		text-align: center;
-		font-size: 33rpx;
+		font-size: 30rpx;
 		color: #fff;
 	}
 
 	.bbctouch-cart-container {
 		display: block;
 		clear: both;
-		background-color: #fff;
 		margin-bottom: 18rpx;
 		position: relative;
 	}
@@ -1986,24 +1970,28 @@
 
 	.bbctouch-cart-item {
 		background-color: #fff;
+		display:flex;
+		width:100%;
+		flex-direction:column;
+		gap: 20rpx;
 	}
 
 	.bbctouch-cart-item li {
-		display: block;
-		position: relative;
-		z-index: 1;
-		margin-left: 0;
-		padding: 23rpx 0 23rpx 23rpx;
 	}
-
+	.buy-item{
+		display: flex;
+		gap: 20rpx;
+		align-items:center;
+		box-sizing: border-box;
+	}
 	.bbctouch-cart-item .buy-item .goods-pic {
 		left: 23rpx;
 	}
 
 	.bbctouch-cart-item li .goods-pic {
 		display: block;
-		width: 220rpx;
-		height: 220rpx;
+		width: 180rpx;
+		height: 180rpx;
 		border-radius: 15rpx;
 		top: 23rpx;
 		left: 74rpx;
@@ -2011,8 +1999,8 @@
 
 	.bbctouch-cart-item li .goods-pic a {
 		display: block;
-		width: 220rpx;
-		height: 220rpx;
+		width: 180rpx;
+		height: 180rpx;
 		border-radius: 15rpx;
 		display: table-cell;
 		vertical-align: middle;
@@ -2021,8 +2009,8 @@
 	}
 
 	.bbctouch-cart-item li .goods-pic a image {
-		width: 220rpx;
-		height: 220rpx;
+		width: 180rpx;
+		height: 180rpx;
 		border-radius: 15rpx;
 	}
 
@@ -2078,10 +2066,7 @@
 	.bbctouch-cart-item li .goods-info dd.goods-type {
 		overflow: hidden;
 		white-space: nowrap;
-		width: 70%;
-		height: 42rpx;
 		font-size: 21rpx;
-		line-height: 42rpx;
 		color: #999;
 		text-overflow: ellipsis;
 	}
@@ -2092,26 +2077,19 @@
 	}
 
 	.bbctouch-cart-item li .goods-subtotal {
-		display: block;
-		height: 46rpx;
-		/* margin: 0 23rpx 0 207rpx; */
-		line-height: 46rpx;
+		display: flex;
+		gap: 20rpx;
+		align-items: center;
 		font-size: 28rpx;
-		font-family: PingFang SC;
-		font-weight: bold;
-		color: rgba(252, 28, 28, 1);
-		line-height: 34rpx;
-		/* position: relative; */
-		/* z-index: 1; */
+		color: #2d2d2d;
 	}
 
 	.bbctouch-cart-item li .goods-subtotal .goods-price {
-		color: #f23030;
-		font-size: 32rpx;
+		
 	}
 
 	.bbctouch-cart-item li .goods-subtotal .goods-price em {
-		font-size: 32rpx;
+		
 	}
 
 	.bbctouch-cart-item li .goods-num {
@@ -2210,9 +2188,8 @@
 		z-index: 1;
 		display: block;
 		/* height: 74rpx; */
-		padding-top: 19rpx;
+		padding: 19rpx 0;
 		box-sizing: border-box;
-		padding-bottom: 104rpx;
 		background: #FFFFFF;
 	}
 
@@ -2593,7 +2570,6 @@
 
 	.express-fee text {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FC1C1C;
 		line-height: 39rpx;
@@ -2771,7 +2747,6 @@
 		justify-content: flex-end;
 		align-items: center;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		color: rgba(102, 102, 102, 1);
 	}
@@ -2785,29 +2760,19 @@
 	}
 
 	.goods_desc {
-		width: 446rpx;
 		display: flex;
 		flex-direction: column;
-		margin-left: 25rpx;
 		padding-top: 15rpx;
 		padding-bottom: 18rpx;
 		box-sizing: border-box;
 	}
 
 	.commodity_price {
-		font-size: 34rpx;
-		font-family: PingFang SC;
-		color: rgba(252, 28, 28, 1);
-		line-height: 32rpx;
+		font-size: 30rpx;
 		font-weight: bold;
 	}
-
-	.commodity_price text:nth-child(1) {
-		font-size: 24rpx;
-	}
-
-	.commodity_price text:nth-of-type(3) {
-		font-size: 24rpx;
+	.commodity_cant{
+		font-size: 26rpx;
 	}
 
 	.full_gift {
@@ -2825,7 +2790,6 @@
 
 	.express_money {
 		font-size: 22rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #2D2D2D;
 		line-height: 32rpx;

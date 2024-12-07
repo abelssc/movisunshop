@@ -11,16 +11,17 @@
 				<block v-if="cart_list_show && isDataLoading && (cart_list.cart_num ||  cart_nums)">
 					<!-- 平台判断 -->
 					<view class="administration">
-						<text v-if="!batchOpt && cart_list.cart_num > 0">{{$L('共')}}{{cart_list.cart_num}}{{$L('件商品')}}</text>
-						<text v-if="batchOpt && cart_nums > 0">{{$L('共')}}{{cart_nums}}{{$L('件商品')}}</text>
-						<text @tap="sel_checkbox" data-type="batchOpt" :data-sele="batchOpt ? 0 : 1"
-							v-if="cart_list.cart_list.length">{{batchOpt ? $L('完成') : $L('管理')}}</text>
+						<view class="free_ship">
+							<image src="/static/images/icon-despacho.svg"></image>
+							<text>Envío gratis</text>
+						</view>
+						<view class="batch_del" @tap="del_goods" data-type="batch">{{$L('删除')}}</view>
 					</view>
 					<view :class="!batchOpt ? 'cart_list_con' : 'cart_list_con1'">
 						<!-- 购物车店铺商品 -->
 						<view class="bbctouch-cart-container" v-if="cart_list.cart_list.length">
 							<view v-for="(item, idstore) in cart_list.cart_list" :key="idstore" class="store_pre">
-								<view class="store_pre_top" :data-store-id="item[0]">
+								<view class="store_pre_top" :data-store-id="item[0]" style="display:none">
 									<!-- 不可选择 -->
 									<image :src="img_url + 'site/cart_no_seleted.png'" data-type="store"
 										class="store_select" v-if="item[4] == 2 && !batchOpt"></image>
@@ -193,7 +194,7 @@
 				<!-- 推荐商品 -->
 				<view class="pick_goods" v-if="tuijian_goods.length > 0 && isDataLoading && !batchOpt">
 					<view class="pick_goods_top">
-						<image :src="img_url + $L('site/pick_bg.png')"></image>
+						<text>Productos Recomendados</text>
 					</view>
 					<view class="pick_list">
 						<view v-for="(item, index) in tuijian_goods" :key="index" class="pick_list_pre">
@@ -222,14 +223,12 @@
 						<image
 							:src="cart_list.is_check==1 ? img_url + 'site/cart_seleted.png' : img_url + 'site/cartlist_not_sle.png'"
 							data-type="all" :data-sele="cart_list.is_check" @tap.stop="sel_checkbox"></image>
-						<text>{{$L('全选')}}</text>
-					</view>
-					<view class="total_settlement_right">
 						<view class="total_settlement_price">
 							<view class="total_settlement_price1">{{$L('合计')}}:<text>{{$L('￥')}}{{cart_list.sum ? cart_list.sum : 0}}</text>
 							</view>
-							<view class="total_settlement_freight">{{$L('不包含运费')}}</view>
 						</view>
+					</view>
+					<view class="total_settlement_right">
 						<view class="total_settlement_text grey" v-if="cart_list.checked_num == 0">
 							{{$L('结算')}}({{cart_list.checked_num}})</view>
 						<view class="total_settlement_text" @tap.stop="go_confirm_order" v-else>
@@ -1874,12 +1873,12 @@
 	}
 
 	.cart_list_con {
-		padding-top: 90rpx;
+		padding-top: 80rpx;
 		box-sizing: border-box;
 	}
 
 	.cart_list_con1 {
-		padding-top: 90rpx;
+		padding-top: 80rpx;
 		padding-bottom: 118rpx;
 		box-sizing: border-box;
 	}
@@ -2408,38 +2407,34 @@
 	}
 
 	.administration {
-		padding: 30rpx 20rpx 30rpx 20rpx;
+		padding: 20rpx 40rpx 20rpx 40rpx;
 		box-sizing: border-box;
 		position: absolute;
 		z-index: 50;
 		width: 100%;
 		display: flex;
 		justify-content: space-between;
+		align-items:center;
 		background: #F5F5F5;
 		top: 0;
-	}
 
-	.administration text:nth-child(1) {
-		font-size: 30rpx;
-		font-family: PingFang SC;
-		font-weight: 400;
-		color: #999999;
-		line-height: 30rpx;
-	}
+		color: #2d2d2d;
+		font-size: 24rpx;
 
-	.administration text:nth-child(2) {
-		font-size: 30rpx;
-		font-family: PingFang SC;
-		font-weight: 400;
-		color: #2D2D2D;
-		line-height: 30rpx;
-		text-align: right;
+		.free_ship{
+			display: flex;
+			gap: 10rpx;
+			align-items:center;
+			image{
+				width: 40rpx;
+				height: 40rpx;
+			}
+		}
 	}
 
 	.store_pre {
 		margin: 0 auto;
 		width: 710rpx;
-		background: #FFFFFF;
 		border-radius: 15rpx;
 		margin-bottom: 20rpx;
 	}
@@ -2476,7 +2471,6 @@
 	.store_des_text {
     max-width:500rpx;
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: 600;
 		color: #2D2D2D;
 		line-height: 42rpx;
@@ -2492,19 +2486,20 @@
 	}
 
 	.store_cart_list {
-		padding: 30rpx 0rpx;
 		box-sizing: border-box;
 	}
 
 	.cart_list_pre {
 		padding: 0 30rpx;
-		margin-bottom: 30rpx;
+		margin-bottom: 20rpx;
 		box-sizing: border-box;
 		display: flex;
 		width: 100%;
 		height: 200rpx;
 		align-items: center;
 		position: relative;
+		background-color: #fff;
+		border-radius: 20rpx;
 	}
 
 	.cart_list_pre:nth-last-of-type(1) {
@@ -2518,32 +2513,28 @@
 	}
 
 	.list_pre_img {
-		width: 200rpx;
-		height: 200rpx;
+		width: 180rpx;
+		height: 180rpx;
 		background: #F3F3F3;
 		border-radius: 14rpx;
 	}
 
 	.list_pre_img image {
-		width: 200rpx;
-		height: 200rpx;
+		width: 180rpx;
+		height: 180rpx;
 		border-radius: 14rpx;
 	}
 
 	.list_pre_des {
 		width: 356rpx;
-		height: 200rpx;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
 		margin-left: 32rpx;
 	}
 
 	.list_pre_des_name {
 		font-size: 28rpx;
-		font-family: PingFang SC;
-		font-weight: 600;
-		color: #2D2D2D;
+		color: #2d2d2d;
 		line-height: 45rpx;
 		width: 356rpx;
 		text-overflow: -o-ellipsis-lastline;
@@ -2562,21 +2553,12 @@
 	.list_pre_des_bot {
 		display: flex;
 		width: 356rpx;
-		height: 20rpx;
 		justify-content: space-between;
 		align-items: flex-end;
 	}
 
 	.list_pre_des_price {
-		font-size: 24rpx;
-		font-family: PingFang SC;
-		font-weight: bold;
-		color: #FC1C1C;
-		line-height: 30rpx;
-	}
-
-	.list_pre_des_price text:nth-child(2) {
-		font-size: 34rpx;
+		color: #2d2d2d;
 	}
 
 	.list_pre_des_price1 {
@@ -2599,7 +2581,6 @@
 		align-items: center;
 		justify-content: center;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 400;
 		color: #949494;
 		line-height: 30rpx;
@@ -2610,8 +2591,6 @@
 		width: 78rpx;
 		height: 50rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
-		font-weight: 600;
 		color: #2D2D2D;
 		text-align: center;
 		line-height: 50rpx;
@@ -2621,7 +2600,6 @@
 		width: 51rpx;
 		height: 50rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 600;
 		color: #2D2D2D;
 		line-height: 30rpx;
@@ -2650,7 +2628,6 @@
 
 	.invalid_goods_top text:nth-child(1) {
 		font-size: 30rpx;
-		font-family: PingFang SC;
 		font-weight: 600;
 		color: #2D2D2D;
 		line-height: 39rpx;
@@ -2658,7 +2635,6 @@
 
 	.invalid_goods_top text:nth-child(2) {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FC1C1C;
 		line-height: 30rpx;
@@ -2696,7 +2672,6 @@
 
 	.invalid_tips text {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 30rpx;
@@ -2731,7 +2706,6 @@
 
 	.invalid_goods_name {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #999999;
 		line-height: 45rpx;
@@ -2739,7 +2713,6 @@
 
 	.invalid_goods_buy {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #2D2D2D;
 		line-height: 30rpx;
@@ -2754,8 +2727,32 @@
 		width: 100%;
 		display: flex;
 		justify-content: center;
-		padding: 38rpx 0 24rpx;
+		padding: 20rpx 0;
 		box-sizing: border-box;
+		color: #666;
+		font-size: 26rpx;
+		text{
+			position: relative;
+			&:after,
+			&:before {
+				content: "";
+				display: block;
+				width: 150rpx;
+				height: 1px;
+				background: #ccc;
+				position: absolute; /* Punto y coma agregado */
+				top: 50%;
+			}
+			&:after {
+				right: -20rpx;
+				transform: translateX(100%);
+			}
+			&:before {
+				left: -20rpx;
+				transform: translateX(-100%);
+			}
+
+		}
 	}
 
 	.pick_goods_top image {
@@ -2770,12 +2767,12 @@
 
 	.pick_list_pre {
 		width: 345rpx;
-		height: 528rpx;
 		background: #FFFFFF;
 		border-radius: 14rpx;
 		margin-right: 20rpx;
 		box-sizing: border-box;
 		margin-bottom: 20rpx;
+		padding: 20rpx 0;
 	}
 
 	.pick_list_pre:nth-of-type(2n) {
@@ -2783,24 +2780,24 @@
 	}
 
 	.pick_list_pre_img {
-		width: 345rpx;
-		height: 345rpx;
+		width: 300rpx;
+		height: 300rpx;
 		border-top-left-radius: 14rpx;
 		border-top-right-radius: 14rpx;
+		margin: 0 auto;
+		display: block;
 	}
 
 	.pick_list_pre_des {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		height: 183rpx;
 		padding-top: 20rpx;
 		box-sizing: border-box;
 	}
 
 	.pick_list_pre_name {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #2D2D2D;
 		width: 298rpx;
@@ -2812,6 +2809,7 @@
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
 		-webkit-box-orient: vertical;
+
 	}
 
 	.pick_lsit_pre_bottom {
@@ -2823,16 +2821,9 @@
 	}
 
 	.pick_list_pre_price {
-		font-size: 24rpx;
-		font-family: PingFang SC;
-		font-weight: 600;
-		color: #FC1C1C;
+		font-size: 32rpx;
+		color: #2d2d2d;
 		line-height: 30rpx;
-	}
-
-	.pick_list_pre_price text:nth-child(2) {
-		font-size: 34rpx;
-		font-weight: 600;
 	}
 
 	.add_cart_list {
@@ -2865,6 +2856,7 @@
 	.total_settlement_left {
 		display: flex;
 		align-items: center;
+		gap: 20rpx;
 	}
 
 	.total_settlement_left image {
@@ -2874,7 +2866,6 @@
 
 	.total_settlement_left text {
 		font-size: 26rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #949494;
 		line-height: 30rpx;
@@ -2889,45 +2880,38 @@
 	.total_settlement_price {
 		display: flex;
 		flex-direction: column;
-		align-items: flex-end;
+		align-items: start;
 	}
 
 	.total_settlement_price1 {
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #333333;
 		line-height: 30rpx;
 	}
 
 	.total_settlement_price text {
-		font-size: 28rpx;
-		font-family: PingFang SC;
+		font-size: 34rpx;
 		font-weight: 600;
-		color: #FC1C1C;
+		color: #2d2d2d;
 		line-height: 30rpx;
 	}
 
 	.total_settlement_freight {
 		font-size: 20rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #949494;
 		line-height: 30rpx;
 	}
 
 	.total_settlement_text {
-		margin-left: 20rpx;
-		width: 200rpx;
-		height: 60rpx;
 		background: #FC1C1C;
 		border-radius: 30rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #F8F8F8;
-		line-height: 60rpx;
 		text-align: center;
+		padding: 10rpx 30rpx;
 	}
 
 	.grey {
@@ -2953,7 +2937,6 @@
 		background: #FFAB26;
 		border-radius: 50%;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 30rpx;
@@ -2970,7 +2953,6 @@
 		background: #FC1C1C;
 		border-radius: 50%;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFFFFF;
 		line-height: 30rpx;
@@ -2985,7 +2967,6 @@
 		border: 1rpx solid #FFAB26;
 		border-radius: 30rpx;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #FFAB26;
 		line-height: 60rpx;
@@ -2993,22 +2974,10 @@
 	}
 
 	.batch_del {
-		width: 110rpx;
-		height: 60rpx;
-		border: 1rpx solid #FF0000;
-		border-radius: 30rpx;
-		font-size: 28rpx;
-		font-family: PingFang SC;
-		font-weight: 500;
-		color: #FC1C1C;
-		line-height: 60rpx;
-		text-align: center;
-		margin-left: 20rpx;
 	}
 
 	.insufficient_stock1 {
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #333333;
 		line-height: 30rpx;
@@ -3020,7 +2989,6 @@
 		border: 1rpx solid rgba(0, 0, 0, 0.1);
 		border-radius: 6rpx;
 		font-size: 24rpx;
-		font-family: PingFang SC;
 		font-weight: 600;
 		color: #2D2D2D;
 		line-height: 50rpx;
@@ -3063,7 +3031,6 @@
 
 	.insufficient_stock_title {
 		font-size: 32rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #2D2D2D;
 		line-height: 45rpx;
@@ -3083,7 +3050,6 @@
 		padding: 20rpx 31rpx;
 		box-sizing: border-box;
 		font-size: 28rpx;
-		font-family: PingFang SC;
 		font-weight: 500;
 		color: #333333;
 		line-height: 40rpx;

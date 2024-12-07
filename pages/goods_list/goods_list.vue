@@ -718,8 +718,13 @@
 	}
 
 	.grid-list .item .goods-name {
+		max-height: 78rpx;
+		word-break: break-all;
 		text-overflow: ellipsis;
-		white-space: nowrap;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		white-space:pre-line;
 	}
 
 	.item .jingle {

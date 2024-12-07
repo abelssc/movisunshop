@@ -1,7 +1,7 @@
 <template>
 	<picker mode="multiSelector" :value="initVal" :range="addressList" range-key="label" @change="selAddress"
 		@columnchange="addressChange">
-		<input type="text" :placeholder="tip" :value="addressArea" disabled="true"></input>
+		<input type="text" :placeholder="tip" :value="addressArea"></input>
 	</picker>
 </template>
 
@@ -120,11 +120,11 @@
 			// 选择地址
 			selAddress(e) {
 				let value = e.detail.value;
-
 				let {
 					addressList,
 					allAreaData
 				} = this;
+				console.log(value,addressList);
 				this.initVal = value;
 				let tarData = [];
 				tarData[0] = addressList[0][value[0]];
@@ -152,6 +152,7 @@
 				this.$emit('confirm', {
 					detail: tarData
 				});
+				console.log(tarData);
 			},
 		}
 	};
